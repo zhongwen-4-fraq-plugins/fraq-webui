@@ -149,7 +149,6 @@ function installFromStore(plugin) {
       <div v-else class="plugin-list">
         <div class="plugin-list__head" aria-hidden="true">
           <span>插件</span>
-          <span>版本</span>
           <span>状态</span>
           <span>操作</span>
         </div>
@@ -157,10 +156,12 @@ function installFromStore(plugin) {
         <ul class="plugin-list__body">
           <li v-for="plugin in sortedPlugins" :key="plugin.id" class="plugin-row">
             <div class="plugin-row__info">
-              <p class="plugin-row__name">{{ plugin.name }}</p>
+              <p class="plugin-row__name">
+                {{ plugin.name }}
+                <span class="plugin-row__version">v{{ plugin.version }}</span>
+              </p>
               <p class="plugin-row__description">{{ plugin.description }}</p>
             </div>
-            <span class="plugin-row__version">{{ plugin.version }}</span>
             <StatusBadge :tone="statusMeta(plugin.status).tone">
               {{ statusMeta(plugin.status).label }}
             </StatusBadge>
@@ -249,12 +250,14 @@ function installFromStore(plugin) {
       <ul v-else class="store-list">
         <li v-for="plugin in filteredStorePlugins" :key="plugin.id" class="store-row">
           <div class="store-row__info">
-            <p class="store-row__name">{{ plugin.name }}</p>
+            <p class="store-row__name">
+              {{ plugin.name }}
+              <span class="store-row__version">v{{ plugin.version }}</span>
+            </p>
             <p class="store-row__description">{{ plugin.description }}</p>
           </div>
           <div class="store-row__meta">
             <StatusBadge tone="neutral">{{ categoryLabel(plugin.category) }}</StatusBadge>
-            <span class="store-row__version">{{ plugin.version }}</span>
           </div>
           <div class="store-row__actions">
             <StatusBadge v-if="isInstalled(store.state.plugins, plugin)" tone="success">已安装</StatusBadge>
@@ -455,6 +458,7 @@ function installFromStore(plugin) {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: var(--text-xs);
   color: var(--faint);
+  font-weight: 400;
 }
 
 .store-row__actions {
@@ -489,7 +493,7 @@ function installFromStore(plugin) {
 .plugin-list__head,
 .plugin-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   gap: var(--space-4);
   align-items: center;
 }
@@ -530,7 +534,8 @@ function installFromStore(plugin) {
 .plugin-row__version {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: var(--text-xs);
-  color: var(--muted);
+  color: var(--faint);
+  font-weight: 400;
 }
 
 .plugin-row__actions {
@@ -579,10 +584,6 @@ function installFromStore(plugin) {
   .plugin-row {
     grid-template-columns: minmax(0, 1fr) auto;
     gap: var(--space-3);
-  }
-
-  .plugin-row__version {
-    text-align: right;
   }
 
   .plugin-row__actions {
