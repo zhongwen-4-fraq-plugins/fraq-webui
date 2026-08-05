@@ -3,7 +3,7 @@ import { LoaderCircle } from '@lucide/vue'
 
 defineProps({
   variant: { type: String, default: 'primary' }, // primary | secondary | ghost | danger | danger-ghost
-  size: { type: String, default: 'md' }, // md | sm
+  size: { type: String, default: 'md' }, // md | sm | icon
   loading: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   autofocus: { type: Boolean, default: false },
@@ -24,7 +24,7 @@ defineEmits(['click'])
     @click="$emit('click', $event)"
   >
     <LoaderCircle v-if="loading" class="btn__spinner" aria-hidden="true" />
-    <slot />
+    <span v-show="!(size === 'icon' && loading)"><slot /></span>
   </button>
 </template>
 
@@ -59,6 +59,25 @@ defineEmits(['click'])
   min-height: 2rem;
   padding: 0 var(--space-3);
   font-size: var(--text-xs);
+}
+
+.btn--icon {
+  position: relative;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+}
+
+/* 扩大触控命中区域到 44px，视觉尺寸保持不变 */
+.btn--icon::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+}
+
+.btn--icon svg {
+  width: 1.125rem;
+  height: 1.125rem;
 }
 
 .btn--primary {

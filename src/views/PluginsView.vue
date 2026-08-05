@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { Blocks, Plus } from '@lucide/vue'
+import { Blocks, Play, Plus, Square, Trash2 } from '@lucide/vue'
 import { store } from '../services/store.js'
 import { sortPlugins } from '../data/plugins.js'
 import { PLUGIN_STATUS } from '../models/plugin.js'
@@ -130,28 +130,34 @@ const isBusy = (id) => store.state.busyPlugins.includes(id)
             <AppButton
               v-if="plugin.status !== PLUGIN_STATUS.running"
               variant="secondary"
-              size="sm"
+              size="icon"
               :loading="isBusy(plugin.id)"
+              :aria-label="`启用 ${plugin.name}`"
+              title="启用"
               @click="store.setPluginEnabled(plugin.id, true)"
             >
-              启用
+              <Play aria-hidden="true" />
             </AppButton>
             <AppButton
               v-else
               variant="secondary"
-              size="sm"
+              size="icon"
               :loading="isBusy(plugin.id)"
+              :aria-label="`停用 ${plugin.name}`"
+              title="停用"
               @click="store.setPluginEnabled(plugin.id, false)"
             >
-              停用
+              <Square aria-hidden="true" />
             </AppButton>
             <AppButton
               variant="danger-ghost"
-              size="sm"
+              size="icon"
               :loading="isBusy(plugin.id)"
+              :aria-label="`卸载 ${plugin.name}`"
+              title="卸载"
               @click="openUninstall(plugin)"
             >
-              卸载
+              <Trash2 aria-hidden="true" />
             </AppButton>
           </div>
         </li>
