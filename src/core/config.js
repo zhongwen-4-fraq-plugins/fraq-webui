@@ -1,0 +1,18 @@
+// 全局配置：轮询间隔、日志分页大小、数据来源开关。
+
+export const APP_NAME = 'fraq-webui'
+
+// 概览与插件的轮询间隔（毫秒）
+export const POLL_INTERVAL_MS = 5000
+
+// 日志的轮询间隔（毫秒）
+export const LOG_POLL_INTERVAL_MS = 2000
+
+// 日志页同时渲染的最大条数，超出部分通过“加载更早”追加
+export const MAX_VISIBLE_LOGS = 200
+
+// “加载更早”每次追加的条数
+export const LOG_PAGE_SIZE = 100
+
+// 当前使用内置模拟数据。真实后端管理接口就绪后，把 services/api.js 换成 fetch 实现即可。
+export const USE_MOCK_API = true

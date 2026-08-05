@@ -1,0 +1,183 @@
+<script setup>
+import { Blocks, LayoutDashboard, ScrollText, Settings, X } from '@lucide/vue'
+import { APP_NAME } from '../core/config.js'
+
+defineProps({
+  open: { type: Boolean, default: false },
+})
+
+defineEmits(['close'])
+
+const navItems = [
+  { to: '/', label: '概览', icon: LayoutDashboard },
+  { to: '/plugins', label: '插件', icon: Blocks },
+  { to: '/logs', label: '日志', icon: ScrollText },
+  { to: '/settings', label: '设置', icon: Settings },
+]
+</script>
+
+<template>
+  <aside class="sidebar" :class="{ 'sidebar--open': open }" aria-label="主导航">
+    <div class="sidebar__brand">
+      <span class="sidebar__logo" aria-hidden="true">F</span>
+      <span class="sidebar__name">{{ APP_NAME }}</span>
+      <button
+        type="button"
+        class="sidebar__close"
+        aria-label="关闭导航"
+        @click="$emit('close')"
+      >
+        <X aria-hidden="true" />
+      </button>
+    </div>
+
+    <nav class="sidebar__nav">
+      <RouterLink
+        v-for="item in navItems"
+        :key="item.to"
+        :to="item.to"
+        class="sidebar__link"
+        exact-active-class="sidebar__link--active"
+        @click="$emit('close')"
+      >
+        <component :is="item.icon" class="sidebar__icon" aria-hidden="true" />
+        {{ item.label }}
+      </RouterLink>
+    </nav>
+
+    <p class="sidebar__footer">演示模式 · 数据为模拟</p>
+  </aside>
+</template>
+
+<style scoped>
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: var(--z-modal);
+  display: flex;
+  flex-direction: column;
+  width: 15rem;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  transform: translateX(-100%);
+  transition: transform 200ms ease-out;
+}
+
+.sidebar--open {
+  transform: translateX(0);
+}
+
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 3.5rem;
+  padding: 0 var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar__logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-md);
+  background: var(--primary);
+  color: #fff;
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.sidebar__name {
+  font-weight: 600;
+  font-size: var(--text-sm);
+}
+
+.sidebar__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin-left: auto;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.sidebar__close:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.sidebar__close svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-3);
+}
+
+.sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    background-color 150ms ease-out,
+    color 150ms ease-out;
+}
+
+.sidebar__link:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.sidebar__link--active {
+  background: var(--primary-soft);
+  color: var(--ink);
+}
+
+.sidebar__link--active:hover {
+  background: var(--primary-soft-hover);
+}
+
+.sidebar__icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+}
+
+.sidebar__footer {
+  margin-top: auto;
+  padding: var(--space-4);
+  color: var(--faint);
+  font-size: var(--text-xs);
+}
+
+@media (min-width: 900px) {
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    transform: none;
+    transition: none;
+  }
+
+  .sidebar__close {
+    display: none;
+  }
+}
+</style>

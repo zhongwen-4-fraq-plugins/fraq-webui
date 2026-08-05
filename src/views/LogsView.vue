@@ -1,0 +1,347 @@
+<script setup>
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { Pause, Play, Search, Terminal } from '@lucide/vue'
+import { store } from '../services/store.js'
+import { filterLogs, levelLabel, logTimeLabel } from '../data/logs.js'
+import { LOG_LEVEL } from '../models/logEntry.js'
+import { LOG_PAGE_SIZE, LOG_POLL_INTERVAL_MS, MAX_VISIBLE_LOGS } from '../core/config.js'
+import AppButton from '../components/AppButton.vue'
+import EmptyState from '../components/EmptyState.vue'
+import ErrorBanner from '../components/ErrorBanner.vue'
+import PageHeader from '../components/PageHeader.vue'
+import SkeletonBlock from '../components/SkeletonBlock.vue'
+
+const LEVELS = [
+  { value: 'all', label: '全部' },
+  { value: LOG_LEVEL.debug, label: '调试' },
+  { value: LOG_LEVEL.info, label: '信息' },
+  { value: LOG_LEVEL.warn, label: '警告' },
+  { value: LOG_LEVEL.error, label: '错误' },
+]
+
+const level = ref('all')
+const query = ref('')
+const debouncedQuery = ref('')
+const follow = ref(true)
+const hasMore = ref(true)
+const loadingOlder = ref(false)
+const streamRef = ref(null)
+
+let pollTimer = null
+let debounceTimer = null
+
+onMounted(async () => {
+  await store.refreshLogs()
+  pollTimer = setInterval(store.refreshLogs, LOG_POLL_INTERVAL_MS)
+})
+
+onUnmounted(() => {
+  clearInterval(pollTimer)
+  clearTimeout(debounceTimer)
+})
+
+watch(query, (value) => {
+  clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(() => {
+    debouncedQuery.value = value
+  }, 300)
+})
+
+const visibleLogs = computed(() =>
+  filterLogs(store.state.logs, { level: level.value, query: debouncedQuery.value }).slice(
+    -MAX_VISIBLE_LOGS,
+  ),
+)
+
+watch(
+  visibleLogs,
+  async () => {
+    if (follow.value) {
+      await nextTick()
+      const el = streamRef.value
+      if (el) el.scrollTop = el.scrollHeight
+    }
+  },
+  { flush: 'post' },
+)
+
+function onScroll() {
+  const el = streamRef.value
+  if (!el) return
+  const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight
+  if (distanceFromBottom > 64) {
+    follow.value = false
+  }
+}
+
+function resumeFollow() {
+  follow.value = true
+  nextTick(() => {
+    const el = streamRef.value
+    if (el) el.scrollTop = el.scrollHeight
+  })
+}
+
+async function loadOlder() {
+  if (loadingOlder.value) return
+  loadingOlder.value = true
+  try {
+    hasMore.value = await store.loadOlderLogs(store.state.logs.length)
+  } catch (error) {
+    store.toast('error', error instanceof Error ? error.message : '加载失败')
+  } finally {
+    loadingOlder.value = false
+  }
+}
+
+const toneOf = (entry) => {
+  if (entry.level === LOG_LEVEL.error) return 'danger'
+  if (entry.level === LOG_LEVEL.warn) return 'warning'
+  if (entry.level === LOG_LEVEL.debug) return 'neutral'
+  return 'info'
+}
+</script>
+
+<template>
+  <div>
+    <PageHeader title="日志" description="实时查看 fraq 运行日志，支持按级别过滤与搜索。" />
+
+    <ErrorBanner v-if="store.state.errors.logs" :message="store.state.errors.logs" @retry="store.refreshLogs" />
+
+    <div class="log-toolbar">
+      <div class="log-toolbar__levels" role="group" aria-label="按级别过滤">
+        <button
+          v-for="item in LEVELS"
+          :key="item.value"
+          type="button"
+          class="level-button"
+          :class="{ 'level-button--active': level === item.value }"
+          :aria-pressed="level === item.value"
+          @click="level = item.value"
+        >
+          {{ item.label }}
+        </button>
+      </div>
+
+      <div class="log-toolbar__search">
+        <Search class="log-toolbar__search-icon" aria-hidden="true" />
+        <input
+          v-model="query"
+          type="search"
+          class="log-toolbar__search-input"
+          placeholder="搜索模块或内容"
+          aria-label="搜索日志"
+        />
+      </div>
+
+      <AppButton variant="secondary" size="sm" @click="resumeFollow">
+        <Pause v-if="follow" aria-hidden="true" />
+        <Play v-else aria-hidden="true" />
+        {{ follow ? '跟随中' : '已暂停' }}
+      </AppButton>
+    </div>
+
+    <div class="log-panel">
+      <SkeletonBlock v-if="store.state.loading.logs" :lines="6" />
+
+      <EmptyState
+        v-else-if="visibleLogs.length === 0"
+        title="暂无输出"
+        description="日志会实时出现在这里。换个过滤条件试试？"
+      >
+        <template #icon>
+          <Terminal class="empty-icon" aria-hidden="true" />
+        </template>
+      </EmptyState>
+
+      <div v-else ref="streamRef" class="log-stream" @scroll="onScroll">
+        <AppButton
+          v-if="hasMore"
+          variant="ghost"
+          size="sm"
+          class="log-stream__older"
+          :loading="loadingOlder"
+          @click="loadOlder"
+        >
+          加载更早的日志
+        </AppButton>
+
+        <ul class="log-stream__list">
+          <li v-for="(entry, index) in visibleLogs" :key="entry.time + '-' + entry.module + '-' + index" class="log-line">
+            <span class="log-line__time">{{ logTimeLabel(entry.time) }}</span>
+            <span class="log-line__level" :class="`log-line__level--${toneOf(entry)}`">
+              {{ levelLabel(entry.level) }}
+            </span>
+            <span class="log-line__module">{{ entry.module }}</span>
+            <span class="log-line__message">{{ entry.message }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.empty-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--primary);
+}
+
+.log-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.log-toolbar__levels {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.level-button {
+  padding: var(--space-1) var(--space-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.level-button:hover {
+  color: var(--ink);
+}
+
+.level-button--active {
+  background: var(--bg);
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+}
+
+.log-toolbar__search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 12rem;
+}
+
+.log-toolbar__search-icon {
+  position: absolute;
+  left: var(--space-3);
+  width: 1rem;
+  height: 1rem;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.log-toolbar__search-input {
+  width: 100%;
+  height: 2.5rem;
+  padding: 0 var(--space-3) 0 2.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: var(--text-sm);
+}
+
+.log-toolbar__search-input::placeholder {
+  color: var(--muted);
+}
+
+.log-panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  padding: var(--space-4);
+}
+
+.log-stream {
+  max-height: min(32rem, 65dvh);
+  overflow-y: auto;
+}
+
+.log-stream__older {
+  width: 100%;
+  margin-bottom: var(--space-2);
+}
+
+.log-stream__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.log-line {
+  display: grid;
+  grid-template-columns: auto 3rem minmax(5rem, 10rem) minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: baseline;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--text-xs);
+}
+
+.log-line:hover {
+  background: var(--bg);
+}
+
+.log-line__time {
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.log-line__level {
+  font-weight: 600;
+}
+
+.log-line__level--info {
+  color: var(--primary);
+}
+
+.log-line__level--warning {
+  color: var(--warning);
+}
+
+.log-line__level--danger {
+  color: var(--danger);
+}
+
+.log-line__level--neutral {
+  color: var(--muted);
+}
+
+.log-line__module {
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.log-line__message {
+  min-width: 0;
+  word-break: break-word;
+}
+
+@media (max-width: 640px) {
+  .log-line {
+    grid-template-columns: auto 3rem minmax(0, 1fr);
+  }
+
+  .log-line__module {
+    display: none;
+  }
+}
+</style>

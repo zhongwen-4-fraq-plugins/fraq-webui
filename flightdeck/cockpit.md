@@ -4,11 +4,11 @@ Focus: fraq-webui：用 Vue 3 + Vite 为 fraq 构建轻量 Web 管理界面（�
 
 ## In flight
 
-* dashboard — 设计简报已确认，待实现（work/dashboard/）
+* dashboard — 初版已实现，待浏览器视觉确认与后端对接（work/dashboard/）
 
 ## Next
 
-* 实现 dashboard（$impeccable craft dashboard）
+* 浏览器检查 dashboard 初版（npm run dev）
 
 ## Open questions
 

@@ -1,0 +1,67 @@
+/* 设计令牌：颜色（OKLCH）、间距、字号、层级、阴影。 */
+
+:root {
+  /* 颜色 */
+  --bg: oklch(1 0 0);
+  --surface: oklch(0.984 0.003 210);
+  --surface-2: oklch(0.965 0.005 210);
+  --ink: oklch(0.22 0.015 220);
+  --muted: oklch(0.46 0.012 220);
+  --faint: oklch(0.56 0.01 220);
+  --border: oklch(0.9 0.005 220);
+
+  --primary: oklch(0.52 0.12 205);
+  --primary-hover: oklch(0.47 0.125 205);
+  --primary-active: oklch(0.43 0.12 205);
+  --primary-soft: oklch(0.93 0.035 205);
+  --primary-soft-hover: oklch(0.9 0.045 205);
+
+  --success: oklch(0.55 0.14 155);
+  --success-soft: oklch(0.92 0.05 155);
+  --warning: oklch(0.72 0.13 70);
+  --warning-soft: oklch(0.93 0.06 80);
+  --danger: oklch(0.55 0.2 25);
+  --danger-hover: oklch(0.5 0.2 25);
+  --danger-soft: oklch(0.93 0.05 25);
+  --info-soft: oklch(0.92 0.04 220);
+
+  --focus: oklch(0.55 0.14 210);
+
+  /* 间距（4pt 基准） */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+
+  /* 字号（固定 rem 阶梯，产品界面） */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+
+  /* 行高 */
+  --leading-tight: 1.3;
+  --leading-normal: 1.6;
+
+  /* 语义化层级 */
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-modal-backdrop: 30;
+  --z-modal: 40;
+  --z-toast: 50;
+
+  /* 阴影（轻微，8px 以内模糊） */
+  --shadow-sm: 0 2px 8px oklch(0.22 0.015 220 / 0.08);
+  --shadow-md: 0 4px 8px oklch(0.22 0.015 220 / 0.1);
+
+  /* 圆角 */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
