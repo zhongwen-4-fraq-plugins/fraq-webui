@@ -86,6 +86,13 @@ defineEmits(['click'])
   height: 1.125rem;
 }
 
+/* 图标与文字共用一个 span：用 flex 垂直居中并对齐间距 */
+.btn > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 .btn--primary {
   background: var(--primary);
   color: #fff;
