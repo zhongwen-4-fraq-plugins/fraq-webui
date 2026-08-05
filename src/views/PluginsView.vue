@@ -261,9 +261,15 @@ function installFromStore(plugin) {
           </div>
           <div class="store-row__actions">
             <StatusBadge v-if="isInstalled(store.state.plugins, plugin)" tone="success">已安装</StatusBadge>
-            <AppButton v-else variant="secondary" size="sm" @click="installFromStore(plugin)">
+            <AppButton
+              v-else
+              variant="secondary"
+              size="icon"
+              :aria-label="`安装 ${plugin.name}`"
+              title="安装"
+              @click="installFromStore(plugin)"
+            >
               <Plus aria-hidden="true" />
-              安装
             </AppButton>
             <AppButton
               v-if="plugin.repository"
