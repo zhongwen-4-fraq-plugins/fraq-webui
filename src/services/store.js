@@ -6,27 +6,32 @@ import { createCoreStatus } from '../models/coreStatus.js'
 import { createPlugin } from '../models/plugin.js'
 import { createLogEntry } from '../models/logEntry.js'
 import { normalizeSettings } from '../models/settings.js'
+import { createStorePlugin } from '../models/storePlugin.js'
 
 const state = reactive({
   core: createCoreStatus(),
   plugins: [],
+  storePlugins: [],
   logs: [],
   settings: normalizeSettings(),
   loading: {
     core: true,
     plugins: true,
+    storePlugins: true,
     logs: true,
     settings: true,
   },
   loaded: {
     core: false,
     plugins: false,
+    storePlugins: false,
     logs: false,
     settings: false,
   },
   errors: {
     core: '',
     plugins: '',
+    storePlugins: '',
     logs: '',
     settings: '',
   },
@@ -74,6 +79,19 @@ async function refreshPlugins() {
     state.errors.plugins = error instanceof Error ? error.message : '无法读取插件列表'
   } finally {
     state.loading.plugins = false
+  }
+}
+
+async function refreshStorePlugins() {
+  if (!state.loaded.storePlugins) state.loading.storePlugins = true
+  try {
+    state.storePlugins = (await api.getStorePlugins()).map((plugin) => createStorePlugin(plugin))
+    state.errors.storePlugins = ''
+    state.loaded.storePlugins = true
+  } catch (error) {
+    state.errors.storePlugins = error instanceof Error ? error.message : '无法读取插件商店'
+  } finally {
+    state.loading.storePlugins = false
   }
 }
 
@@ -188,6 +206,7 @@ export const store = {
   state,
   refreshCore,
   refreshPlugins,
+  refreshStorePlugins,
   refreshLogs,
   refreshSettings,
   loadOlderLogs,

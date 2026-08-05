@@ -16,3 +16,6 @@ export const LOG_PAGE_SIZE = 100
 
 // 当前使用内置模拟数据。真实后端管理接口就绪后，把 services/api.js 换成 fetch 实现即可。
 export const USE_MOCK_API = true
+
+// fraq 官方插件注册表（fraqjs/registry）
+export const PLUGIN_REGISTRY_URL = 'https://raw.githubusercontent.com/fraqjs/registry/main/plugins.json'

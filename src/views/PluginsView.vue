@@ -1,8 +1,9 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { Blocks, ExternalLink, Play, Plus, Square, Trash2 } from '@lucide/vue'
+import { Blocks, ExternalLink, Play, Plus, Search, Square, Trash2 } from '@lucide/vue'
 import { store } from '../services/store.js'
 import { sortPlugins } from '../data/plugins.js'
+import { categoryLabel, filterStorePlugins, isInstalled } from '../data/storePlugins.js'
 import { PLUGIN_STATUS } from '../models/plugin.js'
 import AppButton from '../components/AppButton.vue'
 import ConfirmDialog from '../components/ConfirmDialog.vue'
@@ -12,7 +13,10 @@ import PageHeader from '../components/PageHeader.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
 import StatusBadge from '../components/StatusBadge.vue'
 
-onMounted(() => store.refreshPlugins())
+onMounted(() => {
+  store.refreshPlugins()
+  store.refreshStorePlugins()
+})
 
 const sortedPlugins = computed(() => sortPlugins(store.state.plugins))
 
@@ -38,8 +42,8 @@ async function confirmInstall() {
     installError.value = '请输入插件名称'
     return
   }
-  if (!/^[a-z0-9][a-z0-9-]*$/i.test(name)) {
-    installError.value = '插件名称只能包含字母、数字和短横线'
+  if (!/^(@[a-z0-9-]+\/)?[a-z0-9][a-z0-9-]*$/i.test(name)) {
+    installError.value = '插件名称格式不正确，例如 @fraqjs/plugin-hono'
     return
   }
   installError.value = ''
@@ -70,6 +74,15 @@ function confirmUninstall() {
 const isBusy = (id) => store.state.busyPlugins.includes(id)
 
 const view = ref('local')
+
+const storeQuery = ref('')
+const filteredStorePlugins = computed(() => filterStorePlugins(store.state.storePlugins, storeQuery.value))
+
+function installFromStore(plugin) {
+  installName.value = plugin.name
+  installError.value = ''
+  installOpen.value = true
+}
 </script>
 
 <template>
@@ -190,19 +203,79 @@ const view = ref('local')
       </div>
     </template>
 
-    <section v-else class="store-panel" aria-labelledby="store-heading">
-      <Blocks class="store-panel__icon" aria-hidden="true" />
-      <h3 id="store-heading" class="store-panel__title">插件商店</h3>
-      <p class="store-panel__description">
-        浏览和发现由社区构建的 Fraq 插件，扩展机器人的功能。
-      </p>
-      <AppButton href="https://fraq.dev/plugins" target="_blank">
-        打开插件商店
-        <ExternalLink aria-hidden="true" />
-      </AppButton>
-      <p class="store-panel__hint">
-        在商店找到插件后，回到「本地插件」页，点击安装插件并输入插件名称即可。
-      </p>
+    <section v-else class="store" aria-labelledby="store-heading">
+      <div class="store__toolbar">
+        <div class="store__search">
+          <Search class="store__search-icon" aria-hidden="true" />
+          <input
+            v-model="storeQuery"
+            type="search"
+            class="store__search-input"
+            placeholder="搜索插件名称、描述或分类"
+            aria-label="搜索商店插件"
+          />
+        </div>
+        <span class="store__count">共 {{ filteredStorePlugins.length }} 个插件</span>
+        <AppButton variant="ghost" size="sm" href="https://fraq.dev/plugins" target="_blank">
+          官方商店
+          <ExternalLink aria-hidden="true" />
+        </AppButton>
+      </div>
+
+      <ErrorBanner
+        v-if="store.state.errors.storePlugins"
+        :message="store.state.errors.storePlugins"
+        @retry="store.refreshStorePlugins"
+      />
+
+      <SkeletonBlock v-if="store.state.loading.storePlugins" :lines="6" />
+
+      <EmptyState
+        v-else-if="filteredStorePlugins.length === 0"
+        title="没有找到插件"
+        description="换个关键词试试，或前往官方商店浏览全部插件。"
+      >
+        <template #icon>
+          <Blocks class="empty-icon" aria-hidden="true" />
+        </template>
+        <template #action>
+          <AppButton href="https://fraq.dev/plugins" target="_blank">
+            前往插件商店
+            <ExternalLink aria-hidden="true" />
+          </AppButton>
+        </template>
+      </EmptyState>
+
+      <ul v-else class="store-list">
+        <li v-for="plugin in filteredStorePlugins" :key="plugin.id" class="store-row">
+          <div class="store-row__info">
+            <p class="store-row__name">{{ plugin.name }}</p>
+            <p class="store-row__description">{{ plugin.description }}</p>
+          </div>
+          <div class="store-row__meta">
+            <StatusBadge tone="neutral">{{ categoryLabel(plugin.category) }}</StatusBadge>
+            <span class="store-row__version">{{ plugin.version }}</span>
+          </div>
+          <div class="store-row__actions">
+            <StatusBadge v-if="isInstalled(store.state.plugins, plugin)" tone="success">已安装</StatusBadge>
+            <AppButton v-else variant="secondary" size="sm" @click="installFromStore(plugin)">
+              <Plus aria-hidden="true" />
+              安装
+            </AppButton>
+            <AppButton
+              v-if="plugin.repository"
+              variant="ghost"
+              size="icon"
+              :href="plugin.repository"
+              target="_blank"
+              :aria-label="`查看 ${plugin.name} 源码`"
+              title="查看源码"
+            >
+              <ExternalLink aria-hidden="true" />
+            </AppButton>
+          </div>
+        </li>
+      </ul>
     </section>
 
     <ConfirmDialog
@@ -281,38 +354,123 @@ const view = ref('local')
   font-variant-numeric: tabular-nums;
 }
 
-.store-panel {
+.store {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.store__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: var(--space-3);
-  padding: var(--space-6);
+}
+
+.store__search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 12rem;
+}
+
+.store__search-icon {
+  position: absolute;
+  left: var(--space-3);
+  width: 1rem;
+  height: 1rem;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.store__search-input {
+  width: 100%;
+  height: 2.5rem;
+  padding: 0 var(--space-3) 0 2.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: var(--text-sm);
+}
+
+.store__search-input::placeholder {
+  color: var(--muted);
+}
+
+.store__count {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+
+.store-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--surface);
+  overflow: hidden;
 }
 
-.store-panel__icon {
-  width: 2rem;
-  height: 2rem;
-  color: var(--primary);
+.store-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-4);
+  background: var(--bg);
 }
 
-.store-panel__title {
-  font-size: var(--text-lg);
-  font-weight: 600;
+.store-row + .store-row {
+  border-top: 1px solid var(--border);
 }
 
-.store-panel__description {
-  color: var(--muted);
+.store-row__name {
   font-size: var(--text-sm);
-  max-width: 52ch;
+  font-weight: 600;
+  word-break: break-all;
 }
 
-.store-panel__hint {
-  color: var(--faint);
+.store-row__description {
+  margin-top: 2px;
+  color: var(--muted);
   font-size: var(--text-xs);
-  max-width: 52ch;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.store-row__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-1);
+}
+
+.store-row__version {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--text-xs);
+  color: var(--faint);
+}
+
+.store-row__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+@media (max-width: 720px) {
+  .store-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .store-row__actions {
+    grid-column: 1 / -1;
+  }
 }
 
 .empty-icon {

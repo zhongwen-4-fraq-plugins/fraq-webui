@@ -5,6 +5,8 @@ import { createCoreStatus, CORE_STATUS } from '../models/coreStatus.js'
 import { createPlugin, PLUGIN_STATUS } from '../models/plugin.js'
 import { createLogEntry, LOG_LEVEL } from '../models/logEntry.js'
 import { DEFAULT_SETTINGS, normalizeSettings } from '../models/settings.js'
+import { createStorePlugin } from '../models/storePlugin.js'
+import { PLUGIN_REGISTRY_URL } from '../core/config.js'
 
 const SETTINGS_KEY = 'fraq-webui.settings'
 
@@ -167,6 +169,33 @@ export const mockApi = {
     return state.plugins.map((plugin) => createPlugin(plugin))
   },
 
+  async getStorePlugins() {
+    await sleep(200)
+    try {
+      const response = await fetch(PLUGIN_REGISTRY_URL)
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`)
+      }
+      const data = await response.json()
+      const entries = Object.entries(data.plugins ?? {}).filter(
+        ([, plugin]) => plugin?.market?.unlisted !== true,
+      )
+      return entries.map(([id, plugin]) =>
+        createStorePlugin({
+          id,
+          name: plugin.name,
+          version: plugin.version,
+          description: plugin.description,
+          category: plugin.category,
+          repository: plugin.repository,
+          updatedAt: plugin.updatedAt,
+        }),
+      )
+    } catch {
+      throw new Error('无法连接插件商店，请检查网络后重试')
+    }
+  },
+
   async getLogs({ limit = 100 } = {}) {
     tickLogs()
     await sleep(140)
@@ -202,7 +231,7 @@ export const mockApi = {
 
   async installPlugin({ name }) {
     await sleep(600)
-    const id = name.trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-')
+    const id = name.trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '')
     if (state.plugins.some((plugin) => plugin.id === id)) {
       throw new Error(`插件 ${name} 已安装`)
     }
