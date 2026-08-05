@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { Blocks, Play, Plus, Square, Trash2 } from '@lucide/vue'
+import { Blocks, ExternalLink, Play, Plus, Square, Trash2 } from '@lucide/vue'
 import { store } from '../services/store.js'
 import { sortPlugins } from '../data/plugins.js'
 import { PLUGIN_STATUS } from '../models/plugin.js'
@@ -68,101 +68,142 @@ function confirmUninstall() {
 }
 
 const isBusy = (id) => store.state.busyPlugins.includes(id)
+
+const view = ref('local')
 </script>
 
 <template>
   <div>
     <PageHeader
       title="插件"
-      description="管理 fraq 实例上安装的插件：启动、停用或卸载。"
+      description="管理本地已安装的插件，或前往官方商店发现新插件。"
     >
       <template #action>
-        <AppButton @click="openInstall">
+        <AppButton v-if="view === 'local'" @click="openInstall">
           <Plus aria-hidden="true" />
           安装插件
         </AppButton>
       </template>
     </PageHeader>
 
-    <ErrorBanner
-      v-if="store.state.errors.plugins"
-      :message="store.state.errors.plugins"
-      @retry="store.refreshPlugins"
-    />
-
-    <SkeletonBlock v-if="store.state.loading.plugins" :lines="5" />
-
-    <EmptyState
-      v-else-if="sortedPlugins.length === 0"
-      title="还没有插件"
-      description="安装第一个插件后，它会显示在这里。"
-    >
-      <template #icon>
-        <Blocks class="empty-icon" aria-hidden="true" />
-      </template>
-      <template #action>
-        <AppButton @click="openInstall">
-          <Plus aria-hidden="true" />
-          安装插件
-        </AppButton>
-      </template>
-    </EmptyState>
-
-    <div v-else class="plugin-list">
-      <div class="plugin-list__head" aria-hidden="true">
-        <span>插件</span>
-        <span>版本</span>
-        <span>状态</span>
-        <span>操作</span>
-      </div>
-
-      <ul class="plugin-list__body">
-        <li v-for="plugin in sortedPlugins" :key="plugin.id" class="plugin-row">
-          <div class="plugin-row__info">
-            <p class="plugin-row__name">{{ plugin.name }}</p>
-            <p class="plugin-row__description">{{ plugin.description }}</p>
-          </div>
-          <span class="plugin-row__version">{{ plugin.version }}</span>
-          <StatusBadge :tone="statusMeta(plugin.status).tone">
-            {{ statusMeta(plugin.status).label }}
-          </StatusBadge>
-          <div class="plugin-row__actions">
-            <AppButton
-              v-if="plugin.status !== PLUGIN_STATUS.running"
-              variant="secondary"
-              size="icon"
-              :loading="isBusy(plugin.id)"
-              :aria-label="`启用 ${plugin.name}`"
-              title="启用"
-              @click="store.setPluginEnabled(plugin.id, true)"
-            >
-              <Play aria-hidden="true" />
-            </AppButton>
-            <AppButton
-              v-else
-              variant="secondary"
-              size="icon"
-              :loading="isBusy(plugin.id)"
-              :aria-label="`停用 ${plugin.name}`"
-              title="停用"
-              @click="store.setPluginEnabled(plugin.id, false)"
-            >
-              <Square aria-hidden="true" />
-            </AppButton>
-            <AppButton
-              variant="danger-ghost"
-              size="icon"
-              :loading="isBusy(plugin.id)"
-              :aria-label="`卸载 ${plugin.name}`"
-              title="卸载"
-              @click="openUninstall(plugin)"
-            >
-              <Trash2 aria-hidden="true" />
-            </AppButton>
-          </div>
-        </li>
-      </ul>
+    <div class="source-tabs" role="group" aria-label="插件来源">
+      <button
+        type="button"
+        class="source-tab"
+        :class="{ 'source-tab--active': view === 'local' }"
+        :aria-pressed="view === 'local'"
+        @click="view = 'local'"
+      >
+        本地插件
+        <span class="source-tab__count">{{ store.state.plugins.length }}</span>
+      </button>
+      <button
+        type="button"
+        class="source-tab"
+        :class="{ 'source-tab--active': view === 'store' }"
+        :aria-pressed="view === 'store'"
+        @click="view = 'store'"
+      >
+        插件商店
+      </button>
     </div>
+
+    <template v-if="view === 'local'">
+      <ErrorBanner
+        v-if="store.state.errors.plugins"
+        :message="store.state.errors.plugins"
+        @retry="store.refreshPlugins"
+      />
+
+      <SkeletonBlock v-if="store.state.loading.plugins" :lines="5" />
+
+      <EmptyState
+        v-else-if="sortedPlugins.length === 0"
+        title="还没有本地插件"
+        description="安装第一个插件后，它会显示在这里。"
+      >
+        <template #icon>
+          <Blocks class="empty-icon" aria-hidden="true" />
+        </template>
+        <template #action>
+          <AppButton @click="openInstall">
+            <Plus aria-hidden="true" />
+            安装插件
+          </AppButton>
+        </template>
+      </EmptyState>
+
+      <div v-else class="plugin-list">
+        <div class="plugin-list__head" aria-hidden="true">
+          <span>插件</span>
+          <span>版本</span>
+          <span>状态</span>
+          <span>操作</span>
+        </div>
+
+        <ul class="plugin-list__body">
+          <li v-for="plugin in sortedPlugins" :key="plugin.id" class="plugin-row">
+            <div class="plugin-row__info">
+              <p class="plugin-row__name">{{ plugin.name }}</p>
+              <p class="plugin-row__description">{{ plugin.description }}</p>
+            </div>
+            <span class="plugin-row__version">{{ plugin.version }}</span>
+            <StatusBadge :tone="statusMeta(plugin.status).tone">
+              {{ statusMeta(plugin.status).label }}
+            </StatusBadge>
+            <div class="plugin-row__actions">
+              <AppButton
+                v-if="plugin.status !== PLUGIN_STATUS.running"
+                variant="secondary"
+                size="icon"
+                :loading="isBusy(plugin.id)"
+                :aria-label="`启用 ${plugin.name}`"
+                title="启用"
+                @click="store.setPluginEnabled(plugin.id, true)"
+              >
+                <Play aria-hidden="true" />
+              </AppButton>
+              <AppButton
+                v-else
+                variant="secondary"
+                size="icon"
+                :loading="isBusy(plugin.id)"
+                :aria-label="`停用 ${plugin.name}`"
+                title="停用"
+                @click="store.setPluginEnabled(plugin.id, false)"
+              >
+                <Square aria-hidden="true" />
+              </AppButton>
+              <AppButton
+                variant="danger-ghost"
+                size="icon"
+                :loading="isBusy(plugin.id)"
+                :aria-label="`卸载 ${plugin.name}`"
+                title="卸载"
+                @click="openUninstall(plugin)"
+              >
+                <Trash2 aria-hidden="true" />
+              </AppButton>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </template>
+
+    <section v-else class="store-panel" aria-labelledby="store-heading">
+      <Blocks class="store-panel__icon" aria-hidden="true" />
+      <h3 id="store-heading" class="store-panel__title">插件商店</h3>
+      <p class="store-panel__description">
+        浏览和发现由社区构建的 Fraq 插件，扩展机器人的功能。
+      </p>
+      <AppButton href="https://fraq.dev/plugins" target="_blank">
+        打开插件商店
+        <ExternalLink aria-hidden="true" />
+      </AppButton>
+      <p class="store-panel__hint">
+        在商店找到插件后，回到「本地插件」页，点击安装插件并输入插件名称即可。
+      </p>
+    </section>
 
     <ConfirmDialog
       v-model:open="installOpen"
@@ -198,6 +239,82 @@ const isBusy = (id) => store.state.busyPlugins.includes(id)
 </template>
 
 <style scoped>
+.source-tabs {
+  display: inline-flex;
+  padding: 2px;
+  margin-bottom: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.source-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.source-tab:hover {
+  color: var(--ink);
+}
+
+.source-tab--active {
+  background: var(--bg);
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+}
+
+.source-tab__count {
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--ink);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.store-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.store-panel__icon {
+  width: 2rem;
+  height: 2rem;
+  color: var(--primary);
+}
+
+.store-panel__title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.store-panel__description {
+  color: var(--muted);
+  font-size: var(--text-sm);
+  max-width: 52ch;
+}
+
+.store-panel__hint {
+  color: var(--faint);
+  font-size: var(--text-xs);
+  max-width: 52ch;
+}
+
 .empty-icon {
   width: 1.25rem;
   height: 1.25rem;

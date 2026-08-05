@@ -8,13 +8,27 @@ defineProps({
   disabled: { type: Boolean, default: false },
   autofocus: { type: Boolean, default: false },
   type: { type: String, default: 'button' },
+  href: { type: String, default: '' },
+  target: { type: String, default: '' },
 })
 
 defineEmits(['click'])
 </script>
 
 <template>
+  <a
+    v-if="href"
+    :href="href"
+    :target="target"
+    :rel="target === '_blank' ? 'noopener noreferrer' : undefined"
+    class="btn"
+    :class="[`btn--${variant}`, `btn--${size}`]"
+  >
+    <LoaderCircle v-if="loading" class="btn__spinner" aria-hidden="true" />
+    <span v-show="!(size === 'icon' && loading)"><slot /></span>
+  </a>
   <button
+    v-else
     :type="type"
     class="btn"
     :class="[`btn--${variant}`, `btn--${size}`]"
@@ -38,6 +52,7 @@ defineEmits(['click'])
   border-radius: var(--radius-md);
   font-weight: 500;
   cursor: pointer;
+  text-decoration: none;
   transition:
     background-color 150ms ease-out,
     border-color 150ms ease-out,
