@@ -1,6 +1,8 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { Menu, Power, Square } from '@lucide/vue'
+import IconMenu from '~icons/tabler/menu-2'
+import IconPower from '~icons/tabler/power'
+import IconSquare from '~icons/tabler/square'
 import { useRoute } from 'vue-router'
 import { store } from '../services/store.js'
 import { CORE_STATUS } from '../models/coreStatus.js'
@@ -31,7 +33,7 @@ const pageTitle = computed(() => route.meta.title ?? '')
   <header class="topbar">
     <div class="topbar__inner">
       <button type="button" class="topbar__menu" aria-label="打开导航" @click="$emit('toggle-nav')">
-        <Menu aria-hidden="true" />
+        <IconMenu aria-hidden="true" />
       </button>
       <h1 class="topbar__title">{{ pageTitle }}</h1>
 
@@ -43,8 +45,8 @@ const pageTitle = computed(() => route.meta.title ?? '')
           :loading="store.state.busyCore"
           @click="dialogOpen = true"
         >
-          <Square v-if="coreRunning" aria-hidden="true" />
-          <Power v-else aria-hidden="true" />
+          <IconSquare v-if="coreRunning" aria-hidden="true" />
+          <IconPower v-else aria-hidden="true" />
           {{ coreRunning ? '停止核心' : '启动核心' }}
         </AppButton>
       </div>

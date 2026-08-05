@@ -1,6 +1,8 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
-import { Eye, EyeOff, Save } from '@lucide/vue'
+import IconDeviceFloppy from '~icons/tabler/device-floppy'
+import IconEye from '~icons/tabler/eye'
+import IconEyeOff from '~icons/tabler/eye-off'
 import { store } from '../services/store.js'
 import AppButton from '../components/AppButton.vue'
 import ConfirmDialog from '../components/ConfirmDialog.vue'
@@ -109,8 +111,8 @@ function confirmReset() {
               :aria-label="showToken ? '隐藏访问令牌' : '显示访问令牌'"
               @click="showToken = !showToken"
             >
-              <EyeOff v-if="showToken" aria-hidden="true" />
-              <Eye v-else aria-hidden="true" />
+              <IconEyeOff v-if="showToken" aria-hidden="true" />
+              <IconEye v-else aria-hidden="true" />
             </button>
           </div>
           <p class="field__hint">
@@ -146,7 +148,7 @@ function confirmReset() {
 
       <div class="settings__save">
         <AppButton type="submit" :loading="saving">
-          <Save aria-hidden="true" />
+          <IconDeviceFloppy aria-hidden="true" />
           保存更改
         </AppButton>
       </div>

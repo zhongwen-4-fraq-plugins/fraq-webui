@@ -1,6 +1,12 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { Blocks, ExternalLink, Play, Plus, Search, Square, Trash2 } from '@lucide/vue'
+import IconBlocks from '~icons/tabler/blocks'
+import IconExternalLink from '~icons/tabler/external-link'
+import IconPlayerPlay from '~icons/tabler/player-play'
+import IconPlus from '~icons/tabler/plus'
+import IconSearch from '~icons/tabler/search'
+import IconSquare from '~icons/tabler/square'
+import IconTrash from '~icons/tabler/trash'
 import { store } from '../services/store.js'
 import { sortPlugins } from '../data/plugins.js'
 import { categoryLabel, filterStorePlugins, isInstalled } from '../data/storePlugins.js'
@@ -93,7 +99,7 @@ function installFromStore(plugin) {
     >
       <template #action>
         <AppButton v-if="view === 'local'" @click="openInstall">
-          <Plus aria-hidden="true" />
+          <IconPlus aria-hidden="true" />
           安装插件
         </AppButton>
       </template>
@@ -136,11 +142,11 @@ function installFromStore(plugin) {
         description="安装第一个插件后，它会显示在这里。"
       >
         <template #icon>
-          <Blocks class="empty-icon" aria-hidden="true" />
+          <IconBlocks class="empty-icon" aria-hidden="true" />
         </template>
         <template #action>
           <AppButton @click="openInstall">
-            <Plus aria-hidden="true" />
+            <IconPlus aria-hidden="true" />
             安装插件
           </AppButton>
         </template>
@@ -175,7 +181,7 @@ function installFromStore(plugin) {
                 title="启用"
                 @click="store.setPluginEnabled(plugin.id, true)"
               >
-                <Play aria-hidden="true" />
+                <IconPlayerPlay aria-hidden="true" />
               </AppButton>
               <AppButton
                 v-else
@@ -186,7 +192,7 @@ function installFromStore(plugin) {
                 title="停用"
                 @click="store.setPluginEnabled(plugin.id, false)"
               >
-                <Square aria-hidden="true" />
+                <IconSquare aria-hidden="true" />
               </AppButton>
               <AppButton
                 variant="danger-ghost"
@@ -196,7 +202,7 @@ function installFromStore(plugin) {
                 title="卸载"
                 @click="openUninstall(plugin)"
               >
-                <Trash2 aria-hidden="true" />
+                <IconTrash aria-hidden="true" />
               </AppButton>
             </div>
           </li>
@@ -207,7 +213,7 @@ function installFromStore(plugin) {
     <section v-else class="store" aria-labelledby="store-heading">
       <div class="store__toolbar">
         <div class="store__search">
-          <Search class="store__search-icon" aria-hidden="true" />
+          <IconSearch class="store__search-icon" aria-hidden="true" />
           <input
             v-model="storeQuery"
             type="search"
@@ -219,7 +225,7 @@ function installFromStore(plugin) {
         <span class="store__count">共 {{ filteredStorePlugins.length }} 个插件</span>
         <AppButton variant="ghost" size="sm" href="https://fraq.dev/plugins" target="_blank">
           官方商店
-          <ExternalLink aria-hidden="true" />
+          <IconExternalLink aria-hidden="true" />
         </AppButton>
       </div>
 
@@ -237,12 +243,12 @@ function installFromStore(plugin) {
         description="换个关键词试试，或前往官方商店浏览全部插件。"
       >
         <template #icon>
-          <Blocks class="empty-icon" aria-hidden="true" />
+          <IconBlocks class="empty-icon" aria-hidden="true" />
         </template>
         <template #action>
           <AppButton href="https://fraq.dev/plugins" target="_blank">
             前往插件商店
-            <ExternalLink aria-hidden="true" />
+            <IconExternalLink aria-hidden="true" />
           </AppButton>
         </template>
       </EmptyState>
@@ -269,7 +275,7 @@ function installFromStore(plugin) {
               title="安装"
               @click="installFromStore(plugin)"
             >
-              <Plus aria-hidden="true" />
+              <IconPlus aria-hidden="true" />
             </AppButton>
             <AppButton
               v-if="plugin.repository"
@@ -280,7 +286,7 @@ function installFromStore(plugin) {
               :aria-label="`查看 ${plugin.name} 源码`"
               title="查看源码"
             >
-              <ExternalLink aria-hidden="true" />
+              <IconExternalLink aria-hidden="true" />
             </AppButton>
           </div>
         </li>

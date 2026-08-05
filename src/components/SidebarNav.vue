@@ -1,5 +1,9 @@
 <script setup>
-import { Blocks, LayoutDashboard, ScrollText, Settings, X } from '@lucide/vue'
+import IconBlocks from '~icons/tabler/blocks'
+import IconLayoutDashboard from '~icons/tabler/layout-dashboard'
+import IconListDetails from '~icons/tabler/list-details'
+import IconSettings from '~icons/tabler/settings'
+import IconX from '~icons/tabler/x'
 import { APP_NAME } from '../core/config.js'
 
 defineProps({
@@ -9,10 +13,10 @@ defineProps({
 defineEmits(['close'])
 
 const navItems = [
-  { to: '/', label: '概览', icon: LayoutDashboard },
-  { to: '/plugins', label: '插件', icon: Blocks },
-  { to: '/logs', label: '日志', icon: ScrollText },
-  { to: '/settings', label: '设置', icon: Settings },
+  { to: '/', label: '概览', icon: IconLayoutDashboard },
+  { to: '/plugins', label: '插件', icon: IconBlocks },
+  { to: '/logs', label: '日志', icon: IconListDetails },
+  { to: '/settings', label: '设置', icon: IconSettings },
 ]
 </script>
 
@@ -27,7 +31,7 @@ const navItems = [
         aria-label="关闭导航"
         @click="$emit('close')"
       >
-        <X aria-hidden="true" />
+        <IconX aria-hidden="true" />
       </button>
     </div>
 

@@ -1,5 +1,8 @@
 <script setup>
-import { CircleAlert, CircleCheck, Info, X } from '@lucide/vue'
+import IconAlertCircle from '~icons/tabler/alert-circle'
+import IconCheckCircle from '~icons/tabler/circle-check'
+import IconInfo from '~icons/tabler/info-circle'
+import IconX from '~icons/tabler/x'
 import { store } from '../services/store.js'
 </script>
 
@@ -7,9 +10,9 @@ import { store } from '../services/store.js'
   <div class="toast-host" aria-live="polite" role="status">
     <TransitionGroup name="toast">
       <div v-for="item in store.state.toasts" :key="item.id" class="toast" :class="`toast--${item.type}`">
-        <CircleCheck v-if="item.type === 'success'" class="toast__icon" aria-hidden="true" />
-        <CircleAlert v-else-if="item.type === 'error'" class="toast__icon" aria-hidden="true" />
-        <Info v-else class="toast__icon" aria-hidden="true" />
+        <IconCheckCircle v-if="item.type === 'success'" class="toast__icon" aria-hidden="true" />
+        <IconAlertCircle v-else-if="item.type === 'error'" class="toast__icon" aria-hidden="true" />
+        <IconInfo v-else class="toast__icon" aria-hidden="true" />
         <span class="toast__message">{{ item.message }}</span>
         <button
           type="button"
@@ -17,7 +20,7 @@ import { store } from '../services/store.js'
           aria-label="关闭通知"
           @click="store.dismissToast(item.id)"
         >
-          <X aria-hidden="true" />
+          <IconX aria-hidden="true" />
         </button>
       </div>
     </TransitionGroup>

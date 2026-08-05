@@ -1,5 +1,5 @@
 <script setup>
-import { LoaderCircle } from '@lucide/vue'
+import IconLoader from '~icons/tabler/loader-2'
 
 defineProps({
   variant: { type: String, default: 'primary' }, // primary | secondary | ghost | danger | danger-ghost
@@ -24,7 +24,7 @@ defineEmits(['click'])
     class="btn"
     :class="[`btn--${variant}`, `btn--${size}`]"
   >
-    <LoaderCircle v-if="loading" class="btn__spinner" aria-hidden="true" />
+    <IconLoader v-if="loading" class="btn__spinner" aria-hidden="true" />
     <span v-show="!(size === 'icon' && loading)"><slot /></span>
   </a>
   <button
@@ -37,7 +37,7 @@ defineEmits(['click'])
     :autofocus="autofocus"
     @click="$emit('click', $event)"
   >
-    <LoaderCircle v-if="loading" class="btn__spinner" aria-hidden="true" />
+    <IconLoader v-if="loading" class="btn__spinner" aria-hidden="true" />
     <span v-show="!(size === 'icon' && loading)"><slot /></span>
   </button>
 </template>

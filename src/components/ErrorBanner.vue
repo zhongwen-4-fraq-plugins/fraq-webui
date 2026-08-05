@@ -1,5 +1,5 @@
 <script setup>
-import { CircleAlert } from '@lucide/vue'
+import IconAlertCircle from '~icons/tabler/alert-circle'
 import AppButton from './AppButton.vue'
 
 defineProps({
@@ -11,7 +11,7 @@ defineEmits(['retry'])
 
 <template>
   <div class="error-banner" role="alert">
-    <CircleAlert class="error-banner__icon" aria-hidden="true" />
+    <IconAlertCircle class="error-banner__icon" aria-hidden="true" />
     <span class="error-banner__message">{{ message }}</span>
     <AppButton variant="ghost" size="sm" class="error-banner__retry" @click="$emit('retry')">
       重试

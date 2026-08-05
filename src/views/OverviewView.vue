@@ -1,6 +1,8 @@
 <script setup>
 import { computed, onMounted, onUnmounted } from 'vue'
-import { Activity, ArrowRight, Blocks } from '@lucide/vue'
+import IconActivity from '~icons/tabler/activity'
+import IconArrowRight from '~icons/tabler/arrow-right'
+import IconBlocks from '~icons/tabler/blocks'
 import { store } from '../services/store.js'
 import { formatDuration, formatTime } from '../data/format.js'
 import { logTimeLabel } from '../data/logs.js'
@@ -66,7 +68,7 @@ const logTone = (level) => {
 
     <section class="panel" aria-labelledby="core-heading">
       <h3 id="core-heading" class="panel__heading">
-        <Activity class="panel__heading-icon" aria-hidden="true" />
+        <IconActivity class="panel__heading-icon" aria-hidden="true" />
         核心状态
       </h3>
 
@@ -102,7 +104,7 @@ const logTone = (level) => {
 
     <section class="panel" aria-labelledby="plugins-heading">
       <h3 id="plugins-heading" class="panel__heading">
-        <Blocks class="panel__heading-icon" aria-hidden="true" />
+        <IconBlocks class="panel__heading-icon" aria-hidden="true" />
         插件健康
       </h3>
 
@@ -138,7 +140,7 @@ const logTone = (level) => {
         </h3>
         <RouterLink :to="{ name: 'logs' }" class="panel__more">
           查看全部日志
-          <ArrowRight aria-hidden="true" />
+          <IconArrowRight aria-hidden="true" />
         </RouterLink>
       </div>
 

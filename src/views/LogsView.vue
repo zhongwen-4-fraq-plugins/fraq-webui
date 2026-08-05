@@ -1,6 +1,9 @@
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
-import { Pause, Play, Search, Terminal } from '@lucide/vue'
+import IconPlayerPause from '~icons/tabler/player-pause'
+import IconPlayerPlay from '~icons/tabler/player-play'
+import IconSearch from '~icons/tabler/search'
+import IconTerminal from '~icons/tabler/terminal-2'
 import { store } from '../services/store.js'
 import { filterLogs, levelLabel, logTimeLabel } from '../data/logs.js'
 import { LOG_LEVEL } from '../models/logEntry.js'
@@ -124,7 +127,7 @@ const toneOf = (entry) => {
       </div>
 
       <div class="log-toolbar__search">
-        <Search class="log-toolbar__search-icon" aria-hidden="true" />
+        <IconSearch class="log-toolbar__search-icon" aria-hidden="true" />
         <input
           v-model="query"
           type="search"
@@ -135,8 +138,8 @@ const toneOf = (entry) => {
       </div>
 
       <AppButton variant="secondary" size="sm" @click="resumeFollow">
-        <Pause v-if="follow" aria-hidden="true" />
-        <Play v-else aria-hidden="true" />
+        <IconPlayerPause v-if="follow" aria-hidden="true" />
+        <IconPlayerPlay v-else aria-hidden="true" />
         {{ follow ? '跟随中' : '已暂停' }}
       </AppButton>
     </div>
@@ -150,7 +153,7 @@ const toneOf = (entry) => {
         description="日志会实时出现在这里。换个过滤条件试试？"
       >
         <template #icon>
-          <Terminal class="empty-icon" aria-hidden="true" />
+          <IconTerminal class="empty-icon" aria-hidden="true" />
         </template>
       </EmptyState>
 
