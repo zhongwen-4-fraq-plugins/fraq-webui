@@ -80,6 +80,12 @@ defineEmits(['click'])
   height: 1.125rem;
 }
 
+/* 文字按钮里的图标统一收敛到 18px，避免默认 24px 与文字错位 */
+.btn > span > svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
 .btn--primary {
   background: var(--primary);
   color: #fff;
