@@ -124,8 +124,11 @@ const logTone = (level) => {
           <li v-for="plugin in abnormalPlugins" :key="plugin.id">
             <StatusBadge tone="danger">异常</StatusBadge>
             <span class="abnormal-list__name">{{ plugin.name }}</span>
-            <RouterLink :to="{ name: 'plugins' }" class="abnormal-list__link">
-              查看详情
+            <RouterLink
+              :to="{ name: 'logs', query: { level: 'error', q: plugin.name } }"
+              class="abnormal-list__link"
+            >
+              查看错误日志
             </RouterLink>
           </li>
         </ul>

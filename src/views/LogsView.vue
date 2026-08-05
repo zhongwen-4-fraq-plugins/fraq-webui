@@ -1,5 +1,6 @@
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import IconPlayerPause from '~icons/tabler/player-pause'
 import IconPlayerPlay from '~icons/tabler/player-play'
 import IconSearch from '~icons/tabler/search'
@@ -29,14 +30,18 @@ const follow = ref(true)
 const hasMore = ref(true)
 const loadingOlder = ref(false)
 const streamRef = ref(null)
+const route = useRoute()
 
 let pollTimer = null
 let debounceTimer = null
 
 onMounted(async () => {
   await store.refreshLogs()
+  applyRouteQuery()
   pollTimer = setInterval(store.refreshLogs, LOG_POLL_INTERVAL_MS)
 })
+
+watch(() => route.query, applyRouteQuery)
 
 onUnmounted(() => {
   clearInterval(pollTimer)
@@ -74,6 +79,17 @@ function onScroll() {
   const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight
   if (distanceFromBottom > 64) {
     follow.value = false
+  }
+}
+
+function applyRouteQuery() {
+  const { level: levelQuery, q } = route.query
+  if (levelQuery && LEVELS.some((item) => item.value === levelQuery)) {
+    level.value = levelQuery
+  }
+  if (typeof q === 'string') {
+    query.value = q
+    debouncedQuery.value = q
   }
 }
 
