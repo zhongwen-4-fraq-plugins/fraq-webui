@@ -18,6 +18,12 @@ const state = reactive({
     logs: true,
     settings: true,
   },
+  loaded: {
+    core: false,
+    plugins: false,
+    logs: false,
+    settings: false,
+  },
   errors: {
     core: '',
     plugins: '',
@@ -45,10 +51,12 @@ function dismissToast(id) {
 }
 
 async function refreshCore() {
-  state.loading.core = true
+  // 只在首次加载时显示骨架屏；后台轮询刷新保持内容稳定，避免页面抖动
+  if (!state.loaded.core) state.loading.core = true
   try {
     state.core = createCoreStatus(await api.getCoreStatus())
     state.errors.core = ''
+    state.loaded.core = true
   } catch (error) {
     state.errors.core = error instanceof Error ? error.message : '无法读取核心状态'
   } finally {
@@ -57,10 +65,11 @@ async function refreshCore() {
 }
 
 async function refreshPlugins() {
-  state.loading.plugins = true
+  if (!state.loaded.plugins) state.loading.plugins = true
   try {
     state.plugins = (await api.getPlugins()).map((plugin) => createPlugin(plugin))
     state.errors.plugins = ''
+    state.loaded.plugins = true
   } catch (error) {
     state.errors.plugins = error instanceof Error ? error.message : '无法读取插件列表'
   } finally {
@@ -72,6 +81,7 @@ async function refreshLogs() {
   try {
     state.logs = (await api.getLogs()).map((entry) => createLogEntry(entry))
     state.errors.logs = ''
+    state.loaded.logs = true
   } catch (error) {
     state.errors.logs = error instanceof Error ? error.message : '无法读取日志'
   } finally {
@@ -80,10 +90,11 @@ async function refreshLogs() {
 }
 
 async function refreshSettings() {
-  state.loading.settings = true
+  if (!state.loaded.settings) state.loading.settings = true
   try {
     state.settings = normalizeSettings(await api.getSettings())
     state.errors.settings = ''
+    state.loaded.settings = true
   } catch (error) {
     state.errors.settings = error instanceof Error ? error.message : '无法读取设置'
   } finally {
