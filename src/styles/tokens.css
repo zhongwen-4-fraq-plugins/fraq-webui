@@ -26,6 +26,7 @@
   --info-soft: oklch(0.92 0.04 220);
 
   --focus: oklch(0.55 0.14 210);
+  --placeholder: oklch(0.22 0.015 220 / 0.35);
 
   /* 间距（4pt 基准） */
   --space-1: 0.25rem;

@@ -271,7 +271,7 @@ const toneOf = (entry) => {
 }
 
 .log-toolbar__search-input::placeholder {
-  color: var(--muted);
+  color: var(--placeholder);
 }
 
 .log-panel {

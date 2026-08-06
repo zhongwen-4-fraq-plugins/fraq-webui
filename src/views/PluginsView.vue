@@ -409,7 +409,11 @@ function installFromStore(plugin) {
 }
 
 .store__search-input::placeholder {
-  color: var(--muted);
+  color: var(--placeholder);
+}
+
+.install-input::placeholder {
+  color: var(--placeholder);
 }
 
 .store__count {
