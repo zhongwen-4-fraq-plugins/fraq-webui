@@ -8,10 +8,15 @@ import { createLogEntry } from '../models/logEntry.js'
 import { normalizeSettings } from '../models/settings.js'
 import { createStorePlugin } from '../models/storePlugin.js'
 import { createMessageStats } from '../models/messageStats.js'
+import { normalizeAppearance } from '../models/appearance.js'
+import { colorToRgba } from '../data/color.js'
+
+const APPEARANCE_KEY = 'fraq-webui.appearance'
 
 const state = reactive({
   core: createCoreStatus(),
   stats: createMessageStats(),
+  appearance: normalizeAppearance(loadAppearance()),
   plugins: [],
   storePlugins: [],
   logs: [],
@@ -46,6 +51,45 @@ const state = reactive({
 })
 
 let toastId = 0
+
+function loadAppearance() {
+  try {
+    return JSON.parse(localStorage.getItem(APPEARANCE_KEY)) ?? {}
+  } catch {
+    return {}
+  }
+}
+
+// 把外观设置应用到 CSS 变量（背景图 + 各区域颜色），并持久化
+function applyAppearance() {
+  const { appearance } = state
+  const colors = appearance.unified
+    ? { topbar: appearance.unifiedColor, sidebar: appearance.unifiedColor, area: appearance.unifiedColor }
+    : appearance.colors
+  const root = document.documentElement
+  root.style.setProperty('--app-topbar-bg', colorToRgba(colors.topbar))
+  root.style.setProperty('--app-sidebar-bg', colorToRgba(colors.sidebar))
+  root.style.setProperty('--app-area-bg', colorToRgba(colors.area))
+
+  let image = "url('/bg.jpg')"
+  const { background } = appearance
+  if (background.mode === 'url' && background.value.trim()) {
+    image = `url('${background.value.trim()}')`
+  } else if (background.mode === 'file' && background.value) {
+    image = `url('${background.value}')`
+  }
+  root.style.setProperty('--app-bg-image', image)
+}
+
+function setAppearance(next) {
+  state.appearance = normalizeAppearance(next)
+  try {
+    localStorage.setItem(APPEARANCE_KEY, JSON.stringify(state.appearance))
+  } catch {
+    // 存储不可用时仅本次生效
+  }
+  applyAppearance()
+}
 
 function toast(type, message) {
   const id = ++toastId
@@ -227,6 +271,7 @@ export const store = {
   refreshCore,
   refreshStats,
   setStats,
+  setAppearance,
   refreshPlugins,
   refreshStorePlugins,
   refreshLogs,
@@ -241,3 +286,6 @@ export const store = {
   toast,
   dismissToast,
 }
+
+// 模块加载时应用已保存的外观
+applyAppearance()

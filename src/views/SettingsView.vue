@@ -1,10 +1,11 @@
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import IconDeviceFloppy from '~icons/tabler/device-floppy'
 import IconEye from '~icons/tabler/eye'
 import IconEyeOff from '~icons/tabler/eye-off'
 import { store } from '../services/store.js'
 import AppButton from '../components/AppButton.vue'
+import ArgbField from '../components/ArgbField.vue'
 import ErrorBanner from '../components/ErrorBanner.vue'
 import PageHeader from '../components/PageHeader.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
@@ -17,6 +18,40 @@ const form = reactive({
 const saving = ref(false)
 const baseUrlError = ref('')
 const showToken = ref(false)
+
+const appearance = reactive(JSON.parse(JSON.stringify(store.state.appearance)))
+
+watch(
+  appearance,
+  () => {
+    store.setAppearance(JSON.parse(JSON.stringify(appearance)))
+  },
+  { deep: true },
+)
+
+const bgPreview = computed(() => {
+  const { mode, value } = appearance.background
+  if (mode === 'url' && value.trim()) return `url('${value.trim()}')`
+  if (mode === 'file' && value) return `url('${value}')`
+  return "url('/bg.jpg')"
+})
+
+function onBackgroundFile(event) {
+  const file = event.target.files?.[0]
+  if (!file) return
+  const reader = new FileReader()
+  reader.onload = () => {
+    appearance.background.mode = 'file'
+    appearance.background.value = reader.result
+  }
+  reader.readAsDataURL(file)
+  event.target.value = ''
+}
+
+function resetBackground() {
+  appearance.background.mode = 'default'
+  appearance.background.value = ''
+}
 
 onMounted(async () => {
   await store.refreshSettings()
@@ -119,6 +154,65 @@ async function save() {
         </div>
       </section>
 
+      <section class="settings__group" aria-labelledby="appearance-heading">
+        <h3 id="appearance-heading" class="settings__heading">界面外观</h3>
+
+        <div class="field">
+          <label class="field__label" for="bg-mode">背景图</label>
+          <select id="bg-mode" v-model="appearance.background.mode" class="field__input">
+            <option value="default">默认背景</option>
+            <option value="url">图片链接</option>
+            <option value="file">本地上传</option>
+          </select>
+          <input
+            v-if="appearance.background.mode === 'url'"
+            v-model="appearance.background.value"
+            type="url"
+            class="field__input field__input--gap"
+            placeholder="https://example.com/background.jpg"
+          />
+          <input
+            v-else-if="appearance.background.mode === 'file'"
+            type="file"
+            accept="image/*"
+            class="field__input field__input--gap"
+            @change="onBackgroundFile"
+          />
+          <div
+            class="appearance__preview"
+            :style="{ backgroundImage: bgPreview }"
+            role="img"
+            aria-label="背景图预览"
+          />
+          <AppButton
+            v-if="appearance.background.mode !== 'default'"
+            variant="ghost"
+            size="sm"
+            class="appearance__reset"
+            @click="resetBackground"
+          >
+            恢复默认背景
+          </AppButton>
+        </div>
+
+        <div class="field field--check">
+          <label class="field__check-label" for="unified-colors">
+            <input id="unified-colors" v-model="appearance.unified" class="field__checkbox" type="checkbox" />
+            统一修改所有区域颜色
+          </label>
+        </div>
+
+        <div class="appearance__colors">
+          <ArgbField v-if="appearance.unified" label="统一颜色" :model="appearance.unifiedColor" />
+          <template v-else>
+            <ArgbField label="顶栏" :model="appearance.colors.topbar" />
+            <ArgbField label="侧边栏" :model="appearance.colors.sidebar" />
+            <ArgbField label="内容区域" :model="appearance.colors.area" />
+          </template>
+        </div>
+        <p class="field__hint">颜色格式 ARGB（#AARRGGBB），修改即时生效并自动保存。</p>
+      </section>
+
       <div class="settings__save">
         <AppButton type="submit" :loading="saving">
           <IconDeviceFloppy aria-hidden="true" />
@@ -141,7 +235,7 @@ async function save() {
   padding: var(--space-5);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  background: var(--surface);
+  background: var(--app-area-bg, var(--surface));
 }
 
 .settings__heading {
@@ -192,6 +286,30 @@ async function save() {
 
 .field__error {
   color: var(--danger);
+}
+
+.field__input--gap {
+  margin-top: var(--space-2);
+}
+
+.appearance__preview {
+  height: 8rem;
+  margin-top: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background-size: cover;
+  background-position: center;
+}
+
+.appearance__reset {
+  margin-top: var(--space-2);
+}
+
+.appearance__colors {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
 }
 
 .field__token {

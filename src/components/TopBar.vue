@@ -75,7 +75,7 @@ const pageTitle = computed(() => route.meta.title ?? '')
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
-  background: oklch(1 0 0 / 0.72);
+  background: var(--app-topbar-bg, oklch(1 0 0 / 0.72));
   -webkit-backdrop-filter: blur(16px) saturate(1.5);
   backdrop-filter: blur(16px) saturate(1.5);
 }

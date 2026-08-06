@@ -426,7 +426,7 @@ function installFromStore(plugin) {
   list-style: none;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  background: var(--surface);
+  background: var(--app-area-bg, var(--surface));
   overflow: hidden;
 }
 
@@ -498,7 +498,7 @@ function installFromStore(plugin) {
 .plugin-list {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  background: var(--surface);
+  background: var(--app-area-bg, var(--surface));
   overflow: hidden;
 }
 

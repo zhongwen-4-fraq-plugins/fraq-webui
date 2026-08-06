@@ -207,7 +207,7 @@ const onlineDuration = computed(() => {
   padding: var(--space-5);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  background: var(--surface);
+  background: var(--app-area-bg, var(--surface));
 }
 
 .panel + .panel {

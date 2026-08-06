@@ -15,7 +15,7 @@ body {
   /* 页面背景图：替换 public/bg.jpg 即可换图；白色半透明遮罩保证正文可读 */
   background:
     linear-gradient(oklch(1 0 0 / 0.55), oklch(1 0 0 / 0.55)),
-    url('/bg.jpg') center / cover no-repeat fixed,
+    var(--app-bg-image, url('/bg.jpg')) center / cover no-repeat fixed,
     var(--bg);
   color: var(--ink);
   font-family:

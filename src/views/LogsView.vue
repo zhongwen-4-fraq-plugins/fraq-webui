@@ -279,7 +279,7 @@ const toneOf = (entry) => {
 .log-panel {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  background: var(--surface);
+  background: var(--app-area-bg, var(--surface));
   padding: var(--space-4);
 }
 
