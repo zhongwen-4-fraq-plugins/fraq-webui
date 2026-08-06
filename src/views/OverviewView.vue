@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import IconActivity from '~icons/tabler/activity'
 import IconArrowRight from '~icons/tabler/arrow-right'
 import IconBlocks from '~icons/tabler/blocks'
@@ -15,9 +15,14 @@ import SkeletonBlock from '../components/SkeletonBlock.vue'
 import StatusBadge from '../components/StatusBadge.vue'
 
 let pollTimer = null
+let tickTimer = null
+const now = ref(Date.now())
 
 onMounted(async () => {
   await Promise.all([store.refreshCore(), store.refreshPlugins(), store.refreshLogs()])
+  tickTimer = setInterval(() => {
+    now.value = Date.now()
+  }, 1000)
   pollTimer = setInterval(() => {
     store.refreshCore()
     store.refreshPlugins()
@@ -26,6 +31,7 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
+  clearInterval(tickTimer)
   clearInterval(pollTimer)
 })
 
@@ -51,6 +57,13 @@ const logTone = (level) => {
   if (level === 'debug') return 'neutral'
   return 'info'
 }
+
+// 在线时长：本地每秒跳动，不依赖轮询刷新
+const onlineDuration = computed(() => {
+  const core = store.state.core
+  if (core.status !== CORE_STATUS.running || !core.startedAt) return '—'
+  return formatDuration(Math.floor((now.value - core.startedAt) / 1000))
+})
 </script>
 
 <template>
@@ -97,7 +110,7 @@ const logTone = (level) => {
         </div>
         <div class="facts__item">
           <dt>在线时长</dt>
-          <dd>{{ formatDuration(store.state.core.onlineSeconds) }}</dd>
+          <dd>{{ onlineDuration }}</dd>
         </div>
       </dl>
     </section>
