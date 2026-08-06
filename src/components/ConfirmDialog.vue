@@ -66,9 +66,7 @@ function onConfirm() {
   width: min(28rem, calc(100vw - 2rem));
   padding: 0;
   border-radius: var(--radius-lg);
-  background: var(--app-area-bg, oklch(0.984 0.003 210 / 0.72));
-  -webkit-backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
-  backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
+  background: oklch(1 0 0 / 0.9);
   color: var(--ink);
   box-shadow: var(--shadow-sm);
 }
