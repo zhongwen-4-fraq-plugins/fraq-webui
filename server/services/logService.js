@@ -19,8 +19,15 @@ function pushEntry(entry) {
 
 export function push(text) {
   for (const line of splitLines(text)) {
-    const { module, message } = parseLine(line)
-    pushEntry(logEntry({ level: classifyLevel(line), module, message }))
+    const { time, level, module, message } = parseLine(line)
+    pushEntry(
+      logEntry({
+        time: time ?? Date.now(),
+        level: level ?? classifyLevel(line),
+        module,
+        message,
+      }),
+    )
   }
 }
 
