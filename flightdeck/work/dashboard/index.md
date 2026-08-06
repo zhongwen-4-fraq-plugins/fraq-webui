@@ -27,6 +27,7 @@ Done:
 - 修复主页轮询抖动（后台刷新不再触发骨架屏）
 - 图标切换到 tabler（unplugin-icons 按需打包）
 - 真实后端接入：server/ 管理服务（进程启停、fraq.yml 读写、日志缓冲与 SSE）、前端 httpApi 传输层
+- 消息收发统计：milky 透明代理（fraq.yml milky.url 指向本服务），收=事件流 message_receive、发=发送 API 计数，概览展示
 
 Current:
 - 浏览器视觉确认与打磨；插件级运行状态（目前以进程运行近似）

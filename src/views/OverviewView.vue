@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import IconActivity from '~icons/tabler/activity'
 import IconArrowRight from '~icons/tabler/arrow-right'
 import IconBlocks from '~icons/tabler/blocks'
+import IconChartDots from '~icons/tabler/chart-dots'
 import { store } from '../services/store.js'
 import { formatDuration, formatTime } from '../data/format.js'
 import { logTimeLabel } from '../data/logs.js'
@@ -19,12 +20,13 @@ let tickTimer = null
 const now = ref(Date.now())
 
 onMounted(async () => {
-  await Promise.all([store.refreshCore(), store.refreshPlugins(), store.refreshLogs()])
+  await Promise.all([store.refreshCore(), store.refreshStats(), store.refreshPlugins(), store.refreshLogs()])
   tickTimer = setInterval(() => {
     now.value = Date.now()
   }, 1000)
   pollTimer = setInterval(() => {
     store.refreshCore()
+    store.refreshStats()
     store.refreshPlugins()
     store.refreshLogs()
   }, POLL_INTERVAL_MS)
@@ -113,6 +115,35 @@ const onlineDuration = computed(() => {
           <dd>{{ onlineDuration }}</dd>
         </div>
       </dl>
+    </section>
+
+    <section class="panel" aria-labelledby="stats-heading">
+      <h3 id="stats-heading" class="panel__heading">
+        <IconChartDots class="panel__heading-icon" aria-hidden="true" />
+        消息统计
+      </h3>
+
+      <SkeletonBlock v-if="store.state.loading.stats" :lines="2" />
+
+      <template v-else>
+        <dl class="facts">
+          <div class="facts__item">
+            <dt>收到消息</dt>
+            <dd class="facts__num">{{ store.state.stats.available ? store.state.stats.received : '—' }}</dd>
+          </div>
+          <div class="facts__item">
+            <dt>发出消息</dt>
+            <dd class="facts__num">{{ store.state.stats.available ? store.state.stats.sent : '—' }}</dd>
+          </div>
+          <div class="facts__item">
+            <dt>每分钟发送</dt>
+            <dd class="facts__num">{{ store.state.stats.available ? store.state.stats.sentPerMinute : '—' }}</dd>
+          </div>
+        </dl>
+        <p v-if="!store.state.stats.available" class="summary-quiet">
+          消息统计暂不可用（需要 fraq-stats 插件）。
+        </p>
+      </template>
     </section>
 
     <section class="panel" aria-labelledby="plugins-heading">
@@ -266,6 +297,10 @@ const onlineDuration = computed(() => {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: var(--text-xs) !important;
   word-break: break-all;
+}
+
+.facts__num {
+  font-variant-numeric: tabular-nums;
 }
 
 .summary-line {

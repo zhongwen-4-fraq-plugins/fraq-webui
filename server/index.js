@@ -3,6 +3,7 @@
 // 默认监听 http://127.0.0.1:8787，同时托管前端构建产物（dist/）。
 
 import { serve } from '@hono/node-server'
+import { WebSocketServer } from 'ws'
 import { app } from './core/app.js'
 import { HOST, PORT, APP_DIR } from './core/config.js'
 import * as processManager from './services/processManager.js'
@@ -13,6 +14,7 @@ const server = serve(
     fetch: app.fetch,
     hostname: HOST,
     port: PORT,
+    websocket: { server: new WebSocketServer({ noServer: true }) },
   },
   (info) => {
     logService.pushEvent(

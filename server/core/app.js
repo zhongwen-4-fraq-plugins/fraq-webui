@@ -4,12 +4,14 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { Hono } from 'hono'
 import { serveStatic } from '@hono/node-server/serve-static'
+import { upgradeWebSocket } from '@hono/node-server'
 import { streamSSE } from 'hono/streaming'
 import { parse } from 'yaml'
-import { DIST_DIR, CONFIG_PATH, ADMIN_TOKEN } from './config.js'
+import { DIST_DIR, CONFIG_PATH, ADMIN_TOKEN, MILKY_URL, MILKY_WS_URL, MILKY_ACCESS_TOKEN } from './config.js'
 import * as logService from '../services/logService.js'
 import * as processManager from '../services/processManager.js'
 import * as fraqConfig from '../services/fraqConfig.js'
+import * as messageStats from '../services/messageStats.js'
 import { coreStatus } from '../models/status.js'
 
 export const app = new Hono()
@@ -38,6 +40,8 @@ app.get('/api/core', (c) => {
     }),
   )
 })
+
+app.get('/api/stats', (c) => c.json(messageStats.getStats()))
 
 app.post('/api/core/start', async (c) => {
   try {
@@ -127,6 +131,77 @@ app.put('/api/settings', async (c) => {
   })
   return c.json({ ok: true })
 })
+
+// milky 协议代理：fraq 的 milky.url 指向本服务，
+// 转发发送类 API 时计数“发出”，转发事件流时计数“收到”。
+const SEND_ENDPOINTS = new Set(['send_private_message', 'send_group_message'])
+
+app.post('/api/:endpoint', async (c) => {
+  const endpoint = c.req.param('endpoint')
+  const body = await c.req.text()
+  const headers = { 'Content-Type': 'application/json' }
+  if (MILKY_ACCESS_TOKEN) {
+    headers.Authorization = `Bearer ${MILKY_ACCESS_TOKEN}`
+  }
+  try {
+    const response = await fetch(`${MILKY_URL}/api/${endpoint}`, {
+      method: 'POST',
+      headers,
+      body,
+    })
+    if (SEND_ENDPOINTS.has(endpoint)) {
+      messageStats.bumpSent()
+    }
+    return new Response(response.body, {
+      status: response.status,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  } catch (error) {
+    return c.json(
+      {
+        status: 'failed',
+        retcode: -502,
+        message: `无法连接 Milky 协议端：${error instanceof Error ? error.message : String(error)}`,
+      },
+      502,
+    )
+  }
+})
+
+app.get(
+  '/event',
+  upgradeWebSocket(() => {
+    let target = null
+    return {
+      onOpen(_event, ws) {
+        const url = new URL(`${MILKY_WS_URL}/event`)
+        if (MILKY_ACCESS_TOKEN) {
+          url.searchParams.set('access_token', MILKY_ACCESS_TOKEN)
+        }
+        target = new WebSocket(url)
+        target.onmessage = (event) => {
+          try {
+            const data = JSON.parse(String(event.data))
+            if (data?.event_type === 'message_receive') {
+              messageStats.bumpReceived()
+            }
+          } catch {
+            // 非 JSON 帧直接转发，不影响计数
+          }
+          ws.send(String(event.data))
+        }
+        target.onclose = () => ws.close()
+        target.onerror = () => target?.close()
+      },
+      onMessage(event, ws) {
+        target?.send(String(event.data))
+      },
+      onClose() {
+        target?.close()
+      },
+    }
+  }),
+)
 
 // 静态界面：构建产物存在时托管 dist/，未知路径回退到 index.html
 if (fs.existsSync(DIST_DIR)) {

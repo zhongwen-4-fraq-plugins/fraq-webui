@@ -26,6 +26,10 @@ export const httpApi = {
     return request('/api/core')
   },
 
+  async getStats() {
+    return request('/api/stats')
+  },
+
   async getPlugins() {
     return request('/api/plugins')
   },

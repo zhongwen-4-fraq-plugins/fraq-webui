@@ -7,15 +7,18 @@ import { createPlugin } from '../models/plugin.js'
 import { createLogEntry } from '../models/logEntry.js'
 import { normalizeSettings } from '../models/settings.js'
 import { createStorePlugin } from '../models/storePlugin.js'
+import { createMessageStats } from '../models/messageStats.js'
 
 const state = reactive({
   core: createCoreStatus(),
+  stats: createMessageStats(),
   plugins: [],
   storePlugins: [],
   logs: [],
   settings: normalizeSettings(),
   loading: {
     core: true,
+    stats: true,
     plugins: true,
     storePlugins: true,
     logs: true,
@@ -23,6 +26,7 @@ const state = reactive({
   },
   loaded: {
     core: false,
+    stats: false,
     plugins: false,
     storePlugins: false,
     logs: false,
@@ -30,6 +34,7 @@ const state = reactive({
   },
   errors: {
     core: '',
+    stats: '',
     plugins: '',
     storePlugins: '',
     logs: '',
@@ -66,6 +71,19 @@ async function refreshCore() {
     state.errors.core = error instanceof Error ? error.message : '无法读取核心状态'
   } finally {
     state.loading.core = false
+  }
+}
+
+async function refreshStats() {
+  if (!state.loaded.stats) state.loading.stats = true
+  try {
+    state.stats = createMessageStats(await api.getStats())
+    state.errors.stats = ''
+    state.loaded.stats = true
+  } catch (error) {
+    state.errors.stats = error instanceof Error ? error.message : '无法读取消息统计'
+  } finally {
+    state.loading.stats = false
   }
 }
 
@@ -199,6 +217,7 @@ async function saveSettings(settings) {
 export const store = {
   state,
   refreshCore,
+  refreshStats,
   refreshPlugins,
   refreshStorePlugins,
   refreshLogs,

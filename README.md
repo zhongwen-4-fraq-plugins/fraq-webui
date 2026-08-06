@@ -38,9 +38,15 @@ npm run dev          # Vite 开发服务器（/api 自动代理到 8787）
 | `FRAQ_WEBUI_PORT` | `8787` | 服务端口 |
 | `FRAQ_WEBUI_APP_DIR` | `D:/bot/fraq-plugins/my-fraq-app` | fraq 项目目录 |
 | `FRAQ_WEBUI_TOKEN` | 空 | 设置后所有 /api 请求需带 `Authorization: Bearer <token>` |
+| `FRAQ_WEBUI_MILKY_URL` | `http://localhost:30001` | 真实 Milky 协议端地址 |
+| `FRAQ_WEBUI_MILKY_TOKEN` | 空 | 转发到 Milky 协议端时使用的访问令牌 |
 
 ## 说明
 
 - 插件列表、版本、核心状态、日志均来自真实 fraq 实例；插件启停与 Milky 设置直接写 `fraq.yml`，fraq CLI 会自动重启生效。
+- `fraq.yml` 的 `milky.url` 指向本服务（默认 http://127.0.0.1:8787），由服务端透明代理到真实 Milky 协议端：
+  - 转发发送类 API（send_private_message / send_group_message）时计数"发出"
+  - 转发事件流时识别 `message_receive` 计数"收到"
+  - 概览页的消息收发数量与"每分钟发送"来自这些计数
 - `fraq.yml` 中可能包含 API Key 等密钥，服务端**不会**回传插件配置内容；设置接口也只会返回令牌是否已配置，不返回令牌明文。
 - 当前插件状态以进程是否运行为准（无法从外部区分单个插件的运行状态）。
