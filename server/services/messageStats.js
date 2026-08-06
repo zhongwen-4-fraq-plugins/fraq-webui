@@ -6,8 +6,18 @@ const state = {
   sendTimes: [],
 }
 
+const subscribers = new Set()
+
+function notify() {
+  const stats = getStats()
+  for (const send of subscribers) {
+    send(stats)
+  }
+}
+
 export function bumpReceived() {
   state.received += 1
+  notify()
 }
 
 export function bumpSent() {
@@ -16,6 +26,7 @@ export function bumpSent() {
   if (state.sendTimes.length > 120) {
     state.sendTimes.shift()
   }
+  notify()
 }
 
 export function getStats() {
@@ -26,4 +37,9 @@ export function getStats() {
     sent: state.sent,
     sentPerMinute: state.sendTimes.filter((time) => now - time < 60000).length,
   }
+}
+
+export function subscribe(send) {
+  subscribers.add(send)
+  return () => subscribers.delete(send)
 }

@@ -16,22 +16,32 @@ import StatusBadge from '../components/StatusBadge.vue'
 
 let pollTimer = null
 let tickTimer = null
+let statsSource = null
 const now = ref(Date.now())
 
 onMounted(async () => {
   await Promise.all([store.refreshCore(), store.refreshStats(), store.refreshPlugins(), store.refreshLogs()])
+  // 消息统计走 SSE 实时推送，不再依赖轮询
+  statsSource = new EventSource('/api/stats/stream')
+  statsSource.onmessage = (event) => {
+    try {
+      store.setStats(JSON.parse(event.data))
+    } catch {
+      // 忽略格式异常的心跳
+    }
+  }
   tickTimer = setInterval(() => {
     now.value = Date.now()
   }, 1000)
   pollTimer = setInterval(() => {
     store.refreshCore()
-    store.refreshStats()
     store.refreshPlugins()
     store.refreshLogs()
   }, POLL_INTERVAL_MS)
 })
 
 onUnmounted(() => {
+  statsSource?.close()
   clearInterval(tickTimer)
   clearInterval(pollTimer)
 })

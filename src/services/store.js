@@ -87,6 +87,14 @@ async function refreshStats() {
   }
 }
 
+// SSE 实时推送的统计更新入口
+function setStats(stats) {
+  state.stats = createMessageStats(stats)
+  state.errors.stats = ''
+  state.loaded.stats = true
+  state.loading.stats = false
+}
+
 async function refreshPlugins() {
   if (!state.loaded.plugins) state.loading.plugins = true
   try {
@@ -218,6 +226,7 @@ export const store = {
   state,
   refreshCore,
   refreshStats,
+  setStats,
   refreshPlugins,
   refreshStorePlugins,
   refreshLogs,

@@ -43,6 +43,19 @@ app.get('/api/core', (c) => {
 
 app.get('/api/stats', (c) => c.json(messageStats.getStats()))
 
+app.get('/api/stats/stream', (c) =>
+  streamSSE(c, async (stream) => {
+    const send = (stats) => stream.writeSSE({ data: JSON.stringify(stats) }).catch(unsubscribe)
+    const unsubscribe = messageStats.subscribe(send)
+    await new Promise((resolve) => {
+      stream.onAbort(() => {
+        unsubscribe()
+        resolve()
+      })
+    })
+  }),
+)
+
 app.post('/api/core/start', async (c) => {
   try {
     await processManager.start()
