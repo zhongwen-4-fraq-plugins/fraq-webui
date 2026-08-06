@@ -75,7 +75,15 @@ const pageTitle = computed(() => route.meta.title ?? '')
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
-  background: var(--bg);
+  background: oklch(1 0 0 / 0.72);
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  backdrop-filter: blur(16px) saturate(1.5);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .topbar {
+    background: var(--bg);
+  }
 }
 
 .topbar__inner {

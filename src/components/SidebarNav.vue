@@ -61,7 +61,9 @@ const navItems = [
   display: flex;
   flex-direction: column;
   width: 15rem;
-  background: var(--surface);
+  background: oklch(0.984 0.003 210 / 0.72);
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  backdrop-filter: blur(16px) saturate(1.5);
   border-right: 1px solid var(--border);
   transform: translateX(-100%);
   transition: transform 200ms ease-out;
@@ -182,6 +184,12 @@ const navItems = [
 
   .sidebar__close {
     display: none;
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .sidebar {
+    background: var(--surface);
   }
 }
 </style>
