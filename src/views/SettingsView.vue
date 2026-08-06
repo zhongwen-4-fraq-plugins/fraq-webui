@@ -177,7 +177,7 @@ async function save() {
             v-if="appearance.background.mode === 'url'"
             v-model="appearance.background.value"
             type="url"
-            class="field__input field__input--gap"
+            class="field__input field__input--gap appearance__url-input"
             placeholder="https://example.com/background.jpg"
           />
           <input
@@ -304,6 +304,10 @@ async function save() {
 
 .appearance__reset {
   margin-top: var(--space-2);
+}
+
+.appearance__url-input::placeholder {
+  color: var(--faint);
 }
 
 .appearance__colors {
