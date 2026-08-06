@@ -4,8 +4,6 @@ const DEFAULT_COLOR = { color: '#ffffff', alpha: 0.72 }
 
 export const DEFAULT_APPEARANCE = {
   background: { mode: 'default', value: '' }, // default | url | file
-  unified: false,
-  unifiedColor: { ...DEFAULT_COLOR },
   colors: {
     topbar: { ...DEFAULT_COLOR },
     sidebar: { color: '#fbfbfb', alpha: 0.72 },
@@ -25,8 +23,6 @@ export function normalizeAppearance(raw = {}) {
       mode: ['default', 'url', 'file'].includes(raw.background?.mode) ? raw.background.mode : 'default',
       value: typeof raw.background?.value === 'string' ? raw.background.value : '',
     },
-    unified: raw.unified === true,
-    unifiedColor: normalizeColor(raw.unifiedColor, DEFAULT_APPEARANCE.unifiedColor),
     colors: {
       topbar: normalizeColor(raw.colors?.topbar, DEFAULT_APPEARANCE.colors.topbar),
       sidebar: normalizeColor(raw.colors?.sidebar, DEFAULT_APPEARANCE.colors.sidebar),

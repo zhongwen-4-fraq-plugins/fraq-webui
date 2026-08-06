@@ -195,20 +195,10 @@ async function save() {
           </AppButton>
         </div>
 
-        <div class="field field--check">
-          <label class="field__check-label" for="unified-colors">
-            <input id="unified-colors" v-model="appearance.unified" class="field__checkbox" type="checkbox" />
-            统一修改所有区域颜色
-          </label>
-        </div>
-
         <div class="appearance__colors">
-          <ArgbField v-if="appearance.unified" label="统一颜色" :model="appearance.unifiedColor" />
-          <template v-else>
-            <ArgbField label="顶栏" :model="appearance.colors.topbar" />
-            <ArgbField label="侧边栏" :model="appearance.colors.sidebar" />
-            <ArgbField label="内容区域" :model="appearance.colors.area" />
-          </template>
+          <ArgbField label="顶栏" :model="appearance.colors.topbar" />
+          <ArgbField label="侧边栏" :model="appearance.colors.sidebar" />
+          <ArgbField label="内容区域" :model="appearance.colors.area" />
         </div>
         <p class="field__hint">颜色格式 ARGB（#AARRGGBB），修改即时生效并自动保存。</p>
       </section>

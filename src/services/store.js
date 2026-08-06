@@ -63,9 +63,7 @@ function loadAppearance() {
 // 把外观设置应用到 CSS 变量（背景图 + 各区域颜色），并持久化
 function applyAppearance() {
   const { appearance } = state
-  const colors = appearance.unified
-    ? { topbar: appearance.unifiedColor, sidebar: appearance.unifiedColor, area: appearance.unifiedColor }
-    : appearance.colors
+  const colors = appearance.colors
   const root = document.documentElement
   root.style.setProperty('--app-topbar-bg', colorToRgba(colors.topbar))
   root.style.setProperty('--app-sidebar-bg', colorToRgba(colors.sidebar))
