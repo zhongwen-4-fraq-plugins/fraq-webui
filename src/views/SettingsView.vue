@@ -168,7 +168,7 @@ async function save() {
 
         <div class="field">
           <label class="field__label" for="bg-mode">背景图</label>
-          <select id="bg-mode" v-model="appearance.background.mode" class="field__input">
+          <select id="bg-mode" v-model="appearance.background.mode" class="field__input appearance__glass-input">
             <option value="default">默认背景</option>
             <option value="url">图片链接</option>
             <option value="file">本地上传</option>
@@ -177,14 +177,14 @@ async function save() {
             v-if="appearance.background.mode === 'url'"
             v-model="appearance.background.value"
             type="url"
-            class="field__input field__input--gap appearance__url-input"
+            class="field__input field__input--gap appearance__glass-input appearance__url-input"
             placeholder="https://example.com/background.jpg"
           />
           <input
             v-else-if="appearance.background.mode === 'file'"
             type="file"
             accept="image/*"
-            class="field__input field__input--gap"
+            class="field__input field__input--gap appearance__glass-input"
             @change="onBackgroundFile"
           />
           <div
@@ -308,6 +308,10 @@ async function save() {
 
 .appearance__url-input::placeholder {
   color: var(--faint);
+}
+
+.appearance__glass-input {
+  background: oklch(1 0 0 / 0.45);
 }
 
 .appearance__colors {
