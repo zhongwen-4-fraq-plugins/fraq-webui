@@ -4,11 +4,11 @@ Focus: fraq-webui：用 Vue 3 + Vite 为 fraq 构建轻量 Web 管理界面（�
 
 ## In flight
 
-* dashboard — 初版已实现，待浏览器视觉确认与后端对接（work/dashboard/）
+* dashboard — 已接真实后端（server/），待浏览器验证（work/dashboard/）
 
 ## Next
 
-* 浏览器检查 dashboard 初版（npm run dev）
+* 浏览器打开 http://127.0.0.1:8787 验证管理界面
 
 ## Open questions
 

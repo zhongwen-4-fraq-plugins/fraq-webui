@@ -196,12 +196,6 @@ async function saveSettings(settings) {
   toast('success', '设置已保存')
 }
 
-async function resetDemo() {
-  await api.resetDemo()
-  toast('success', '演示数据已重置')
-  await Promise.all([refreshCore(), refreshPlugins(), refreshLogs(), refreshSettings()])
-}
-
 export const store = {
   state,
   refreshCore,
@@ -216,7 +210,6 @@ export const store = {
   setPluginEnabled,
   uninstallPlugin,
   saveSettings,
-  resetDemo,
   toast,
   dismissToast,
 }

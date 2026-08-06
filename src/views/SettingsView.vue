@@ -5,7 +5,6 @@ import IconEye from '~icons/tabler/eye'
 import IconEyeOff from '~icons/tabler/eye-off'
 import { store } from '../services/store.js'
 import AppButton from '../components/AppButton.vue'
-import ConfirmDialog from '../components/ConfirmDialog.vue'
 import ErrorBanner from '../components/ErrorBanner.vue'
 import PageHeader from '../components/PageHeader.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
@@ -13,17 +12,18 @@ import SkeletonBlock from '../components/SkeletonBlock.vue'
 const form = reactive({
   baseUrl: '',
   accessToken: '',
-  secureCookies: false,
 })
 
 const saving = ref(false)
 const baseUrlError = ref('')
 const showToken = ref(false)
-const resetOpen = ref(false)
 
 onMounted(async () => {
   await store.refreshSettings()
-  Object.assign(form, store.state.settings)
+  Object.assign(form, {
+    baseUrl: store.state.settings.baseUrl,
+    accessToken: store.state.settings.accessToken,
+  })
 })
 
 async function save() {
@@ -44,7 +44,6 @@ async function save() {
     await store.saveSettings({
       baseUrl: form.baseUrl.trim().replace(/\/+$/, ''),
       accessToken: form.accessToken,
-      secureCookies: form.secureCookies,
     })
   } catch (error) {
     store.toast('error', error instanceof Error ? error.message : '保存失败')
@@ -52,16 +51,11 @@ async function save() {
     saving.value = false
   }
 }
-
-function confirmReset() {
-  resetOpen.value = false
-  store.resetDemo()
-}
 </script>
 
 <template>
   <div>
-    <PageHeader title="设置" description="配置 Milky 连接与 WebUI 安全选项。" />
+    <PageHeader title="设置" description="配置 Milky 连接地址与访问令牌。" />
 
     <ErrorBanner
       v-if="store.state.errors.settings"
@@ -116,34 +110,13 @@ function confirmReset() {
             </button>
           </div>
           <p class="field__hint">
-            与协议端配置保持一致；令牌仅保存在本机浏览器（演示实现）。
+            {{
+              store.state.settings.hasAccessToken
+                ? '已配置访问令牌，留空表示不修改。'
+                : '协议端访问令牌，留空表示不校验。'
+            }}
           </p>
         </div>
-      </section>
-
-      <section class="settings__group" aria-labelledby="webui-heading">
-        <h3 id="webui-heading" class="settings__heading">WebUI</h3>
-
-        <div class="field field--check">
-          <label class="field__check-label" for="secure-cookies">
-            <input
-              id="secure-cookies"
-              v-model="form.secureCookies"
-              class="field__checkbox"
-              type="checkbox"
-            />
-            启用安全 Cookie
-          </label>
-          <p class="field__hint">通过 HTTPS 访问时开启，防止 Cookie 被明文传输。</p>
-        </div>
-      </section>
-
-      <section class="settings__group" aria-labelledby="danger-heading">
-        <h3 id="danger-heading" class="settings__heading">演示数据</h3>
-        <p class="field__hint">
-          把模拟的核心、插件和日志恢复到初始状态，便于重新演示。
-        </p>
-        <AppButton variant="danger-ghost" @click="resetOpen = true">重置演示数据</AppButton>
       </section>
 
       <div class="settings__save">
@@ -153,17 +126,6 @@ function confirmReset() {
         </AppButton>
       </div>
     </form>
-
-    <ConfirmDialog
-      v-model:open="resetOpen"
-      title="重置演示数据？"
-      confirm-label="重置演示数据"
-      cancel-label="取消"
-      danger
-      @confirm="confirmReset"
-    >
-      所有模拟的核心状态、插件和日志都会恢复初始状态，无法撤销。
-    </ConfirmDialog>
   </div>
 </template>
 
