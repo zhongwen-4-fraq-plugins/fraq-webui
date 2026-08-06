@@ -94,7 +94,6 @@ const pageTitle = computed(() => route.meta.title ?? '')
   height: 3.5rem;
   margin: 0 auto;
   padding: 0 var(--space-4);
-  border-bottom: 1px solid var(--border);
 }
 
 .topbar__menu {

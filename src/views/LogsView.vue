@@ -218,7 +218,6 @@ const toneOf = (entry) => {
 .log-toolbar__levels {
   display: inline-flex;
   padding: 2px;
-  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--surface);
 }
@@ -265,9 +264,8 @@ const toneOf = (entry) => {
   width: 100%;
   height: 2.5rem;
   padding: 0 var(--space-3) 0 2.25rem;
-  border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  background: var(--bg);
+  background: var(--surface-2);
   color: var(--ink);
   font-size: var(--text-sm);
 }
@@ -277,7 +275,6 @@ const toneOf = (entry) => {
 }
 
 .log-panel {
-  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--app-area-bg, var(--surface));
   padding: var(--space-4);

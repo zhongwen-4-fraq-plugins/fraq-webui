@@ -233,7 +233,6 @@ async function save() {
 
 .settings__group {
   padding: var(--space-5);
-  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--app-area-bg, var(--surface));
 }
@@ -259,9 +258,8 @@ async function save() {
   width: 100%;
   height: 2.5rem;
   padding: 0 var(--space-3);
-  border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  background: var(--bg);
+  background: var(--surface-2);
   color: var(--ink);
   font-size: var(--text-sm);
 }
@@ -271,7 +269,7 @@ async function save() {
 }
 
 .field__input[aria-invalid='true'] {
-  border-color: var(--danger);
+  background: var(--danger-soft);
 }
 
 .field__hint,
@@ -295,7 +293,6 @@ async function save() {
 .appearance__preview {
   height: 8rem;
   margin-top: var(--space-3);
-  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background-size: cover;
   background-position: center;

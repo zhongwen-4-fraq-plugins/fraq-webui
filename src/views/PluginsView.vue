@@ -331,7 +331,6 @@ function installFromStore(plugin) {
   display: inline-flex;
   padding: 2px;
   margin-bottom: var(--space-4);
-  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--surface);
 }
@@ -403,9 +402,8 @@ function installFromStore(plugin) {
   width: 100%;
   height: 2.5rem;
   padding: 0 var(--space-3) 0 2.25rem;
-  border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  background: var(--bg);
+  background: var(--surface-2);
   color: var(--ink);
   font-size: var(--text-sm);
 }
@@ -424,7 +422,6 @@ function installFromStore(plugin) {
   margin: 0;
   padding: 0;
   list-style: none;
-  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--app-area-bg, var(--surface));
   overflow: hidden;
@@ -437,10 +434,6 @@ function installFromStore(plugin) {
   align-items: center;
   padding: var(--space-4);
   background: var(--app-area-bg, var(--bg));
-}
-
-.store-row + .store-row {
-  border-top: 1px solid var(--border);
 }
 
 .store-row__name {
@@ -496,7 +489,6 @@ function installFromStore(plugin) {
 }
 
 .plugin-list {
-  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--app-area-bg, var(--surface));
   overflow: hidden;
@@ -525,7 +517,6 @@ function installFromStore(plugin) {
 
 .plugin-row {
   padding: var(--space-4);
-  border-top: 1px solid var(--border);
   background: var(--app-area-bg, var(--bg));
 }
 
@@ -565,9 +556,8 @@ function installFromStore(plugin) {
 .install-input {
   width: 100%;
   padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  background: var(--bg);
+  background: var(--surface-2);
   color: var(--ink);
   font-size: var(--text-sm);
 }

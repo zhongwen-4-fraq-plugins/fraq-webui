@@ -26,7 +26,6 @@ defineProps({
   justify-content: center;
   padding: var(--space-8) var(--space-5);
   text-align: center;
-  border: 1px dashed var(--border);
   border-radius: var(--radius-lg);
 }
 

@@ -122,14 +122,12 @@ defineEmits(['click'])
 }
 
 .btn--secondary {
-  background: var(--bg);
-  border-color: var(--border);
+  background: var(--surface-2);
   color: var(--ink);
 }
 
 .btn--secondary:hover:not(:disabled) {
-  background: var(--surface);
-  border-color: var(--faint);
+  background: var(--border);
 }
 
 .btn--ghost {

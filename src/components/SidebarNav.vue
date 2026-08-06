@@ -64,7 +64,6 @@ const navItems = [
   background: var(--app-sidebar-bg, oklch(0.984 0.003 210 / 0.72));
   -webkit-backdrop-filter: blur(16px) saturate(1.5);
   backdrop-filter: blur(16px) saturate(1.5);
-  border-right: 1px solid var(--border);
   transform: translateX(-100%);
   transition: transform 200ms ease-out;
 }
@@ -79,7 +78,6 @@ const navItems = [
   gap: var(--space-3);
   height: 3.5rem;
   padding: 0 var(--space-4);
-  border-bottom: 1px solid var(--border);
 }
 
 .sidebar__logo {

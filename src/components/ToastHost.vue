@@ -45,7 +45,6 @@ import { store } from '../services/store.js'
   align-items: flex-start;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--bg);
   box-shadow: var(--shadow-sm);

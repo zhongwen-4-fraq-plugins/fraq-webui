@@ -65,7 +65,6 @@ function onConfirm() {
 .dialog {
   width: min(28rem, calc(100vw - 2rem));
   padding: 0;
-  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--bg);
   color: var(--ink);
