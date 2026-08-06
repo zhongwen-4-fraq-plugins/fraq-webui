@@ -145,17 +145,19 @@ const navItems = [
 }
 
 .sidebar__link:hover {
-  background: var(--surface-2);
+  background: transparent;
   color: var(--ink);
 }
 
 .sidebar__link--active {
-  background: var(--primary-soft);
-  color: var(--ink);
+  background: transparent;
+  color: var(--primary);
+  font-weight: 600;
 }
 
 .sidebar__link--active:hover {
-  background: var(--primary-soft-hover);
+  background: transparent;
+  color: var(--primary);
 }
 
 .sidebar__icon {
