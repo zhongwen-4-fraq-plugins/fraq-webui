@@ -321,7 +321,7 @@ const onlineDuration = computed(() => {
   gap: var(--space-3);
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
-  background: var(--bg);
+  background: var(--app-area-bg, var(--bg));
 }
 
 .abnormal-list__name {
@@ -355,7 +355,7 @@ const onlineDuration = computed(() => {
   min-width: 0;
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
-  background: var(--bg);
+  background: var(--app-area-bg, var(--bg));
   font-size: var(--text-sm);
 }
 

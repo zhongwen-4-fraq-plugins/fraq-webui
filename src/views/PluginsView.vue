@@ -436,7 +436,7 @@ function installFromStore(plugin) {
   gap: var(--space-4);
   align-items: center;
   padding: var(--space-4);
-  background: var(--bg);
+  background: var(--app-area-bg, var(--bg));
 }
 
 .store-row + .store-row {
@@ -526,7 +526,7 @@ function installFromStore(plugin) {
 .plugin-row {
   padding: var(--space-4);
   border-top: 1px solid var(--border);
-  background: var(--bg);
+  background: var(--app-area-bg, var(--bg));
 }
 
 .plugin-row__name {

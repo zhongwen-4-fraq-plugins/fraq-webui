@@ -314,7 +314,7 @@ const toneOf = (entry) => {
 }
 
 .log-line:hover {
-  background: var(--bg);
+  background: var(--app-area-bg, var(--bg));
 }
 
 .log-line__time {
