@@ -7,7 +7,7 @@ export const DEFAULT_APPEARANCE = {
   colors: {
     topbar: { ...DEFAULT_COLOR },
     sidebar: { color: '#fbfbfb', alpha: 0.72 },
-    area: { color: '#fbfbfb', alpha: 1 },
+    area: { color: '#fbfbfb', alpha: 0.72 },
   },
 }
 

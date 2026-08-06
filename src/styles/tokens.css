@@ -68,6 +68,6 @@
   /* 外观覆盖（由设置页动态修改） */
   --app-topbar-bg: oklch(1 0 0 / 0.72);
   --app-sidebar-bg: oklch(0.984 0.003 210 / 0.72);
-  --app-area-bg: var(--surface);
+  --app-area-bg: oklch(0.984 0.003 210 / 0.72);
   --app-bg-image: url('/bg.jpg');
 }

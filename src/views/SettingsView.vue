@@ -225,6 +225,8 @@ async function save() {
   padding: var(--space-5);
   border-radius: var(--radius-lg);
   background: var(--app-area-bg, var(--surface));
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  backdrop-filter: blur(16px) saturate(1.4);
 }
 
 .settings__heading {
