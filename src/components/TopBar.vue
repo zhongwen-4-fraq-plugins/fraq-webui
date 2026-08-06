@@ -76,7 +76,6 @@ const pageTitle = computed(() => route.meta.title ?? '')
   top: 0;
   z-index: var(--z-sticky);
   background: var(--bg);
-  border-bottom: 1px solid var(--border);
 }
 
 .topbar__inner {
@@ -87,6 +86,7 @@ const pageTitle = computed(() => route.meta.title ?? '')
   height: 3.5rem;
   margin: 0 auto;
   padding: 0 var(--space-4);
+  border-bottom: 1px solid var(--border);
 }
 
 .topbar__menu {
