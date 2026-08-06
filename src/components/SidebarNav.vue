@@ -62,8 +62,8 @@ const navItems = [
   flex-direction: column;
   width: 15rem;
   background: var(--app-sidebar-bg, oklch(0.984 0.003 210 / 0.72));
-  -webkit-backdrop-filter: blur(16px) saturate(1.5);
-  backdrop-filter: blur(16px) saturate(1.5);
+  -webkit-backdrop-filter: blur(var(--app-sidebar-blur, 16px)) saturate(1.5);
+  backdrop-filter: blur(var(--app-sidebar-blur, 16px)) saturate(1.5);
   transform: translateX(-100%);
   transition: transform 200ms ease-out;
 }

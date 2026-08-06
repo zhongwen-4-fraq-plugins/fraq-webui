@@ -424,8 +424,8 @@ function installFromStore(plugin) {
   list-style: none;
   border-radius: var(--radius-lg);
   background: var(--app-area-bg, var(--surface));
-  -webkit-backdrop-filter: blur(16px) saturate(1.4);
-  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
+  backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
   overflow: hidden;
 }
 
@@ -493,8 +493,8 @@ function installFromStore(plugin) {
 .plugin-list {
   border-radius: var(--radius-lg);
   background: var(--app-area-bg, var(--surface));
-  -webkit-backdrop-filter: blur(16px) saturate(1.4);
-  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
+  backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
   overflow: hidden;
 }
 

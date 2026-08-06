@@ -200,7 +200,7 @@ async function save() {
           <ArgbField label="侧边栏" :model="appearance.colors.sidebar" />
           <ArgbField label="内容区域" :model="appearance.colors.area" />
         </div>
-        <p class="field__hint">颜色格式 ARGB（#AARRGGBB），修改即时生效并自动保存。</p>
+        <p class="field__hint">颜色格式 ARGB（#AARRGGBB）+ 模糊程度，修改即时生效并自动保存。</p>
       </section>
 
       <div class="settings__save">
@@ -225,8 +225,8 @@ async function save() {
   padding: var(--space-5);
   border-radius: var(--radius-lg);
   background: var(--app-area-bg, var(--surface));
-  -webkit-backdrop-filter: blur(16px) saturate(1.4);
-  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
+  backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
 }
 
 .settings__heading {

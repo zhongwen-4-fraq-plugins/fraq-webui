@@ -21,6 +21,13 @@ const alphaPercent = computed({
   },
 })
 
+const blurValue = computed({
+  get: () => props.model.blur,
+  set: (value) => {
+    props.model.blur = Number(value)
+  },
+})
+
 const argb = computed(() => {
   const { r, g, b } = hexToRgb(props.model.color)
   const a = toHex(Math.round(props.model.alpha * 255))
@@ -40,6 +47,16 @@ const argb = computed(() => {
       class="argb__alpha"
       :aria-label="`${label}透明度`"
     />
+    <input
+      v-model="blurValue"
+      type="range"
+      min="0"
+      max="40"
+      step="1"
+      class="argb__blur"
+      :aria-label="`${label}模糊程度`"
+    />
+    <span class="argb__blur-value">{{ blurValue }}px</span>
     <code class="argb__value">{{ argb }}</code>
   </div>
 </template>
@@ -48,6 +65,7 @@ const argb = computed(() => {
 .argb {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: var(--space-3);
 }
 
@@ -68,9 +86,22 @@ const argb = computed(() => {
 }
 
 .argb__alpha {
-  flex: 1;
+  width: 6rem;
   min-width: 6rem;
   accent-color: var(--primary);
+}
+
+.argb__blur {
+  width: 6rem;
+  min-width: 6rem;
+  accent-color: var(--primary);
+}
+
+.argb__blur-value {
+  width: 2.5rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--text-xs);
+  color: var(--muted);
 }
 
 .argb__value {

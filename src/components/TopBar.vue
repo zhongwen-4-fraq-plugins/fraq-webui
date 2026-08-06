@@ -76,8 +76,8 @@ const pageTitle = computed(() => route.meta.title ?? '')
   top: 0;
   z-index: var(--z-sticky);
   background: var(--app-topbar-bg, oklch(1 0 0 / 0.72));
-  -webkit-backdrop-filter: blur(16px) saturate(1.5);
-  backdrop-filter: blur(16px) saturate(1.5);
+  -webkit-backdrop-filter: blur(var(--app-topbar-blur, 16px)) saturate(1.5);
+  backdrop-filter: blur(var(--app-topbar-blur, 16px)) saturate(1.5);
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
