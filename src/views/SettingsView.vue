@@ -4,6 +4,7 @@ import IconDeviceFloppy from '~icons/tabler/device-floppy'
 import IconEye from '~icons/tabler/eye'
 import IconEyeOff from '~icons/tabler/eye-off'
 import { store } from '../services/store.js'
+import { createDefaultAppearance } from '../models/appearance.js'
 import AppButton from '../components/AppButton.vue'
 import ArgbField from '../components/ArgbField.vue'
 import ErrorBanner from '../components/ErrorBanner.vue'
@@ -51,6 +52,14 @@ function onBackgroundFile(event) {
 function resetBackground() {
   appearance.background.mode = 'default'
   appearance.background.value = ''
+}
+
+function resetAppearance() {
+  const defaults = createDefaultAppearance()
+  appearance.background = defaults.background
+  appearance.colors.topbar = defaults.colors.topbar
+  appearance.colors.sidebar = defaults.colors.sidebar
+  appearance.colors.area = defaults.colors.area
 }
 
 onMounted(async () => {
@@ -200,6 +209,9 @@ async function save() {
           <ArgbField label="侧边栏" :model="appearance.colors.sidebar" />
           <ArgbField label="内容区域" :model="appearance.colors.area" />
         </div>
+        <AppButton variant="secondary" size="sm" class="appearance__reset" @click="resetAppearance">
+          恢复默认外观
+        </AppButton>
         <p class="field__hint">颜色格式 ARGB（#AARRGGBB）+ 模糊程度，修改即时生效并自动保存。</p>
       </section>
 

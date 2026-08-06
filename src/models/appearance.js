@@ -31,3 +31,7 @@ export function normalizeAppearance(raw = {}) {
     },
   }
 }
+
+export function createDefaultAppearance() {
+  return JSON.parse(JSON.stringify(DEFAULT_APPEARANCE))
+}
