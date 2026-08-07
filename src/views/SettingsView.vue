@@ -208,6 +208,7 @@ async function save() {
           <ArgbField label="顶栏" :model="appearance.colors.topbar" />
           <ArgbField label="侧边栏" :model="appearance.colors.sidebar" />
           <ArgbField label="内容区域" :model="appearance.colors.area" />
+          <ArgbField label="组件" :model="appearance.colors.components" />
         </div>
         <AppButton variant="secondary" size="sm" class="appearance__reset" @click="resetAppearance">
           恢复默认外观
@@ -263,7 +264,7 @@ async function save() {
   height: 2.5rem;
   padding: 0 var(--space-3);
   border-radius: var(--radius-md);
-  background: var(--surface-2);
+  background: var(--app-component-bg, var(--surface-2));
   color: var(--ink);
   font-size: var(--text-sm);
 }

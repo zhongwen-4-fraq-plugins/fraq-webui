@@ -68,9 +68,11 @@ function applyAppearance() {
   root.style.setProperty('--app-topbar-bg', colorToRgba(colors.topbar))
   root.style.setProperty('--app-sidebar-bg', colorToRgba(colors.sidebar))
   root.style.setProperty('--app-area-bg', colorToRgba(colors.area))
+  root.style.setProperty('--app-component-bg', colorToRgba(colors.components))
   root.style.setProperty('--app-topbar-blur', `${colors.topbar.blur}px`)
   root.style.setProperty('--app-sidebar-blur', `${colors.sidebar.blur}px`)
   root.style.setProperty('--app-area-blur', `${colors.area.blur}px`)
+  root.style.setProperty('--app-component-blur', `${colors.components.blur}px`)
 
   let image = "url('/bg.jpg')"
   const { background } = appearance

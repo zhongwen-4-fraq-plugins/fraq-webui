@@ -46,7 +46,9 @@ import { store } from '../services/store.js'
   gap: var(--space-2);
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
-  background: var(--bg);
+  background: var(--app-component-bg, var(--bg));
+  -webkit-backdrop-filter: blur(var(--app-component-blur, 0px)) saturate(1.4);
+  backdrop-filter: blur(var(--app-component-blur, 0px)) saturate(1.4);
   box-shadow: var(--shadow-sm);
   font-size: var(--text-sm);
   pointer-events: auto;

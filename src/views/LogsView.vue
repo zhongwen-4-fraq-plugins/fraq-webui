@@ -265,7 +265,7 @@ const toneOf = (entry) => {
   height: 2.5rem;
   padding: 0 var(--space-3) 0 2.25rem;
   border-radius: var(--radius-md);
-  background: var(--surface-2);
+  background: var(--app-component-bg, var(--surface-2));
   color: var(--ink);
   font-size: var(--text-sm);
 }

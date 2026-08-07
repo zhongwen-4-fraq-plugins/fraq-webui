@@ -122,7 +122,7 @@ defineEmits(['click'])
 }
 
 .btn--secondary {
-  background: var(--surface-2);
+  background: var(--app-component-bg, var(--surface-2));
   color: var(--ink);
 }
 
