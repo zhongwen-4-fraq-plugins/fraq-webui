@@ -80,6 +80,19 @@ function applyAppearance() {
   root.style.setProperty('--app-area-blur', `${colors.area.blur}px`)
   root.style.setProperty('--app-component-blur', `${colors.components.blur}px`)
 
+  // 日志各级别的文字颜色与底色
+  for (const level of ['error', 'warn', 'info', 'debug']) {
+    const item = appearance.logColors[level]
+    root.style.setProperty(
+      `--log-${level}-color`,
+      item.color ? colorToRgba({ color: item.color, alpha: 1 }) : 'inherit',
+    )
+    root.style.setProperty(
+      `--log-${level}-bg`,
+      item.bgAlpha > 0 ? colorToRgba({ color: item.bgColor, alpha: item.bgAlpha }) : 'transparent',
+    )
+  }
+
   let image = "url('/bg.jpg')"
   const { background } = appearance
   if (background.mode === 'url' && background.value.trim()) {

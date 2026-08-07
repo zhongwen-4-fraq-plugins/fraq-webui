@@ -4,6 +4,8 @@ const DEFAULT_COLOR = { color: '#ffffff', alpha: 0.72, blur: 16 }
 const DEFAULT_COMPONENT = { color: '#fbfbfb', alpha: 1, blur: 0 }
 const DEFAULT_TEXT = { color: '#2b2e33', alpha: 1, blur: 0 }
 
+const DEFAULT_LOG_COLOR = { color: '', bgColor: '#ffffff', bgAlpha: 0 }
+
 export const DEFAULT_APPEARANCE = {
   background: { mode: 'default', value: '' }, // default | url | file
   colors: {
@@ -13,6 +15,12 @@ export const DEFAULT_APPEARANCE = {
     components: { ...DEFAULT_COMPONENT },
     text: { ...DEFAULT_TEXT },
   },
+  logColors: {
+    error: { color: '#b4232a', bgColor: '#ffffff', bgAlpha: 0 },
+    warn: { color: '#d9b500', bgColor: '#ffffff', bgAlpha: 0 },
+    info: { ...DEFAULT_LOG_COLOR },
+    debug: { ...DEFAULT_LOG_COLOR },
+  },
 }
 
 function normalizeColor(raw, fallback) {
@@ -20,6 +28,17 @@ function normalizeColor(raw, fallback) {
   const alpha = Number.isFinite(raw?.alpha) ? Math.min(1, Math.max(0, raw.alpha)) : fallback.alpha
   const blur = Number.isFinite(raw?.blur) ? Math.min(40, Math.max(0, raw.blur)) : fallback.blur
   return { color, alpha, blur }
+}
+
+function normalizeLogColor(raw, fallback) {
+  const color =
+    typeof raw?.color === 'string' && /^#[0-9a-f]{3,6}$/i.test(raw.color) ? raw.color : fallback.color
+  const bgColor =
+    typeof raw?.bgColor === 'string' && /^#[0-9a-f]{3,6}$/i.test(raw.bgColor)
+      ? raw.bgColor
+      : fallback.bgColor
+  const bgAlpha = Number.isFinite(raw?.bgAlpha) ? Math.min(1, Math.max(0, raw.bgAlpha)) : fallback.bgAlpha
+  return { color, bgColor, bgAlpha }
 }
 
 export function normalizeAppearance(raw = {}) {
@@ -34,6 +53,12 @@ export function normalizeAppearance(raw = {}) {
       area: normalizeColor(raw.colors?.area, DEFAULT_APPEARANCE.colors.area),
       components: normalizeColor(raw.colors?.components, DEFAULT_APPEARANCE.colors.components),
       text: normalizeColor(raw.colors?.text, DEFAULT_APPEARANCE.colors.text),
+    },
+    logColors: {
+      error: normalizeLogColor(raw.logColors?.error, DEFAULT_APPEARANCE.logColors.error),
+      warn: normalizeLogColor(raw.logColors?.warn, DEFAULT_APPEARANCE.logColors.warn),
+      info: normalizeLogColor(raw.logColors?.info, DEFAULT_APPEARANCE.logColors.info),
+      debug: normalizeLogColor(raw.logColors?.debug, DEFAULT_APPEARANCE.logColors.debug),
     },
   }
 }

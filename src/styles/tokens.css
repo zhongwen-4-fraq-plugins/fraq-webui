@@ -78,4 +78,14 @@
   --app-area-blur: 16px;
   --app-component-blur: 0px;
   --app-bg-image: url('/bg.jpg');
+
+  /* 日志级别颜色（由日志设置页动态修改） */
+  --log-error-color: var(--danger);
+  --log-error-bg: transparent;
+  --log-warn-color: var(--warning-text);
+  --log-warn-bg: transparent;
+  --log-info-color: inherit;
+  --log-info-bg: transparent;
+  --log-debug-color: inherit;
+  --log-debug-bg: transparent;
 }
