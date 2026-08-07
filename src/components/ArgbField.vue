@@ -86,15 +86,49 @@ const argb = computed(() => {
 }
 
 .argb__alpha {
+  -webkit-appearance: none;
+  appearance: none;
   width: 6rem;
   min-width: 6rem;
-  accent-color: var(--primary);
+  height: 0.375rem;
+  border: none;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--app-component-bg, var(--surface-2)) 60%, transparent);
+  outline: none;
 }
 
 .argb__blur {
+  -webkit-appearance: none;
+  appearance: none;
   width: 6rem;
   min-width: 6rem;
-  accent-color: var(--primary);
+  height: 0.375rem;
+  border: none;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--app-component-bg, var(--surface-2)) 60%, transparent);
+  outline: none;
+}
+
+.argb__alpha::-webkit-slider-thumb,
+.argb__blur::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+}
+
+.argb__alpha::-moz-range-thumb,
+.argb__blur::-moz-range-thumb {
+  width: 1rem;
+  height: 1rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
 }
 
 .argb__blur-value {
