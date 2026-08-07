@@ -19,7 +19,7 @@
   --success: oklch(0.55 0.14 155);
   --success-soft: oklch(0.92 0.05 155);
   --warning: oklch(0.72 0.13 70);
-  --warning-text: #ffd800;
+  --warning-text: #d9b500;
   --warning-soft: oklch(0.93 0.06 80);
   --danger: oklch(0.55 0.2 25);
   --danger-hover: oklch(0.5 0.2 25);
