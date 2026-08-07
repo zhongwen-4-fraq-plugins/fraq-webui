@@ -5,6 +5,7 @@ import IconListDetails from '~icons/tabler/list-details'
 import IconSettings from '~icons/tabler/settings'
 import IconX from '~icons/tabler/x'
 import { APP_NAME } from '../core/config.js'
+import { store } from '../services/store.js'
 
 defineProps({
   open: { type: Boolean, default: false },
@@ -15,7 +16,7 @@ defineEmits(['close'])
 const navItems = [
   { to: '/', label: '概览', icon: IconLayoutDashboard },
   { to: '/plugins', label: '插件', icon: IconBlocks },
-  { to: '/logs', label: '日志', icon: IconListDetails },
+  { to: '/logs', label: '日志', icon: IconListDetails, settings: true },
   { to: '/settings', label: '设置', icon: IconSettings },
 ]
 </script>
@@ -36,17 +37,27 @@ const navItems = [
     </div>
 
     <nav class="sidebar__nav">
-      <RouterLink
-        v-for="item in navItems"
-        :key="item.to"
-        :to="item.to"
-        class="sidebar__link"
-        exact-active-class="sidebar__link--active"
-        @click="$emit('close')"
-      >
-        <component :is="item.icon" class="sidebar__icon" aria-hidden="true" />
-        {{ item.label }}
-      </RouterLink>
+      <div v-for="item in navItems" :key="item.to" class="sidebar__row">
+        <RouterLink
+          :to="item.to"
+          class="sidebar__link"
+          exact-active-class="sidebar__link--active"
+          @click="$emit('close')"
+        >
+          <component :is="item.icon" class="sidebar__icon" aria-hidden="true" />
+          {{ item.label }}
+        </RouterLink>
+        <button
+          v-if="item.settings"
+          type="button"
+          class="sidebar__gear"
+          aria-label="日志颜色设置"
+          title="日志颜色设置"
+          @click="store.state.logColorsOpen = true"
+        >
+          <IconSettings aria-hidden="true" />
+        </button>
+      </div>
     </nav>
 
     <p class="sidebar__footer">演示模式 · 数据为模拟</p>
@@ -127,6 +138,41 @@ const navItems = [
   flex-direction: column;
   gap: 2px;
   padding: var(--space-3);
+}
+
+.sidebar__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar__row .sidebar__link {
+  flex: 1;
+}
+
+.sidebar__gear {
+  position: absolute;
+  right: var(--space-1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.sidebar__gear:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.sidebar__gear svg {
+  width: 1rem;
+  height: 1rem;
 }
 
 .sidebar__link {

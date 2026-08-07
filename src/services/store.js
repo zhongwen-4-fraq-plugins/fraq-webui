@@ -22,6 +22,7 @@ const state = reactive({
     authenticated: false,
     error: '',
   },
+  logColorsOpen: false,
   plugins: [],
   storePlugins: [],
   logs: [],

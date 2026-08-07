@@ -2,6 +2,7 @@
 import { onMounted } from 'vue'
 import AppShell from './components/AppShell.vue'
 import LoginView from './components/LoginView.vue'
+import LogColorsDialog from './components/LogColorsDialog.vue'
 import ToastHost from './components/ToastHost.vue'
 import { store } from './services/store.js'
 
@@ -14,6 +15,7 @@ onMounted(() => store.checkAuth())
   <template v-else>
     <AppShell />
     <ToastHost />
+    <LogColorsDialog v-model:open="store.state.logColorsOpen" />
   </template>
 </template>
 

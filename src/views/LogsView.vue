@@ -4,17 +4,14 @@ import { useRoute } from 'vue-router'
 import IconPlayerPause from '~icons/tabler/player-pause'
 import IconPlayerPlay from '~icons/tabler/player-play'
 import IconSearch from '~icons/tabler/search'
-import IconSettings from '~icons/tabler/settings'
 import IconTerminal from '~icons/tabler/terminal-2'
 import { store } from '../services/store.js'
 import { filterLogs, levelLabel, logTimeLabel } from '../data/logs.js'
 import { LOG_LEVEL } from '../models/logEntry.js'
 import { LOG_PAGE_SIZE, LOG_POLL_INTERVAL_MS, MAX_VISIBLE_LOGS } from '../core/config.js'
 import AppButton from '../components/AppButton.vue'
-import ConfirmDialog from '../components/ConfirmDialog.vue'
 import EmptyState from '../components/EmptyState.vue'
 import ErrorBanner from '../components/ErrorBanner.vue'
-import LogColorRow from '../components/LogColorRow.vue'
 import PageHeader from '../components/PageHeader.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
 
@@ -35,19 +32,6 @@ const loadingOlder = ref(false)
 const streamRef = ref(null)
 const route = useRoute()
 const expanded = reactive(new Set())
-const colorsOpen = ref(false)
-const logColors = reactive(JSON.parse(JSON.stringify(store.state.appearance.logColors)))
-
-watch(
-  logColors,
-  () => {
-    store.setAppearance({
-      ...JSON.parse(JSON.stringify(store.state.appearance)),
-      logColors: JSON.parse(JSON.stringify(logColors)),
-    })
-  },
-  { deep: true },
-)
 
 const LONG_MESSAGE_LIMIT = 120
 
@@ -171,14 +155,7 @@ const toneOf = (entry) => {
 
 <template>
   <div>
-    <PageHeader title="日志" description="实时查看 fraq 运行日志，支持按级别过滤与搜索。">
-      <template #action>
-        <AppButton variant="secondary" size="sm" @click="colorsOpen = true">
-          <IconSettings aria-hidden="true" />
-          日志颜色
-        </AppButton>
-      </template>
-    </PageHeader>
+    <PageHeader title="日志" description="实时查看 fraq 运行日志，支持按级别过滤与搜索。" />
 
     <ErrorBanner v-if="store.state.errors.logs" :message="store.state.errors.logs" @retry="store.refreshLogs" />
 
@@ -273,15 +250,6 @@ const toneOf = (entry) => {
       </div>
     </div>
 
-    <ConfirmDialog v-model:open="colorsOpen" title="日志颜色" confirm-label="完成" @confirm="colorsOpen = false">
-      <div class="log-colors">
-        <LogColorRow label="错误" :model="logColors.error" />
-        <LogColorRow label="警告" :model="logColors.warn" />
-        <LogColorRow label="信息" :model="logColors.info" />
-        <LogColorRow label="调试" :model="logColors.debug" />
-      </div>
-      <p class="log-colors__hint">文字颜色与底色即时生效并自动保存；底色透明度 0 表示无底色。</p>
-    </ConfirmDialog>
   </div>
 </template>
 
@@ -490,17 +458,6 @@ const toneOf = (entry) => {
   cursor: pointer;
 }
 
-.log-colors {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.log-colors__hint {
-  margin-top: var(--space-3);
-  color: var(--muted);
-  font-size: var(--text-xs);
-}
 
 @media (max-width: 640px) {
   .log-line {
