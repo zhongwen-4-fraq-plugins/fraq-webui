@@ -350,7 +350,7 @@ function installFromStore(plugin) {
 }
 
 .source-tab:hover {
-  color: var(--ink);
+  color: var(--app-text-color, var(--ink));
 }
 
 .source-tab--active {
@@ -363,7 +363,7 @@ function installFromStore(plugin) {
   padding: 0 6px;
   border-radius: 999px;
   background: var(--primary-soft);
-  color: var(--ink);
+  color: var(--app-text-color, var(--ink));
   font-size: var(--text-xs);
   font-variant-numeric: tabular-nums;
 }
@@ -404,7 +404,7 @@ function installFromStore(plugin) {
   padding: 0 var(--space-3) 0 2.25rem;
   border-radius: var(--radius-md);
   background: var(--app-component-bg, var(--surface-2));
-  color: var(--ink);
+  color: var(--app-text-color, var(--ink));
   font-size: var(--text-sm);
 }
 
@@ -566,7 +566,7 @@ function installFromStore(plugin) {
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
   background: var(--app-component-bg, var(--surface-2));
-  color: var(--ink);
+  color: var(--app-text-color, var(--ink));
   font-size: var(--text-sm);
 }
 

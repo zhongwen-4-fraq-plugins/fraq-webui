@@ -70,7 +70,7 @@ function onConfirm() {
   background: var(--app-component-bg, oklch(1 0 0 / 0.9));
   -webkit-backdrop-filter: blur(var(--app-component-blur, 0px)) saturate(1.4);
   backdrop-filter: blur(var(--app-component-blur, 0px)) saturate(1.4);
-  color: var(--ink);
+  color: var(--app-text-color, var(--ink));
   box-shadow: var(--shadow-sm);
 }
 

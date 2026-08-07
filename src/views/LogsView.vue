@@ -234,12 +234,12 @@ const toneOf = (entry) => {
 }
 
 .level-button:hover {
-  color: var(--ink);
+  color: var(--app-text-color, var(--ink));
 }
 
 .level-button--active {
   background: var(--bg);
-  color: var(--ink);
+  color: var(--app-text-color, var(--ink));
   box-shadow: var(--shadow-sm);
 }
 
@@ -266,7 +266,7 @@ const toneOf = (entry) => {
   padding: 0 var(--space-3) 0 2.25rem;
   border-radius: var(--radius-md);
   background: var(--app-component-bg, var(--surface-2));
-  color: var(--ink);
+  color: var(--app-text-color, var(--ink));
   font-size: var(--text-sm);
 }
 

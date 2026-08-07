@@ -114,7 +114,7 @@ const navItems = [
 
 .sidebar__close:hover {
   background: var(--surface-2);
-  color: var(--ink);
+  color: var(--app-text-color, var(--ink));
 }
 
 .sidebar__close svg {
@@ -146,7 +146,7 @@ const navItems = [
 
 .sidebar__link:hover {
   background: transparent;
-  color: var(--ink);
+  color: var(--app-text-color, var(--ink));
 }
 
 .sidebar__link--active {

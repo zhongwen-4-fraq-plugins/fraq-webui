@@ -109,7 +109,7 @@ const pageTitle = computed(() => route.meta.title ?? '')
   border: none;
   border-radius: var(--radius-md);
   background: transparent;
-  color: var(--ink);
+  color: var(--app-text-color, var(--ink));
   cursor: pointer;
 }
 
@@ -149,7 +149,7 @@ const pageTitle = computed(() => route.meta.title ?? '')
 
 .topbar__logout:hover {
   background: var(--surface-2);
-  color: var(--ink);
+  color: var(--app-text-color, var(--ink));
 }
 
 .topbar__logout svg {

@@ -94,7 +94,7 @@ import { store } from '../services/store.js'
 
 .toast__close:hover {
   background: var(--surface-2);
-  color: var(--ink);
+  color: var(--app-text-color, var(--ink));
 }
 
 .toast__close svg {

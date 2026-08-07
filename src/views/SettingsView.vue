@@ -242,6 +242,7 @@ async function save() {
           <ArgbField label="侧边栏" :model="appearance.colors.sidebar" />
           <ArgbField label="内容区域" :model="appearance.colors.area" />
           <ArgbField label="组件" :model="appearance.colors.components" />
+          <ArgbField label="文字" :model="appearance.colors.text" />
         </div>
         <AppButton variant="secondary" size="sm" class="appearance__reset" @click="resetAppearance">
           恢复默认外观
@@ -298,7 +299,7 @@ async function save() {
   padding: 0 var(--space-3);
   border-radius: var(--radius-md);
   background: var(--app-component-bg, var(--surface-2));
-  color: var(--ink);
+  color: var(--app-text-color, var(--ink));
   font-size: var(--text-sm);
 }
 
@@ -386,7 +387,7 @@ async function save() {
 
 .field__toggle:hover {
   background: var(--surface-2);
-  color: var(--ink);
+  color: var(--app-text-color, var(--ink));
 }
 
 .field__toggle svg {

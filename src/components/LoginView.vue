@@ -142,7 +142,7 @@ async function submit() {
   border: 1px solid var(--ink);
   border-radius: var(--radius-md);
   background: var(--app-component-bg, var(--surface-2));
-  color: var(--ink);
+  color: var(--app-text-color, var(--ink));
   font-size: var(--text-sm);
 }
 
@@ -185,7 +185,7 @@ async function submit() {
 
 .login__toggle:hover {
   background: var(--surface-2);
-  color: var(--ink);
+  color: var(--app-text-color, var(--ink));
 }
 
 .login__toggle svg {
