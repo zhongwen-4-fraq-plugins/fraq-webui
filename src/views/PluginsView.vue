@@ -517,6 +517,16 @@ function installFromStore(plugin) {
   font-size: var(--text-xs);
 }
 
+/* 状态标注与徽标文字对齐（跳过圆点） */
+.plugin-list__head span:nth-child(2) {
+  padding-left: calc(0.5rem + var(--space-1));
+}
+
+/* 操作标注居中于两个按钮之间 */
+.plugin-list__head span:nth-child(3) {
+  text-align: center;
+}
+
 .plugin-list__body {
   margin: 0;
   padding: 0;
