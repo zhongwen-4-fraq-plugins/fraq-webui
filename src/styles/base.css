@@ -73,6 +73,21 @@ a {
   border-radius: var(--radius-sm);
 }
 
+/* 输入框：使用激活色（主题色）边框，聚焦时不显示选中外框 */
+.field__input,
+.store__search-input,
+.log-toolbar__search-input,
+.install-input,
+.appearance__glass-input {
+  border: 1px solid var(--primary);
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+}
+
 .skip-link {
   position: fixed;
   top: var(--space-3);
