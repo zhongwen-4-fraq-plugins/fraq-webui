@@ -101,6 +101,14 @@ function resumeFollow() {
   })
 }
 
+function toggleFollow() {
+  if (follow.value) {
+    follow.value = false
+  } else {
+    resumeFollow()
+  }
+}
+
 async function loadOlder() {
   if (loadingOlder.value) return
   loadingOlder.value = true
@@ -153,7 +161,7 @@ const toneOf = (entry) => {
         />
       </div>
 
-      <AppButton variant="secondary" size="sm" @click="resumeFollow">
+      <AppButton variant="secondary" size="sm" @click="toggleFollow">
         <IconPlayerPause v-if="follow" aria-hidden="true" />
         <IconPlayerPlay v-else aria-hidden="true" />
         {{ follow ? '跟随中' : '已暂停' }}
