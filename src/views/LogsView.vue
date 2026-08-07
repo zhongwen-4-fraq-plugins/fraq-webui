@@ -417,6 +417,7 @@ const toneOf = (entry) => {
 .log-line__message {
   min-width: 0;
   word-break: break-word;
+  white-space: pre-wrap;
 }
 
 .log-line__message--collapsed {

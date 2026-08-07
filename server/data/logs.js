@@ -47,3 +47,8 @@ export function parseLine(line) {
   }
   return { time: null, level: null, module: 'app', message: line }
 }
+
+// 堆栈续行：以空白开头、后跟 "at " 或 "^" 的行属于上一条错误日志
+export function isStackContinuation(line) {
+  return /^\s+(at\s|\^)/.test(line)
+}
