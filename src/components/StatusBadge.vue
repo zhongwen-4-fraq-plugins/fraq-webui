@@ -16,9 +16,7 @@ defineProps({
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: 2px var(--space-2);
-  border-radius: 999px;
+  gap: var(--space-1);
   font-size: var(--text-xs);
   font-weight: 500;
   line-height: 1.4;
@@ -26,27 +24,22 @@ defineProps({
 }
 
 .badge--success {
-  background: var(--success-soft);
-  color: var(--ink);
+  color: var(--success);
 }
 
 .badge--warning {
-  background: var(--warning-soft);
-  color: var(--ink);
+  color: var(--warning-text);
 }
 
 .badge--danger {
-  background: var(--danger-soft);
-  color: var(--ink);
+  color: var(--danger);
 }
 
 .badge--info {
-  background: var(--info-soft);
-  color: var(--ink);
+  color: var(--primary);
 }
 
 .badge--neutral {
-  background: var(--app-component-bg, var(--surface-2));
   color: var(--muted);
 }
 
@@ -55,25 +48,5 @@ defineProps({
   height: 0.5rem;
   border-radius: 50%;
   background: currentColor;
-}
-
-.badge--success .badge__dot {
-  background: var(--success);
-}
-
-.badge--warning .badge__dot {
-  background: var(--warning);
-}
-
-.badge--danger .badge__dot {
-  background: var(--danger);
-}
-
-.badge--info .badge__dot {
-  background: var(--primary);
-}
-
-.badge--neutral .badge__dot {
-  background: var(--muted);
 }
 </style>
