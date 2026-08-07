@@ -354,10 +354,9 @@ function installFromStore(plugin) {
 }
 
 .source-tab--active {
-  background: var(--bg);
+  background: transparent;
   color: var(--primary);
   font-weight: 600;
-  box-shadow: var(--shadow-sm);
 }
 
 .source-tab__count {
