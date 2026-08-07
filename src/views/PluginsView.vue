@@ -505,7 +505,8 @@ function installFromStore(plugin) {
 .plugin-list__head,
 .plugin-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  /* 表头与行共用同一套列宽，保证标注与内容对齐 */
+  grid-template-columns: minmax(0, 1fr) 4.5rem 5rem;
   gap: var(--space-4);
   align-items: center;
 }
