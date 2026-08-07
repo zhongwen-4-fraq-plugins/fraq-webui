@@ -88,6 +88,14 @@ textarea:focus-visible {
   outline: none;
 }
 
+.field__input:focus,
+.store__search-input:focus,
+.log-toolbar__search-input:focus,
+.install-input:focus,
+.appearance__glass-input:focus {
+  border-color: var(--success);
+}
+
 .skip-link {
   position: fixed;
   top: var(--space-3);

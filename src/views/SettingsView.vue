@@ -290,6 +290,10 @@ async function save() {
   border-color: var(--primary);
 }
 
+.field__input:focus {
+  border-color: var(--success);
+}
+
 .field__hint,
 .field__error {
   margin-top: var(--space-2);
