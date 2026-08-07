@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import IconPlayerPause from '~icons/tabler/player-pause'
 import IconPlayerPlay from '~icons/tabler/player-play'
 import IconSearch from '~icons/tabler/search'
+import IconSettings from '~icons/tabler/settings'
 import IconTerminal from '~icons/tabler/terminal-2'
 import { store } from '../services/store.js'
 import { filterLogs, levelLabel, logTimeLabel } from '../data/logs.js'
@@ -155,7 +156,19 @@ const toneOf = (entry) => {
 
 <template>
   <div>
-    <PageHeader title="日志" description="实时查看 fraq 运行日志，支持按级别过滤与搜索。" />
+    <PageHeader title="日志" description="实时查看 fraq 运行日志，支持按级别过滤与搜索。">
+      <template #action>
+        <AppButton
+          variant="ghost"
+          size="icon"
+          aria-label="日志颜色设置"
+          title="日志颜色设置"
+          @click="store.state.logColorsOpen = true"
+        >
+          <IconSettings aria-hidden="true" />
+        </AppButton>
+      </template>
+    </PageHeader>
 
     <ErrorBanner v-if="store.state.errors.logs" :message="store.state.errors.logs" @retry="store.refreshLogs" />
 
