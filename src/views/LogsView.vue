@@ -194,7 +194,15 @@ const toneOf = (entry) => {
         </AppButton>
 
         <ul class="log-stream__list">
-          <li v-for="(entry, index) in visibleLogs" :key="entry.time + '-' + entry.module + '-' + index" class="log-line">
+          <li
+            v-for="(entry, index) in visibleLogs"
+            :key="entry.time + '-' + entry.module + '-' + index"
+            class="log-line"
+            :class="{
+              'log-line--error': entry.level === 'error',
+              'log-line--warning': entry.level === 'warn',
+            }"
+          >
             <span class="log-line__time">{{ logTimeLabel(entry.time) }}</span>
             <span class="log-line__level" :class="`log-line__level--${toneOf(entry)}`">
               {{ levelLabel(entry.level) }}
@@ -322,6 +330,22 @@ const toneOf = (entry) => {
 
 .log-line:hover {
   background: var(--app-area-bg, var(--bg));
+}
+
+.log-line--error {
+  background: var(--danger-soft);
+}
+
+.log-line--error:hover {
+  background: var(--danger-soft);
+}
+
+.log-line--warning {
+  background: var(--warning-soft);
+}
+
+.log-line--warning:hover {
+  background: var(--warning-soft);
 }
 
 .log-line__time {
