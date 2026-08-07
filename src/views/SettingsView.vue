@@ -14,6 +14,7 @@ import SkeletonBlock from '../components/SkeletonBlock.vue'
 const form = reactive({
   baseUrl: '',
   accessToken: '',
+  appDir: '',
 })
 
 const saving = ref(false)
@@ -24,7 +25,8 @@ const showToken = ref(false)
 const dirty = computed(
   () =>
     form.baseUrl !== store.state.settings.baseUrl ||
-    form.accessToken !== store.state.settings.accessToken,
+    form.accessToken !== store.state.settings.accessToken ||
+    form.appDir !== store.state.settings.appDir,
 )
 
 const appearance = reactive(JSON.parse(JSON.stringify(store.state.appearance)))
@@ -74,6 +76,7 @@ onMounted(async () => {
   Object.assign(form, {
     baseUrl: store.state.settings.baseUrl,
     accessToken: store.state.settings.accessToken,
+    appDir: store.state.settings.appDir,
   })
 })
 
@@ -95,6 +98,7 @@ async function save() {
     await store.saveSettings({
       baseUrl: form.baseUrl.trim().replace(/\/+$/, ''),
       accessToken: form.accessToken,
+      appDir: form.appDir.trim(),
     })
   } catch (error) {
     store.toast('error', error instanceof Error ? error.message : '保存失败')
@@ -168,6 +172,26 @@ async function save() {
                 ? '已配置访问令牌，留空表示不修改。'
                 : '协议端访问令牌，留空表示不校验。'
             }}
+          </p>
+        </div>
+      </section>
+
+      <section class="settings__group" aria-labelledby="project-heading">
+        <h3 id="project-heading" class="settings__heading">fraq 项目</h3>
+
+        <div class="field">
+          <label class="field__label" for="app-dir">项目目录</label>
+          <input
+            id="app-dir"
+            v-model="form.appDir"
+            class="field__input"
+            type="text"
+            placeholder="D:\bot\fraq-plugins\my-fraq-app"
+            :class="{ 'field__input--dirty': dirty }"
+            autocomplete="off"
+          />
+          <p class="field__hint">
+            包含 fraq.yml 的项目目录；修改保存后需重启核心生效。
           </p>
         </div>
       </section>

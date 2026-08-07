@@ -82,10 +82,10 @@ export const httpApi = {
     return request('/api/settings')
   },
 
-  async saveSettings({ baseUrl, accessToken }) {
+  async saveSettings({ baseUrl, accessToken, appDir }) {
     return request('/api/settings', {
       method: 'PUT',
-      body: JSON.stringify({ baseUrl, accessToken }),
+      body: JSON.stringify({ baseUrl, accessToken, appDir }),
     })
   },
 }

@@ -12,5 +12,6 @@ export function normalizeSettings(raw = {}) {
     accessToken: typeof raw.accessToken === 'string' ? raw.accessToken : '',
     secureCookies: raw.secureCookies === true,
     hasAccessToken: raw.hasAccessToken === true,
+    appDir: typeof raw.appDir === 'string' ? raw.appDir : '',
   }
 }

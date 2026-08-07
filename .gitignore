@@ -1,3 +1,4 @@
 reference/
 node_modules/
 dist/
+.fraq-webui-state.json

@@ -7,7 +7,16 @@ import { serveStatic } from '@hono/node-server/serve-static'
 import { upgradeWebSocket } from '@hono/node-server'
 import { streamSSE } from 'hono/streaming'
 import { parse } from 'yaml'
-import { DIST_DIR, CONFIG_PATH, ADMIN_TOKEN, MILKY_URL, MILKY_WS_URL, MILKY_ACCESS_TOKEN } from './config.js'
+import {
+  DIST_DIR,
+  ADMIN_TOKEN,
+  MILKY_URL,
+  MILKY_WS_URL,
+  MILKY_ACCESS_TOKEN,
+  getAppDir,
+  setAppDir,
+  saveState,
+} from './config.js'
 import * as logService from '../services/logService.js'
 import * as processManager from '../services/processManager.js'
 import * as fraqConfig from '../services/fraqConfig.js'
@@ -138,6 +147,21 @@ app.put('/api/settings', async (c) => {
   } catch {
     return c.json({ error: '服务地址格式不正确，例如 http://127.0.0.1:30001' }, 400)
   }
+  if (typeof body.appDir === 'string' && body.appDir.trim()) {
+    const dir = path.resolve(body.appDir.trim())
+    try {
+      if (!fs.statSync(dir).isDirectory()) {
+        throw new Error('not a directory')
+      }
+      if (!fs.existsSync(path.join(dir, 'fraq.yml'))) {
+        return c.json({ error: '该目录中没有 fraq.yml' }, 400)
+      }
+    } catch {
+      return c.json({ error: '项目目录不存在或不可访问' }, 400)
+    }
+    setAppDir(dir)
+    saveState()
+  }
   fraqConfig.saveSettings({
     baseUrl,
     accessToken: typeof body.accessToken === 'string' ? body.accessToken : '',
@@ -247,7 +271,7 @@ app.notFound((c) => {
 
 function safeReadConfig() {
   try {
-    return parse(fs.readFileSync(CONFIG_PATH, 'utf8'))
+    return parse(fs.readFileSync(path.join(getAppDir(), 'fraq.yml'), 'utf8'))
   } catch {
     return null
   }

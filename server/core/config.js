@@ -1,16 +1,42 @@
 // 服务端配置：端口、fraq 项目路径、可选访问令牌。
 
 import path from 'node:path'
+import fs from 'node:fs'
 
 export const HOST = process.env.FRAQ_WEBUI_HOST ?? '127.0.0.1'
 export const PORT = Number(process.env.FRAQ_WEBUI_PORT ?? 8787)
 
-// fraq 项目目录（包含 fraq.yml）。可在启动时用环境变量覆盖：
-//   FRAQ_WEBUI_APP_DIR=D:\path\to\fraq-app node server/index.js
-export const APP_DIR = path.resolve(process.env.FRAQ_WEBUI_APP_DIR ?? 'D:/bot/fraq-plugins/my-fraq-app')
+// fraq 项目目录（包含 fraq.yml）。优先级：环境变量 > 设置里保存的路径 > 默认值。
+// 环境变量：FRAQ_WEBUI_APP_DIR=D:\path\to\fraq-app node server/index.js
+const DEFAULT_APP_DIR = 'D:/bot/fraq-plugins/my-fraq-app'
+const STATE_FILE = path.resolve('.fraq-webui-state.json')
 
-export const CONFIG_PATH = path.join(APP_DIR, 'fraq.yml')
-export const VERSIONS_PATH = path.join(APP_DIR, 'versions.yml')
+let appDir = path.resolve(process.env.FRAQ_WEBUI_APP_DIR ?? loadSavedAppDir() ?? DEFAULT_APP_DIR)
+
+export function getAppDir() {
+  return appDir
+}
+
+export function setAppDir(dir) {
+  appDir = path.resolve(dir)
+}
+
+export function saveState() {
+  try {
+    fs.writeFileSync(STATE_FILE, JSON.stringify({ appDir }))
+  } catch {
+    // 状态文件写入失败时仅本次生效
+  }
+}
+
+function loadSavedAppDir() {
+  try {
+    const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'))
+    return typeof state?.appDir === 'string' && state.appDir ? state.appDir : null
+  } catch {
+    return null
+  }
+}
 
 // 可选：设置后所有 /api 请求都需要 Authorization: Bearer <token>
 export const ADMIN_TOKEN = process.env.FRAQ_WEBUI_TOKEN ?? ''

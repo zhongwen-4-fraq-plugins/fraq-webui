@@ -2,23 +2,27 @@
 // 注意：读取时绝不返回插件配置内容（可能包含 API Key 等密钥）。
 
 import fs from 'node:fs'
+import path from 'node:path'
 import { parse, stringify } from 'yaml'
-import { CONFIG_PATH, VERSIONS_PATH } from '../core/config.js'
+import { getAppDir } from '../core/config.js'
 import { plugin } from '../models/plugin.js'
 import { settings } from '../models/settings.js'
 
+const configPath = () => path.join(getAppDir(), 'fraq.yml')
+const versionsPath = () => path.join(getAppDir(), 'versions.yml')
+
 function readConfig() {
-  const text = fs.readFileSync(CONFIG_PATH, 'utf8')
+  const text = fs.readFileSync(configPath(), 'utf8')
   return parse(text)
 }
 
 function writeConfig(doc) {
-  fs.writeFileSync(CONFIG_PATH, stringify(doc))
+  fs.writeFileSync(configPath(), stringify(doc))
 }
 
 function readVersions() {
   try {
-    return parse(fs.readFileSync(VERSIONS_PATH, 'utf8')) ?? {}
+    return parse(fs.readFileSync(versionsPath(), 'utf8')) ?? {}
   } catch {
     return {}
   }
@@ -70,6 +74,7 @@ export function getSettings() {
   return settings({
     baseUrl: doc.milky?.url ?? '',
     hasAccessToken: Boolean(doc.milky?.accessToken),
+    appDir: getAppDir(),
   })
 }
 

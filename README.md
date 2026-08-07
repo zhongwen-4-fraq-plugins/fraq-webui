@@ -36,7 +36,7 @@ npm run dev          # Vite 开发服务器（/api 自动代理到 8787）
 | --- | --- | --- |
 | `FRAQ_WEBUI_HOST` | `127.0.0.1` | 服务监听地址 |
 | `FRAQ_WEBUI_PORT` | `8787` | 服务端口 |
-| `FRAQ_WEBUI_APP_DIR` | `D:/bot/fraq-plugins/my-fraq-app` | fraq 项目目录 |
+| `FRAQ_WEBUI_APP_DIR` | `D:/bot/fraq-plugins/my-fraq-app` | fraq 项目目录（也可在设置页修改；env 优先，设置保存到 `.fraq-webui-state.json`） |
 | `FRAQ_WEBUI_TOKEN` | 空 | 设置后所有 /api 请求需带 `Authorization: Bearer <token>` |
 | `FRAQ_WEBUI_MILKY_URL` | `http://localhost:30001` | 真实 Milky 协议端地址 |
 | `FRAQ_WEBUI_MILKY_TOKEN` | 空 | 转发到 Milky 协议端时使用的访问令牌 |

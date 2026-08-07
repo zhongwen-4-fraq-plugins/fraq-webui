@@ -4,7 +4,7 @@ import { spawn, exec } from 'node:child_process'
 import { promisify } from 'node:util'
 import os from 'node:os'
 import path from 'node:path'
-import { APP_DIR } from '../core/config.js'
+import { getAppDir } from '../core/config.js'
 import * as logService from './logService.js'
 
 const execAsync = promisify(exec)
@@ -47,7 +47,7 @@ export async function start() {
   stopping = false
   startedAt = Date.now()
   child = spawn('fraq', ['start'], {
-    cwd: APP_DIR,
+    cwd: getAppDir(),
     shell: process.platform === 'win32',
     windowsHide: true,
     env: buildChildEnv(),
@@ -68,7 +68,7 @@ export async function start() {
     child = null
   })
 
-  logService.pushEvent('info', `正在启动 fraq（${APP_DIR}）...`)
+  logService.pushEvent('info', `正在启动 fraq（${getAppDir()}）...`)
 }
 
 export async function stop() {
@@ -94,5 +94,5 @@ export async function stop() {
 }
 
 export async function installDependencies() {
-  await execAsync('fraq install', { cwd: APP_DIR })
+  await execAsync('fraq install', { cwd: getAppDir() })
 }

@@ -5,7 +5,7 @@
 import { serve } from '@hono/node-server'
 import { WebSocketServer } from 'ws'
 import { app } from './core/app.js'
-import { HOST, PORT, APP_DIR } from './core/config.js'
+import { HOST, PORT, getAppDir } from './core/config.js'
 import * as processManager from './services/processManager.js'
 import * as logService from './services/logService.js'
 
@@ -19,7 +19,7 @@ const server = serve(
   (info) => {
     logService.pushEvent(
       'info',
-      `fraq-webui 服务已启动：http://${HOST}:${info.port}（fraq 项目：${APP_DIR}）`,
+      `fraq-webui 服务已启动：http://${HOST}:${info.port}（fraq 项目：${getAppDir()}）`,
     )
     console.log(`fraq-webui: http://${HOST}:${info.port}`)
   },
