@@ -20,6 +20,13 @@ const saving = ref(false)
 const baseUrlError = ref('')
 const showToken = ref(false)
 
+// 表单有未保存的修改时，输入框边框显示主题色
+const dirty = computed(
+  () =>
+    form.baseUrl !== store.state.settings.baseUrl ||
+    form.accessToken !== store.state.settings.accessToken,
+)
+
 const appearance = reactive(JSON.parse(JSON.stringify(store.state.appearance)))
 
 watch(
@@ -121,6 +128,7 @@ async function save() {
             class="field__input"
             type="url"
             placeholder="http://127.0.0.1:4649"
+            :class="{ 'field__input--dirty': dirty }"
             :aria-invalid="Boolean(baseUrlError)"
             :aria-describedby="baseUrlError ? 'base-url-error' : 'base-url-hint'"
           />
@@ -142,6 +150,7 @@ async function save() {
               :type="showToken ? 'text' : 'password'"
               autocomplete="off"
               placeholder="留空表示不校验"
+              :class="{ 'field__input--dirty': dirty }"
             />
             <button
               type="button"
@@ -275,6 +284,10 @@ async function save() {
 
 .field__input[aria-invalid='true'] {
   background: var(--danger-soft);
+}
+
+.field__input.field__input--dirty {
+  border-color: var(--primary);
 }
 
 .field__hint,
