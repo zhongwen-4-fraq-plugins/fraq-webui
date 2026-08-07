@@ -80,6 +80,7 @@ const argb = computed(() => {
   width: 2.5rem;
   height: 2rem;
   padding: 0;
+  border: none;
   border-radius: var(--radius-sm);
   background: var(--surface-2);
   cursor: pointer;
