@@ -28,6 +28,28 @@ function readVersions() {
   }
 }
 
+function writeVersions(versions) {
+  fs.writeFileSync(versionsPath(), stringify(versions))
+}
+
+// 把 npm 包名转回 fraq.yml 的插件键名：
+//   @fraqjs/plugin-hono   -> fraqjs/hono
+//   fraq-plugin-botweb    -> botweb
+export function toPluginKey(name) {
+  const trimmed = name.trim()
+  if (trimmed.startsWith('@')) {
+    const [scope, pkg] = trimmed.split('/')
+    if (pkg?.startsWith('plugin-')) {
+      return `${scope.slice(1)}/${pkg.slice('plugin-'.length)}`
+    }
+    return trimmed
+  }
+  if (trimmed.startsWith('fraq-plugin-')) {
+    return trimmed.slice('fraq-plugin-'.length)
+  }
+  return trimmed
+}
+
 export function getPlugins(coreRunning) {
   const doc = readConfig()
   const versions = readVersions()
@@ -56,11 +78,17 @@ export function setPluginEnabled(id, enabled) {
   writeConfig(doc)
 }
 
-export function installPlugin(name) {
+export function installPlugin(name, version) {
+  const key = toPluginKey(name)
   const doc = readConfig()
   doc.plugins ??= {}
-  doc.plugins[name] ??= {}
+  doc.plugins[key] ??= {}
   writeConfig(doc)
+  if (version) {
+    const versions = readVersions()
+    versions[key] = version
+    writeVersions(versions)
+  }
 }
 
 export function uninstallPlugin(id) {

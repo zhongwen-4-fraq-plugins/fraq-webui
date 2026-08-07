@@ -77,10 +77,10 @@ export const httpApi = {
     return request('/api/core/stop', { method: 'POST' })
   },
 
-  async installPlugin({ name }) {
+  async installPlugin({ name, version }) {
     return request('/api/plugins/install', {
       method: 'POST',
-      body: JSON.stringify({ name }),
+      body: JSON.stringify({ name, version }),
     })
   },
 

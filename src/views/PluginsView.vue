@@ -35,6 +35,7 @@ const statusMeta = (status) => {
 const installOpen = ref(false)
 const installName = ref('')
 const installError = ref('')
+const installVersion = ref('')
 
 function openInstall() {
   installName.value = ''
@@ -55,10 +56,11 @@ async function confirmInstall() {
   installError.value = ''
   installOpen.value = false
   try {
-    await store.installPlugin(name)
+    await store.installPlugin(name, installVersion.value)
   } catch (error) {
     store.toast('error', error instanceof Error ? error.message : '安装失败')
   }
+  installVersion.value = ''
 }
 
 const uninstallTarget = ref(null)
@@ -86,6 +88,7 @@ const filteredStorePlugins = computed(() => filterStorePlugins(store.state.store
 
 function installFromStore(plugin) {
   installName.value = plugin.name
+  installVersion.value = plugin.version ?? ''
   installError.value = ''
   installOpen.value = true
 }

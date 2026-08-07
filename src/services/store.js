@@ -265,8 +265,8 @@ async function stopCore() {
   }
 }
 
-async function installPlugin(name) {
-  await api.installPlugin({ name })
+async function installPlugin(name, version) {
+  await api.installPlugin({ name, version })
   toast('success', `插件 ${name} 已安装`)
   await refreshPlugins()
 }

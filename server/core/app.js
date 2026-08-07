@@ -129,7 +129,7 @@ app.post('/api/plugins/install', async (c) => {
   if (!/^(@[a-z0-9-]+\/)?[a-z0-9][a-z0-9-]*$/i.test(name)) {
     return c.json({ error: '插件名称格式不正确，例如 @fraqjs/plugin-hono' }, 400)
   }
-  fraqConfig.installPlugin(name)
+  fraqConfig.installPlugin(name, typeof body.version === 'string' ? body.version : undefined)
   // 进程未运行时手动安装依赖，让新插件立即可用
   if (!processManager.isRunning()) {
     await processManager.installDependencies()
