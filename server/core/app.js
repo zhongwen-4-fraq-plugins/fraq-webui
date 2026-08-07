@@ -7,12 +7,14 @@ import { serveStatic } from '@hono/node-server/serve-static'
 import { upgradeWebSocket } from '@hono/node-server'
 import { streamSSE } from 'hono/streaming'
 import { parse } from 'yaml'
+import { getCookie, setCookie, deleteCookie } from 'hono/cookie'
 import {
   DIST_DIR,
   ADMIN_TOKEN,
   MILKY_URL,
   MILKY_WS_URL,
   MILKY_ACCESS_TOKEN,
+  SESSION_TTL_MS,
   getAppDir,
   setAppDir,
   saveState,
@@ -21,16 +23,56 @@ import * as logService from '../services/logService.js'
 import * as processManager from '../services/processManager.js'
 import * as fraqConfig from '../services/fraqConfig.js'
 import * as messageStats from '../services/messageStats.js'
+import * as auth from '../services/auth.js'
 import { coreStatus } from '../models/status.js'
 
 export const app = new Hono()
 
-// 可选令牌校验：设置了 FRAQ_WEBUI_TOKEN 后，所有 /api 请求都需带 Bearer 令牌
+const COOKIE_NAME = 'fraq_webui_session'
+
+// 登录校验：未登录的 /api 请求返回 401（health 与 auth 路由除外）
 app.use('/api/*', async (c, next) => {
-  if (ADMIN_TOKEN && c.req.header('Authorization') !== `Bearer ${ADMIN_TOKEN}`) {
+  const path = c.req.path
+  if (path === '/api/health' || path.startsWith('/api/auth/')) {
+    return next()
+  }
+  const sid = getCookie(c, COOKIE_NAME)
+  if (auth.isValidSession(sid)) {
+    return next()
+  }
+  if (ADMIN_TOKEN && c.req.header('Authorization') === `Bearer ${ADMIN_TOKEN}`) {
+    return next()
+  }
+  return c.json({ error: 'Unauthorized' }, 401)
+})
+
+app.get('/api/auth/me', (c) => {
+  const sid = getCookie(c, COOKIE_NAME)
+  return c.json({ authenticated: auth.isValidSession(sid) })
+})
+
+app.post('/api/auth/login', async (c) => {
+  const body = await c.req.json().catch(() => ({}))
+  if (!auth.verifyLoginToken(body.token)) {
     return c.json({ error: 'Unauthorized' }, 401)
   }
-  await next()
+  const sid = auth.createSession()
+  setCookie(c, COOKIE_NAME, sid, {
+    httpOnly: true,
+    sameSite: 'Lax',
+    maxAge: Math.floor(SESSION_TTL_MS / 1000),
+    path: '/',
+  })
+  return c.json({ ok: true })
+})
+
+app.post('/api/auth/logout', (c) => {
+  const sid = getCookie(c, COOKIE_NAME)
+  if (sid) {
+    auth.destroySession(sid)
+  }
+  deleteCookie(c, COOKIE_NAME, { path: '/' })
+  return c.json({ ok: true })
 })
 
 app.get('/api/health', (c) => c.json({ ok: true }))

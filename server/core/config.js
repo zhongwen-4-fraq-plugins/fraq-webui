@@ -40,6 +40,7 @@ function loadSavedAppDir() {
 
 // 可选：设置后所有 /api 请求都需要 Authorization: Bearer <token>
 export const ADMIN_TOKEN = process.env.FRAQ_WEBUI_TOKEN ?? ''
+export const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000
 
 // 真实 Milky 协议端地址（fraq 的 milky.url 指向本服务，由本服务转发到这里）
 export const MILKY_URL = process.env.FRAQ_WEBUI_MILKY_URL ?? 'http://localhost:30001'

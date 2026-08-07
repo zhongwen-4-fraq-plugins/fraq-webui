@@ -21,7 +21,7 @@ npm run build        # 构建前端到 dist/
 npm run server       # 启动管理服务（默认 http://127.0.0.1:8787）
 ```
 
-打开 http://127.0.0.1:8787 即可使用。服务端会负责拉起 `fraq start`、收集日志、读写 `fraq.yml`（插件启停、Milky 连接设置）。
+打开 http://127.0.0.1:8787 即可使用。**首次打开会显示登录页**，登录令牌在启动管理服务的终端中打印（或用环境变量 `FRAQ_WEBUI_TOKEN` 固定）。服务端会负责拉起 `fraq start`、收集日志、读写 `fraq.yml`（插件启停、Milky 连接设置）。
 
 ## 开发模式
 
@@ -37,7 +37,7 @@ npm run dev          # Vite 开发服务器（/api 自动代理到 8787）
 | `FRAQ_WEBUI_HOST` | `127.0.0.1` | 服务监听地址 |
 | `FRAQ_WEBUI_PORT` | `8787` | 服务端口 |
 | `FRAQ_WEBUI_APP_DIR` | `D:/bot/fraq-plugins/my-fraq-app` | fraq 项目目录（也可在设置页修改；env 优先，设置保存到 `.fraq-webui-state.json`） |
-| `FRAQ_WEBUI_TOKEN` | 空 | 设置后所有 /api 请求需带 `Authorization: Bearer <token>` |
+| `FRAQ_WEBUI_TOKEN` | 空 | 登录令牌；未设置时启动自动生成并打印在终端（也可用于 API 的 Bearer 鉴权） |
 | `FRAQ_WEBUI_MILKY_URL` | `http://localhost:30001` | 真实 Milky 协议端地址 |
 | `FRAQ_WEBUI_MILKY_TOKEN` | 空 | 转发到 Milky 协议端时使用的访问令牌 |
 

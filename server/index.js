@@ -5,7 +5,8 @@
 import { serve } from '@hono/node-server'
 import { WebSocketServer } from 'ws'
 import { app } from './core/app.js'
-import { HOST, PORT, getAppDir } from './core/config.js'
+import { HOST, PORT, getAppDir, ADMIN_TOKEN } from './core/config.js'
+import { LOGIN_TOKEN } from './services/auth.js'
 import * as processManager from './services/processManager.js'
 import * as logService from './services/logService.js'
 
@@ -22,6 +23,9 @@ const server = serve(
       `fraq-webui 服务已启动：http://${HOST}:${info.port}（fraq 项目：${getAppDir()}）`,
     )
     console.log(`fraq-webui: http://${HOST}:${info.port}`)
+    if (!ADMIN_TOKEN) {
+      console.log(`登录令牌：${LOGIN_TOKEN}`)
+    }
   },
 )
 

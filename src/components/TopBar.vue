@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import IconMenu from '~icons/tabler/menu-2'
 import IconPower from '~icons/tabler/power'
 import IconSquare from '~icons/tabler/square'
+import IconLogout from '~icons/tabler/logout'
 import { useRoute } from 'vue-router'
 import { store } from '../services/store.js'
 import { CORE_STATUS } from '../models/coreStatus.js'
@@ -49,6 +50,9 @@ const pageTitle = computed(() => route.meta.title ?? '')
           <IconPower v-else aria-hidden="true" />
           {{ coreRunning ? '停止核心' : '启动核心' }}
         </AppButton>
+        <button type="button" class="topbar__logout" aria-label="退出登录" title="退出登录" @click="store.logout()">
+          <IconLogout aria-hidden="true" />
+        </button>
       </div>
     </div>
 
@@ -128,6 +132,29 @@ const pageTitle = computed(() => route.meta.title ?? '')
   align-items: center;
   gap: var(--space-3);
   margin-left: auto;
+}
+
+.topbar__logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.topbar__logout:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.topbar__logout svg {
+  width: 1.125rem;
+  height: 1.125rem;
 }
 
 @media (min-width: 900px) {

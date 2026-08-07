@@ -17,6 +17,11 @@ const state = reactive({
   core: createCoreStatus(),
   stats: createMessageStats(),
   appearance: normalizeAppearance(loadAppearance()),
+  auth: {
+    checking: true,
+    authenticated: false,
+    error: '',
+  },
   plugins: [],
   storePlugins: [],
   logs: [],
@@ -92,6 +97,38 @@ function setAppearance(next) {
     // 存储不可用时仅本次生效
   }
   applyAppearance()
+}
+
+async function checkAuth() {
+  try {
+    const result = await api.me()
+    state.auth.authenticated = result.authenticated === true
+  } catch {
+    state.auth.authenticated = false
+  } finally {
+    state.auth.checking = false
+  }
+}
+
+async function login(token) {
+  state.auth.error = ''
+  try {
+    await api.login(token)
+    state.auth.authenticated = true
+    toast('success', '登录成功')
+  } catch (error) {
+    state.auth.error = error instanceof Error ? error.message : '登录失败'
+    throw error
+  }
+}
+
+async function logout() {
+  try {
+    await api.logout()
+  } finally {
+    state.auth.authenticated = false
+    toast('info', '已退出登录')
+  }
 }
 
 function toast(type, message) {
@@ -275,6 +312,9 @@ export const store = {
   refreshStats,
   setStats,
   setAppearance,
+  checkAuth,
+  login,
+  logout,
   refreshPlugins,
   refreshStorePlugins,
   refreshLogs,

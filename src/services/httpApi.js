@@ -22,6 +22,22 @@ async function request(path, options = {}) {
 }
 
 export const httpApi = {
+  async me() {
+    const response = await fetch('/api/auth/me')
+    return response.json()
+  },
+
+  async login(token) {
+    return request('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ token }),
+    })
+  },
+
+  async logout() {
+    return request('/api/auth/logout', { method: 'POST' })
+  },
+
   async getCoreStatus() {
     return request('/api/core')
   },
