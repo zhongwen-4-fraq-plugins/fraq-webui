@@ -313,7 +313,7 @@ function installFromStore(plugin) {
         @keydown.enter="confirmInstall"
       />
       <p v-if="installError" class="install-error">{{ installError }}</p>
-      <p class="install-hint">安装后插件处于停用状态，需要手动启用。</p>
+      <p class="install-hint">会自动解析并安装所需的依赖插件；安装后插件处于停用状态，需要手动启用。</p>
     </ConfirmDialog>
 
     <ConfirmDialog

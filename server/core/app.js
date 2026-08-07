@@ -24,6 +24,7 @@ import * as processManager from '../services/processManager.js'
 import * as fraqConfig from '../services/fraqConfig.js'
 import * as messageStats from '../services/messageStats.js'
 import * as auth from '../services/auth.js'
+import { resolveInstallPlan } from '../services/pluginRegistry.js'
 import { coreStatus } from '../models/status.js'
 
 export const app = new Hono()
@@ -129,12 +130,18 @@ app.post('/api/plugins/install', async (c) => {
   if (!/^(@[a-z0-9-]+\/)?[a-z0-9][a-z0-9-]*$/i.test(name)) {
     return c.json({ error: '插件名称格式不正确，例如 @fraqjs/plugin-hono' }, 400)
   }
-  fraqConfig.installPlugin(name, typeof body.version === 'string' ? body.version : undefined)
+  let plan
+  try {
+    plan = await resolveInstallPlan(name, typeof body.version === 'string' ? body.version : undefined)
+  } catch (error) {
+    return c.json({ error: error instanceof Error ? error.message : '无法解析插件信息' }, 400)
+  }
+  fraqConfig.addPlugins(plan)
   // 进程未运行时手动安装依赖，让新插件立即可用
   if (!processManager.isRunning()) {
     await processManager.installDependencies()
   }
-  return c.json({ ok: true })
+  return c.json({ ok: true, plugins: plan.map((item) => item.key) })
 })
 
 app.post('/api/plugins/:id/enable', (c) => {

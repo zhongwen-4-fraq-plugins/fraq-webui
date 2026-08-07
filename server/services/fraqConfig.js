@@ -91,6 +91,24 @@ export function installPlugin(name, version) {
   }
 }
 
+// 一次性写入多个插件及其版本（安装时连同依赖一起）
+export function addPlugins(entries) {
+  const doc = readConfig()
+  doc.plugins ??= {}
+  for (const { key } of entries) {
+    doc.plugins[key] ??= {}
+  }
+  writeConfig(doc)
+
+  const versions = readVersions()
+  for (const { key, version } of entries) {
+    if (version) {
+      versions[key] = version
+    }
+  }
+  writeVersions(versions)
+}
+
 export function uninstallPlugin(id) {
   const doc = readConfig()
   delete doc.plugins?.[id]
