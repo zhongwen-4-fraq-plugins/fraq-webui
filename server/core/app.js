@@ -284,6 +284,13 @@ app.get(
 
 // 静态界面：构建产物存在时托管 dist/，未知路径回退到 index.html
 if (fs.existsSync(DIST_DIR)) {
+  app.use('/*', async (c, next) => {
+    // index.html 不缓存，避免前端更新后浏览器仍用旧页面
+    if (!c.req.path.startsWith('/api') && !/\.[a-z0-9]+$/i.test(c.req.path)) {
+      c.header('Cache-Control', 'no-cache')
+    }
+    await next()
+  })
   app.use(
     '/*',
     serveStatic({
@@ -298,7 +305,10 @@ if (fs.existsSync(DIST_DIR)) {
     const indexHtml = path.join(DIST_DIR, 'index.html')
     return fs.existsSync(indexHtml)
       ? new Response(fs.readFileSync(indexHtml), {
-          headers: { 'Content-Type': 'text/html; charset=utf-8' },
+          headers: {
+            'Content-Type': 'text/html; charset=utf-8',
+            'Cache-Control': 'no-cache',
+          },
         })
       : next()
   })
