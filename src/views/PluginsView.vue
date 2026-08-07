@@ -512,7 +512,7 @@ function installFromStore(plugin) {
 
 .plugin-list__head {
   padding: var(--space-2) var(--space-4);
-  background: var(--surface-2);
+  background: transparent;
   color: var(--muted);
   font-size: var(--text-xs);
 }
