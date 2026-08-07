@@ -1,5 +1,5 @@
 <script setup>
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import IconPlayerPause from '~icons/tabler/player-pause'
 import IconPlayerPlay from '~icons/tabler/player-play'
@@ -31,6 +31,30 @@ const hasMore = ref(true)
 const loadingOlder = ref(false)
 const streamRef = ref(null)
 const route = useRoute()
+const expanded = reactive(new Set())
+
+const LONG_MESSAGE_LIMIT = 120
+
+function messageKey(entry, index) {
+  return `${entry.time}-${entry.module}-${entry.message.slice(0, 60)}`
+}
+
+function isCollapsible(entry) {
+  return entry.message.length > LONG_MESSAGE_LIMIT
+}
+
+function isExpanded(entry, index) {
+  return expanded.has(messageKey(entry, index))
+}
+
+function toggleMessage(entry, index) {
+  const key = messageKey(entry, index)
+  if (expanded.has(key)) {
+    expanded.delete(key)
+  } else {
+    expanded.add(key)
+  }
+}
 
 let pollTimer = null
 let debounceTimer = null
@@ -208,7 +232,17 @@ const toneOf = (entry) => {
               {{ levelLabel(entry.level) }}
             </span>
             <span class="log-line__module">{{ entry.module }}</span>
-            <span class="log-line__message">{{ entry.message }}</span>
+            <span
+              class="log-line__message"
+              :class="{ 'log-line__message--collapsed': isCollapsible(entry) && !isExpanded(entry, index) }"
+              :role="isCollapsible(entry) ? 'button' : undefined"
+              :tabindex="isCollapsible(entry) ? 0 : undefined"
+              :aria-expanded="isCollapsible(entry) ? isExpanded(entry, index) : undefined"
+              :title="isCollapsible(entry) ? (isExpanded(entry, index) ? '点击收起' : '点击展开') : undefined"
+              @click="isCollapsible(entry) && toggleMessage(entry, index)"
+              @keydown.enter="isCollapsible(entry) && toggleMessage(entry, index)"
+              @keydown.space.prevent="isCollapsible(entry) && toggleMessage(entry, index)"
+            >{{ entry.message }}</span>
           </li>
         </ul>
       </div>
@@ -383,6 +417,13 @@ const toneOf = (entry) => {
 .log-line__message {
   min-width: 0;
   word-break: break-word;
+}
+
+.log-line__message--collapsed {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
 @media (max-width: 640px) {
