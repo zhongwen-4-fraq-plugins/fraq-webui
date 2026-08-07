@@ -131,12 +131,12 @@ defineEmits(['click'])
 }
 
 .btn--ghost {
-  background: transparent;
+  background: var(--app-component-bg, transparent);
   color: var(--ink);
 }
 
 .btn--ghost:hover:not(:disabled) {
-  background: var(--surface-2);
+  background: color-mix(in srgb, var(--ink) 10%, var(--app-component-bg, var(--surface-2)));
 }
 
 .btn--danger {
@@ -149,7 +149,7 @@ defineEmits(['click'])
 }
 
 .btn--danger-ghost {
-  background: transparent;
+  background: var(--app-component-bg, transparent);
   color: var(--danger);
 }
 

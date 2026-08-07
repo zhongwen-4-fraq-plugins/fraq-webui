@@ -332,7 +332,7 @@ function installFromStore(plugin) {
   padding: 2px;
   margin-bottom: var(--space-4);
   border-radius: var(--radius-md);
-  background: var(--surface);
+  background: var(--app-component-bg, var(--surface));
 }
 
 .source-tab {

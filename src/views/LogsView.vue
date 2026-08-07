@@ -219,7 +219,7 @@ const toneOf = (entry) => {
   display: inline-flex;
   padding: 2px;
   border-radius: var(--radius-md);
-  background: var(--surface);
+  background: var(--app-component-bg, var(--surface));
 }
 
 .level-button {
