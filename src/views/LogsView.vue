@@ -367,19 +367,25 @@ const toneOf = (entry) => {
 }
 
 .log-line--error {
-  background: var(--danger-soft);
+  color: var(--danger);
 }
 
-.log-line--error:hover {
-  background: var(--danger-soft);
+.log-line--error .log-line__time,
+.log-line--error .log-line__level,
+.log-line--error .log-line__module,
+.log-line--error .log-line__message {
+  color: var(--danger);
 }
 
 .log-line--warning {
-  background: var(--warning-soft);
+  color: var(--warning-text);
 }
 
-.log-line--warning:hover {
-  background: var(--warning-soft);
+.log-line--warning .log-line__time,
+.log-line--warning .log-line__level,
+.log-line--warning .log-line__module,
+.log-line--warning .log-line__message {
+  color: var(--warning-text);
 }
 
 .log-line__time {
