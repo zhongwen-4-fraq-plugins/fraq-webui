@@ -86,6 +86,21 @@ const argb = computed(() => {
   cursor: pointer;
 }
 
+.argb__color::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border: none;
+}
+
+.argb__color::-webkit-color-swatch {
+  border: none;
+  border-radius: var(--radius-sm);
+}
+
+.argb__color::-moz-color-swatch {
+  border: none;
+  border-radius: var(--radius-sm);
+}
+
 .argb__alpha {
   -webkit-appearance: none;
   appearance: none;
