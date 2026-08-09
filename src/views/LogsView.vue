@@ -284,6 +284,11 @@ const toneOf = (entry) => {
   margin-left: 15px;
 }
 
+.logs-header__gear.logs-header__gear,
+.logs-header__gear.logs-header__gear:hover {
+  background: transparent;
+}
+
 .logs-header__description {
   margin-top: var(--space-1);
   color: var(--muted);
