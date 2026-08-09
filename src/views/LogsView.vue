@@ -281,7 +281,7 @@ const toneOf = (entry) => {
 }
 
 .logs-header__gear {
-  margin-left: 15px;
+  margin-left: 10px;
 }
 
 .logs-header__gear.logs-header__gear,
