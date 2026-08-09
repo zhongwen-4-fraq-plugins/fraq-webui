@@ -13,7 +13,6 @@ import { LOG_PAGE_SIZE, LOG_POLL_INTERVAL_MS, MAX_VISIBLE_LOGS } from '../core/c
 import AppButton from '../components/AppButton.vue'
 import EmptyState from '../components/EmptyState.vue'
 import ErrorBanner from '../components/ErrorBanner.vue'
-import PageHeader from '../components/PageHeader.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
 
 const LEVELS = [
@@ -156,19 +155,22 @@ const toneOf = (entry) => {
 
 <template>
   <div>
-    <PageHeader title="日志" description="实时查看 fraq 运行日志，支持按级别过滤与搜索。">
-      <template #action>
+    <div class="logs-header">
+      <h2 class="logs-header__title">
+        日志
         <AppButton
           variant="ghost"
           size="icon"
+          class="logs-header__gear"
           aria-label="日志颜色设置"
           title="日志颜色设置"
           @click="store.state.logColorsOpen = true"
         >
           <IconSettings aria-hidden="true" />
         </AppButton>
-      </template>
-    </PageHeader>
+      </h2>
+      <p class="logs-header__description">实时查看 fraq 运行日志，支持按级别过滤与搜索。</p>
+    </div>
 
     <ErrorBanner v-if="store.state.errors.logs" :message="store.state.errors.logs" @retry="store.refreshLogs" />
 
@@ -267,6 +269,28 @@ const toneOf = (entry) => {
 </template>
 
 <style scoped>
+.logs-header {
+  margin-bottom: var(--space-6);
+}
+
+.logs-header__title {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--text-xl);
+  font-weight: 600;
+}
+
+.logs-header__gear {
+  margin-left: 15px;
+}
+
+.logs-header__description {
+  margin-top: var(--space-1);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  max-width: 60ch;
+}
+
 .empty-icon {
   width: 1.25rem;
   height: 1.25rem;
