@@ -345,11 +345,7 @@ function installFromStore(plugin) {
       卸载会移除插件及其数据，且无法恢复。请先停用插件再卸载。
     </ConfirmDialog>
 
-    <PluginConfigDialog
-      v-if="configTarget"
-      v-model:open="configOpen"
-      :plugin="configTarget"
-    />
+    <PluginConfigDialog v-model:open="configOpen" :plugin="configTarget" />
   </div>
 </template>
 

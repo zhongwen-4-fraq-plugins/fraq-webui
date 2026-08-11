@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import AppButton from './AppButton.vue'
 
 const props = defineProps({
@@ -13,6 +13,13 @@ const props = defineProps({
 
 const emit = defineEmits(['update:open', 'confirm', 'cancel'])
 const dialogRef = ref(null)
+
+// 防御：组件挂载时 open 已是 true（如 v-if 首次渲染）也正常打开
+onMounted(() => {
+  if (props.open && dialogRef.value && !dialogRef.value.open) {
+    dialogRef.value.showModal()
+  }
+})
 
 watch(
   () => props.open,
