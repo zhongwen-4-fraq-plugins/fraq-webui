@@ -4,7 +4,7 @@ import { spawn, exec } from 'node:child_process'
 import { promisify } from 'node:util'
 import os from 'node:os'
 import path from 'node:path'
-import { getAppDir } from '../core/config.js'
+import { getAppDir, getPortableNodeDir } from '../core/config.js'
 import * as logService from './logService.js'
 
 const execAsync = promisify(exec)
@@ -16,10 +16,11 @@ export function buildChildEnv() {
     process.platform === 'win32'
       ? path.join(os.homedir(), 'AppData', 'Roaming', 'npm')
       : '/usr/local/bin'
+  const portable = getPortableNodeDir()
   return {
     ...process.env,
     FORCE_COLOR: '0',
-    PATH: [nodeDir, globalBin, process.env.PATH].filter(Boolean).join(path.delimiter),
+    PATH: [portable, nodeDir, globalBin, process.env.PATH].filter(Boolean).join(path.delimiter),
   }
 }
 

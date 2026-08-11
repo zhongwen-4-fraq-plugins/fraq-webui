@@ -9,6 +9,8 @@ import extract from 'extract-zip'
 import {
   getProtocolDir,
   setProtocolDir,
+  getPortableNodeDir,
+  setPortableNodeDir,
   saveState,
   MILKY_URL,
   MILKY_ACCESS_TOKEN,
@@ -33,6 +35,7 @@ const state = {
   message: '',
   error: '',
   exePath: '',
+  task: '', // cli | protocol | node
   source: '',
   tag: '',
   asset: '',
@@ -110,8 +113,23 @@ export async function checkProtocol() {
 }
 
 export async function checkAll() {
-  const [cli, protocol] = await Promise.all([checkCli(), checkProtocol()])
-  return { cli, protocol, status: getStatus() }
+  const [node, cli, protocol] = await Promise.all([checkNode(), checkCli(), checkProtocol()])
+  return { node, cli, protocol, status: getStatus() }
+}
+
+export async function checkNode() {
+  const [node, npm] = await Promise.allSettled([
+    runCommand('node', ['--version'], { quiet: true }),
+    runCommand('npm', ['--version'], { quiet: true }),
+  ])
+  if (node.status !== 'fulfilled') {
+    return { installed: false, nodeVersion: '', npmVersion: '' }
+  }
+  return {
+    installed: true,
+    nodeVersion: node.value.replace(/^v/, ''),
+    npmVersion: npm.status === 'fulfilled' ? npm.value : '',
+  }
 }
 
 export function installCli() {
@@ -125,6 +143,7 @@ export function installCli() {
     message: '正在安装 fraq CLI（npm install -g @fraqjs/cli）...',
     error: '',
     exePath: '',
+    task: 'cli',
     source: '',
     tag: '',
     asset: '',
@@ -146,6 +165,91 @@ export function installCli() {
     .finally(() => {
       state.busy = false
     })
+}
+
+const nodeReleaseCache = { at: 0, data: [] }
+
+export async function listNodeReleases() {
+  if (Date.now() - nodeReleaseCache.at < CACHE_TTL_MS) {
+    return nodeReleaseCache.data
+  }
+  const response = await fetch('https://nodejs.org/dist/index.json', {
+    headers: { 'User-Agent': 'fraq-webui' },
+  })
+  if (!response.ok) {
+    throw new Error(`Node.js 官网返回 HTTP ${response.status}，请稍后重试`)
+  }
+  const all = await response.json()
+  nodeReleaseCache.data = all
+    .filter((item) => item.lts !== false)
+    .slice(0, 12)
+    .map((item) => ({
+      version: item.version,
+      lts: typeof item.lts === 'string' ? item.lts : '',
+      date: item.date,
+    }))
+  nodeReleaseCache.at = Date.now()
+  return nodeReleaseCache.data
+}
+
+export function installNode({ version, installDir }) {
+  if (state.busy) {
+    throw new Error('已有安装任务在进行，请稍后再试')
+  }
+  state.busy = true
+  const dirError = applyInstallDir(installDir)
+  if (dirError) {
+    state.busy = false
+    throw new Error(dirError)
+  }
+  const ver = version.startsWith('v') ? version : `v${version}`
+  const assetName = `node-${ver}-win-x64.zip`
+  const destDir = path.join(getProtocolDir(), 'node', ver)
+  const url = `https://nodejs.org/dist/${ver}/${assetName}`
+
+  state.task = 'node'
+  state.phase = 'downloading'
+  state.progress = 0
+  state.message = `正在下载 ${assetName}`
+  state.error = ''
+  state.exePath = ''
+  state.source = ''
+  state.tag = ver
+  state.asset = assetName
+  logService.pushEvent('info', `开始下载 ${assetName}...`)
+  void (async () => {
+    try {
+      const filePath = path.join(destDir, assetName)
+      fs.mkdirSync(destDir, { recursive: true })
+      await downloadFileWithRetry(url, filePath, 0, (received, total) => {
+        state.progress = Math.min(89, Math.round((received / total) * 100))
+        state.message = `正在下载 ${assetName}（${formatBytes(received)} / ${formatBytes(total)}）`
+      })
+      state.phase = 'extracting'
+      state.progress = 92
+      state.message = '正在解压...'
+      await extract(filePath, { dir: destDir })
+      try {
+        fs.unlinkSync(filePath)
+      } catch {
+        // 解压后删除压缩包失败不影响使用
+      }
+      const nodeExe = findExecutable(destDir, 'node')
+      setPortableNodeDir(nodeExe ? path.dirname(nodeExe) : destDir)
+      saveState()
+      state.phase = 'done'
+      state.progress = 100
+      state.message = 'Node.js 安装完成'
+      logService.pushEvent('info', `Node.js 安装完成（${nodeExe}）`)
+    } catch (error) {
+      state.phase = 'error'
+      state.error = error instanceof Error ? error.message : '安装失败'
+      state.message = 'Node.js 安装失败'
+      logService.pushEvent('error', `Node.js 安装失败：${state.error}`)
+    } finally {
+      state.busy = false
+    }
+  })()
 }
 
 export async function listReleases(source) {
@@ -195,14 +299,10 @@ export function installProtocol({ source, tag, assetName, installDir }) {
     state.busy = false
     throw new Error('未知的协议端来源')
   }
-  if (installDir !== undefined && installDir !== null && String(installDir).trim()) {
-    const dir = String(installDir).trim()
-    if (!path.isAbsolute(dir)) {
-      state.busy = false
-      throw new Error('安装目录需要是完整路径，例如 D:\\bot\\yogurt')
-    }
-    setProtocolDir(dir)
-    saveState()
+  const dirError = applyInstallDir(installDir)
+  if (dirError) {
+    state.busy = false
+    throw new Error(dirError)
   }
   // 校验版本与文件，通过后再开始后台下载
   void listReleases(source).then((releases) => {
@@ -236,6 +336,7 @@ async function startDownload(source, tag, assetName, release, asset) {
     message: `正在下载 ${assetName}`,
     error: '',
     exePath: '',
+    task: 'protocol',
     source,
     tag,
     asset: assetName,
@@ -413,6 +514,18 @@ export async function stopProtocol() {
 
 export function getStatus() {
   return { ...state, protocolDir: getProtocolDir() }
+}
+
+function applyInstallDir(installDir) {
+  if (installDir !== undefined && installDir !== null && String(installDir).trim()) {
+    const dir = String(installDir).trim()
+    if (!path.isAbsolute(dir)) {
+      return '安装目录需要是完整路径，例如 D:\\bot\\yogurt'
+    }
+    setProtocolDir(dir)
+    saveState()
+  }
+  return ''
 }
 
 function formatBytes(bytes) {

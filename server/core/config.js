@@ -20,6 +20,9 @@ let protocolDir = path.resolve(
   process.env.FRAQ_WEBUI_PROTOCOL_DIR ?? savedState.protocolDir ?? 'protocols',
 )
 
+// 便携版 Node.js 目录（安装页下载的 Node zip 解压位置，空表示未安装）
+let portableNodeDir = process.env.FRAQ_WEBUI_NODE_DIR ?? savedState.nodeDir ?? ''
+
 export function getAppDir() {
   return appDir
 }
@@ -36,9 +39,17 @@ export function setProtocolDir(dir) {
   protocolDir = path.resolve(dir)
 }
 
+export function getPortableNodeDir() {
+  return portableNodeDir
+}
+
+export function setPortableNodeDir(dir) {
+  portableNodeDir = path.resolve(dir)
+}
+
 export function saveState() {
   try {
-    fs.writeFileSync(STATE_FILE, JSON.stringify({ appDir, protocolDir }))
+    fs.writeFileSync(STATE_FILE, JSON.stringify({ appDir, protocolDir, nodeDir: portableNodeDir }))
   } catch {
     // 状态文件写入失败时仅本次生效
   }

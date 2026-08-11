@@ -21,6 +21,7 @@ const sources = [
 const checking = ref(true)
 const checkError = ref('')
 const cli = reactive({ installed: false, version: '' })
+const node = reactive({ installed: false, nodeVersion: '', npmVersion: '' })
 const protocol = reactive({ reachable: false, running: false, detail: '' })
 
 const source = ref('yogurt')
@@ -38,14 +39,21 @@ const status = reactive({
   message: '',
   error: '',
   exePath: '',
+  task: '',
   running: false,
   pid: null,
 })
 
 const installingCli = ref(false)
+const nodeInstalling = ref(false)
 const downloading = ref(false)
 const starting = ref(false)
 const stopping = ref(false)
+
+const nodeReleases = ref([])
+const nodeReleasesLoading = ref(false)
+const nodeReleaseError = ref('')
+const nodeTag = ref('')
 
 let pollTimer = null
 
@@ -54,10 +62,13 @@ const currentRelease = computed(
 )
 
 const cliBusy = computed(() => status.phase === 'installing-cli')
-const protocolBusy = computed(() =>
-  ['downloading', 'extracting'].includes(status.phase),
+const nodeBusy = computed(
+  () => status.task === 'node' && ['downloading', 'extracting'].includes(status.phase),
 )
-const busyPhase = computed(() => cliBusy.value || protocolBusy.value)
+const protocolBusy = computed(
+  () => status.task === 'protocol' && ['downloading', 'extracting'].includes(status.phase),
+)
+const busyPhase = computed(() => cliBusy.value || nodeBusy.value || protocolBusy.value)
 
 function isRecommended(asset) {
   const name = asset.name.toLowerCase()
@@ -102,6 +113,23 @@ async function loadReleases() {
   }
 }
 
+async function loadNodeReleases() {
+  nodeReleasesLoading.value = true
+  nodeReleaseError.value = ''
+  try {
+    const result = await httpApi.getNodeReleases()
+    nodeReleases.value = result.releases
+    nodeTag.value = nodeReleases.value[0]?.version ?? ''
+    if (nodeReleases.value.length === 0) {
+      nodeReleaseError.value = '暂无可用版本'
+    }
+  } catch (error) {
+    nodeReleaseError.value = error instanceof Error ? error.message : '无法获取版本列表'
+  } finally {
+    nodeReleasesLoading.value = false
+  }
+}
+
 async function refreshCheck() {
   checking.value = true
   checkError.value = ''
@@ -109,6 +137,9 @@ async function refreshCheck() {
     const result = await httpApi.getInstallCheck()
     cli.installed = result.cli.installed
     cli.version = result.cli.version
+    node.installed = result.node.installed
+    node.nodeVersion = result.node.nodeVersion
+    node.npmVersion = result.node.npmVersion
     protocol.reachable = result.protocol.reachable
     protocol.running = result.protocol.running === true
     protocol.detail = result.protocol.detail
@@ -161,6 +192,23 @@ async function installCli() {
   }
 }
 
+async function installNode() {
+  if (!nodeTag.value) return
+  nodeInstalling.value = true
+  status.error = ''
+  try {
+    await httpApi.installNode({
+      version: nodeTag.value,
+      installDir: protocolDir.value,
+    })
+    startPolling()
+  } catch (error) {
+    status.error = error instanceof Error ? error.message : '安装失败'
+  } finally {
+    nodeInstalling.value = false
+  }
+}
+
 async function download() {
   if (!tag.value || !assetName.value) return
   downloading.value = true
@@ -209,6 +257,7 @@ async function stopProtocol() {
 
 onMounted(async () => {
   await refreshCheck()
+  await loadNodeReleases()
   await loadReleases()
   await refreshStatus()
   if (busyPhase.value) {
@@ -223,7 +272,7 @@ onUnmounted(stopPolling)
   <div>
     <PageHeader
       title="安装"
-      description="检查并安装 fraq 运行环境：fraq CLI 与 Milky 协议端。"
+      description="检查并安装 fraq 运行环境：Node.js、fraq CLI 与 Milky 协议端。"
     />
 
     <ErrorBanner
@@ -235,6 +284,89 @@ onUnmounted(stopPolling)
     <SkeletonBlock v-if="checking" :lines="5" />
 
     <div v-else class="install">
+      <section class="install__group" aria-labelledby="dir-heading">
+        <h3 id="dir-heading" class="install__heading">安装目录</h3>
+        <input
+          id="install-dir"
+          v-model.trim="protocolDir"
+          class="install__input"
+          type="text"
+          placeholder="D:\bot\fraq-webui\protocols"
+          autocomplete="off"
+          aria-label="安装目录"
+        />
+        <p class="install__hint">
+          Node.js 与协议端的下载解压位置，需为完整路径；留空使用默认目录，修改后自动保存。
+        </p>
+      </section>
+
+      <section class="install__group" aria-labelledby="node-heading">
+        <h3 id="node-heading" class="install__heading">Node.js</h3>
+        <div class="install__row">
+          <StatusBadge :tone="node.installed ? 'success' : 'danger'">
+            {{ node.installed ? `已安装 ${node.nodeVersion}` : '未检测到' }}
+          </StatusBadge>
+          <AppButton v-if="node.installed" variant="ghost" size="sm" @click="refreshCheck">
+            <IconRefresh aria-hidden="true" />
+            重新检查
+          </AppButton>
+        </div>
+        <p v-if="node.installed && node.npmVersion" class="install__hint">
+          npm {{ node.npmVersion }}
+        </p>
+        <p v-else class="install__hint">
+          Node.js 是 fraq CLI 与协议端安装的基础；未安装时可选择版本下载安装（便携版，无需管理员权限）。
+        </p>
+
+        <template v-if="!node.installed">
+          <div class="install__field">
+            <label class="install__label" for="node-version">版本</label>
+            <select
+              id="node-version"
+              v-model="nodeTag"
+              class="install__input"
+              :disabled="nodeReleasesLoading || nodeReleases.length === 0"
+            >
+              <option v-if="nodeReleasesLoading" value="">正在加载版本...</option>
+              <option v-for="item in nodeReleases" :key="item.version" :value="item.version">
+                {{ item.version }}{{ item.lts ? `（LTS ${item.lts}）` : '' }}
+              </option>
+            </select>
+            <p v-if="nodeReleaseError" class="install__error">{{ nodeReleaseError }}</p>
+          </div>
+
+          <div class="install__actions">
+            <AppButton :loading="nodeInstalling" :disabled="!nodeTag" @click="installNode">
+              <IconDownload aria-hidden="true" />
+              下载并安装
+            </AppButton>
+          </div>
+
+          <div
+            v-if="nodeBusy"
+            class="install__progress"
+            role="progressbar"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            :aria-valuenow="status.progress"
+          >
+            <div class="install__bar" :style="{ width: `${status.progress}%` }" />
+            <span class="install__progress-text" aria-live="polite">
+              {{ status.message }}（{{ status.progress }}%）
+            </span>
+          </div>
+          <p v-if="status.task === 'node' && status.phase === 'error'" class="install__error">
+            {{ status.error }}
+          </p>
+          <p
+            v-else-if="status.task === 'node' && status.phase === 'done'"
+            class="install__hint install__hint--notice"
+          >
+            Node.js 安装完成，正在使用新版本。
+          </p>
+        </template>
+      </section>
+
       <section class="install__group" aria-labelledby="cli-heading">
         <h3 id="cli-heading" class="install__heading">fraq CLI</h3>
         <div class="install__row">
@@ -264,7 +396,9 @@ onUnmounted(stopPolling)
             {{ status.message }}（{{ status.progress }}%）
           </span>
         </div>
-        <p v-if="status.phase === 'error'" class="install__error">{{ status.error }}</p>
+        <p v-if="status.task === 'cli' && status.phase === 'error'" class="install__error">
+          {{ status.error }}
+        </p>
       </section>
 
       <section class="install__group" aria-labelledby="protocol-heading">
@@ -391,28 +525,13 @@ onUnmounted(stopPolling)
             </div>
           </div>
 
-          <div class="install__field">
-            <label class="install__label" for="install-dir">安装目录</label>
-            <input
-              id="install-dir"
-              v-model.trim="protocolDir"
-              class="install__input"
-              type="text"
-              placeholder="D:\bot\fraq-webui\protocols"
-              autocomplete="off"
-            />
-            <p class="install__hint">
-              协议端下载解压的位置，需为完整路径；留空使用默认目录，修改后自动保存。
-            </p>
-          </div>
-
           <div class="install__actions">
             <AppButton :loading="downloading" :disabled="!assetName" @click="download">
               <IconDownload aria-hidden="true" />
               下载并安装
             </AppButton>
             <AppButton
-              v-if="status.phase === 'done' && status.exePath"
+              v-if="status.phase === 'done' && status.exePath && status.task === 'protocol'"
               :loading="starting"
               @click="startProtocol"
             >
@@ -443,9 +562,13 @@ onUnmounted(stopPolling)
               {{ status.message }}（{{ status.progress }}%）
             </span>
           </div>
-          <p v-if="status.phase === 'error'" class="install__error">{{ status.error }}</p>
+          <p v-if="status.task === 'protocol' && status.phase === 'error'" class="install__error">
+            {{ status.error }}
+          </p>
           <p
-            v-else-if="status.phase === 'done' && !status.exePath"
+            v-else-if="
+              status.task === 'protocol' && status.phase === 'done' && !status.exePath
+            "
             class="install__hint install__hint--notice"
           >
             文件已下载到本地，请手动运行安装程序完成安装。

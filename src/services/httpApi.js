@@ -113,6 +113,17 @@ export const httpApi = {
     return request('/api/install/cli', { method: 'POST' })
   },
 
+  async getNodeReleases() {
+    return request('/api/install/node-releases')
+  },
+
+  async installNode({ version, installDir }) {
+    return request('/api/install/node', {
+      method: 'POST',
+      body: JSON.stringify({ version, installDir }),
+    })
+  },
+
   async getInstallStatus() {
     return request('/api/install/status')
   },

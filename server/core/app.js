@@ -236,6 +236,28 @@ app.post('/api/install/cli', (c) => {
   }
 })
 
+app.get('/api/install/node-releases', async (c) => {
+  try {
+    const releases = await environment.listNodeReleases()
+    return c.json({ releases })
+  } catch (error) {
+    return c.json({ error: error instanceof Error ? error.message : '无法获取版本列表' }, 400)
+  }
+})
+
+app.post('/api/install/node', async (c) => {
+  const body = await c.req.json().catch(() => ({}))
+  try {
+    environment.installNode({
+      version: body.version,
+      installDir: body.installDir,
+    })
+    return c.json({ ok: true })
+  } catch (error) {
+    return c.json({ error: error instanceof Error ? error.message : '安装失败' }, 409)
+  }
+})
+
 app.get('/api/install/releases', async (c) => {
   try {
     const releases = await environment.listReleases(c.req.query('source'))
