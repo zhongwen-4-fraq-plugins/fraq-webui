@@ -18,3 +18,20 @@ export function formatDuration(totalSeconds) {
   if (minutes > 0) return `${minutes} 分 ${seconds} 秒`
   return `${seconds} 秒`
 }
+
+export function formatBytes(bytes) {
+  if (!Number.isFinite(bytes) || bytes <= 0) return '—'
+  const units = ['B', 'KB', 'MB', 'GB']
+  let value = bytes
+  let unit = 0
+  while (value >= 1024 && unit < units.length - 1) {
+    value /= 1024
+    unit += 1
+  }
+  return `${value >= 10 || unit === 0 ? Math.round(value) : value.toFixed(1)} ${units[unit]}`
+}
+
+export function formatDate(timestamp) {
+  if (!timestamp) return '—'
+  return new Date(timestamp).toLocaleDateString('zh-CN')
+}

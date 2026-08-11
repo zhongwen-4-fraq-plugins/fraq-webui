@@ -104,4 +104,35 @@ export const httpApi = {
       body: JSON.stringify({ baseUrl, accessToken, appDir }),
     })
   },
+
+  async getInstallCheck() {
+    return request('/api/install/check')
+  },
+
+  async installCli() {
+    return request('/api/install/cli', { method: 'POST' })
+  },
+
+  async getInstallStatus() {
+    return request('/api/install/status')
+  },
+
+  async getProtocolReleases(source) {
+    return request(`/api/install/releases?source=${encodeURIComponent(source)}`)
+  },
+
+  async installProtocol({ source, tag, asset }) {
+    return request('/api/install/protocol', {
+      method: 'POST',
+      body: JSON.stringify({ source, tag, asset }),
+    })
+  },
+
+  async startProtocol() {
+    return request('/api/install/protocol/start', { method: 'POST' })
+  },
+
+  async stopProtocol() {
+    return request('/api/install/protocol/stop', { method: 'POST' })
+  },
 }

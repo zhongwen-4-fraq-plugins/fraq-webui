@@ -124,6 +124,15 @@ export function getSettings() {
   })
 }
 
+// 服务端内部使用：协议端连通性检查需要真实令牌（此函数不暴露给 API）
+export function getMilkyConfig() {
+  const doc = readConfig()
+  return {
+    baseUrl: doc.milky?.url ?? '',
+    accessToken: doc.milky?.accessToken ?? '',
+  }
+}
+
 export function saveSettings({ baseUrl, accessToken }) {
   const doc = readConfig()
   doc.milky ??= {}

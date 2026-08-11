@@ -3,6 +3,7 @@ import IconBlocks from '~icons/tabler/blocks'
 import IconLayoutDashboard from '~icons/tabler/layout-dashboard'
 import IconListDetails from '~icons/tabler/list-details'
 import IconSettings from '~icons/tabler/settings'
+import IconTool from '~icons/tabler/tool'
 import IconX from '~icons/tabler/x'
 import { APP_NAME } from '../core/config.js'
 
@@ -15,6 +16,7 @@ defineEmits(['close'])
 const navItems = [
   { to: '/', label: '概览', icon: IconLayoutDashboard },
   { to: '/plugins', label: '插件', icon: IconBlocks },
+  { to: '/install', label: '安装', icon: IconTool },
   { to: '/logs', label: '日志', icon: IconListDetails },
   { to: '/settings', label: '设置', icon: IconSettings },
 ]

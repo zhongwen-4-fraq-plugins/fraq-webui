@@ -24,6 +24,7 @@ import * as processManager from '../services/processManager.js'
 import * as fraqConfig from '../services/fraqConfig.js'
 import * as messageStats from '../services/messageStats.js'
 import * as auth from '../services/auth.js'
+import * as environment from '../services/environment.js'
 import { resolveInstallPlan } from '../services/pluginRegistry.js'
 import { coreStatus } from '../models/status.js'
 
@@ -215,6 +216,56 @@ app.put('/api/settings', async (c) => {
     baseUrl,
     accessToken: typeof body.accessToken === 'string' ? body.accessToken : '',
   })
+  return c.json({ ok: true })
+})
+
+// 安装：环境检查 + 安装 fraq CLI 与 Milky 协议端
+app.get('/api/install/check', async (c) => c.json(await environment.checkAll()))
+
+app.post('/api/install/cli', (c) => {
+  try {
+    environment.installCli()
+    return c.json({ ok: true })
+  } catch (error) {
+    return c.json({ error: error instanceof Error ? error.message : '安装失败' }, 409)
+  }
+})
+
+app.get('/api/install/releases', async (c) => {
+  try {
+    const releases = await environment.listReleases(c.req.query('source'))
+    return c.json({ releases })
+  } catch (error) {
+    return c.json({ error: error instanceof Error ? error.message : '无法获取版本列表' }, 400)
+  }
+})
+
+app.get('/api/install/status', (c) => c.json(environment.getStatus()))
+
+app.post('/api/install/protocol', async (c) => {
+  const body = await c.req.json().catch(() => ({}))
+  try {
+    environment.installProtocol({
+      source: body.source,
+      tag: body.tag,
+      assetName: body.asset,
+    })
+    return c.json({ ok: true })
+  } catch (error) {
+    return c.json({ error: error instanceof Error ? error.message : '安装失败' }, 409)
+  }
+})
+
+app.post('/api/install/protocol/start', (c) => {
+  try {
+    return c.json(environment.startProtocol())
+  } catch (error) {
+    return c.json({ error: error instanceof Error ? error.message : '启动失败' }, 409)
+  }
+})
+
+app.post('/api/install/protocol/stop', async (c) => {
+  await environment.stopProtocol()
   return c.json({ ok: true })
 })
 

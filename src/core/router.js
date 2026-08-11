@@ -15,6 +15,12 @@ const routes = [
     meta: { title: '插件' },
   },
   {
+    path: '/install',
+    name: 'install',
+    component: () => import('../views/InstallView.vue'),
+    meta: { title: '安装' },
+  },
+  {
     path: '/logs',
     name: 'logs',
     component: () => import('../views/LogsView.vue'),

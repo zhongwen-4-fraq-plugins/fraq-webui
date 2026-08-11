@@ -10,7 +10,7 @@ import * as logService from './logService.js'
 const execAsync = promisify(exec)
 
 // 子进程 PATH 可能缺少 npm/fraq 所在目录，这里显式补上
-function buildChildEnv() {
+export function buildChildEnv() {
   const nodeDir = path.dirname(process.execPath)
   const globalBin =
     process.platform === 'win32'

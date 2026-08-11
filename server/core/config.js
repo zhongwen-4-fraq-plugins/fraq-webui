@@ -50,5 +50,8 @@ export const MILKY_ACCESS_TOKEN = process.env.FRAQ_WEBUI_MILKY_TOKEN ?? ''
 // 前端构建产物目录（server 同时托管静态界面）
 export const DIST_DIR = path.resolve('dist')
 
+// 协议端安装目录（下载并解压 Yogurt / LuckyLilliaBot 的位置）
+export const PROTOCOL_DIR = process.env.FRAQ_WEBUI_PROTOCOL_DIR ?? path.resolve('protocols')
+
 // 日志缓冲上限
 export const MAX_LOG_LINES = 2000
