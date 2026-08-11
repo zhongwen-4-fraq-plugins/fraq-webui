@@ -394,25 +394,22 @@ async function save() {
   min-height: 5rem;
   margin-top: var(--space-2);
   padding: var(--space-3);
-  border: 1px dashed var(--border);
   border-radius: var(--radius-md);
   background: var(--app-component-bg, var(--surface-2));
   color: var(--muted);
   font-size: var(--text-sm);
   cursor: pointer;
   transition:
-    border-color 150ms ease-out,
     background-color 150ms ease-out,
     color 150ms ease-out;
 }
 
 .appearance__dropzone:hover {
-  border-color: var(--primary);
+  background: var(--border);
   color: var(--app-text-color, var(--ink));
 }
 
 .appearance__dropzone--drag {
-  border-color: var(--primary);
   background: var(--primary-soft);
   color: var(--app-text-color, var(--ink));
 }
