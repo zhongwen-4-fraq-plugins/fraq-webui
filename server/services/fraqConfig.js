@@ -115,6 +115,59 @@ export function uninstallPlugin(id) {
   writeConfig(doc)
 }
 
+const MASK = '******'
+const SECRET_PATTERN = /(api[_-]?key|token|secret|password|authorization)/i
+
+// 递归打码密钥字段（apiKey / token / secret / password 等）
+function maskConfig(value) {
+  if (Array.isArray(value)) {
+    return value.map(maskConfig)
+  }
+  if (value && typeof value === 'object') {
+    const out = {}
+    for (const [key, item] of Object.entries(value)) {
+      out[key] =
+        SECRET_PATTERN.test(key) && typeof item === 'string' && item ? MASK : maskConfig(item)
+    }
+    return out
+  }
+  return value
+}
+
+// 保存时把打码占位还原成原值（未改动的密钥不丢）
+function restoreConfig(original, incoming) {
+  if (Array.isArray(incoming)) {
+    return incoming.map((item, index) => restoreConfig(original?.[index], item))
+  }
+  if (incoming && typeof incoming === 'object') {
+    const out = {}
+    for (const [key, item] of Object.entries(incoming)) {
+      if (item === MASK) {
+        out[key] = original?.[key] ?? ''
+      } else if (item && typeof item === 'object') {
+        out[key] = restoreConfig(original?.[key], item)
+      } else {
+        out[key] = item
+      }
+    }
+    return out
+  }
+  return incoming
+}
+
+export function getPluginConfig(id) {
+  const doc = readConfig()
+  return maskConfig(doc.plugins?.[id] ?? {})
+}
+
+export function savePluginConfig(id, config) {
+  const doc = readConfig()
+  const original = doc.plugins?.[id] ?? {}
+  doc.plugins ??= {}
+  doc.plugins[id] = restoreConfig(original, config)
+  writeConfig(doc)
+}
+
 export function getSettings() {
   const doc = readConfig()
   return settings({

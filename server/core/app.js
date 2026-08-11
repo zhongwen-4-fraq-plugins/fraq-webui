@@ -165,6 +165,19 @@ app.post('/api/plugins/:id/uninstall', (c) => {
   return c.json({ ok: true })
 })
 
+app.get('/api/plugins/:id/config', (c) => {
+  return c.json({ config: fraqConfig.getPluginConfig(c.req.param('id')) })
+})
+
+app.put('/api/plugins/:id/config', async (c) => {
+  const body = await c.req.json().catch(() => ({}))
+  if (!body.config || typeof body.config !== 'object' || Array.isArray(body.config)) {
+    return c.json({ error: '配置格式不正确' }, 400)
+  }
+  fraqConfig.savePluginConfig(c.req.param('id'), body.config)
+  return c.json({ ok: true })
+})
+
 app.get('/api/logs', (c) => {
   const limit = Number(c.req.query('limit') ?? 200)
   return c.json(logService.list(Number.isFinite(limit) ? limit : 200))
