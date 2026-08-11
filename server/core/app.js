@@ -159,6 +159,26 @@ app.post('/api/plugins/:id/uninstall', (c) => {
   return c.json({ ok: true })
 })
 
+app.get('/api/plugins/:id/config', (c) => {
+  try {
+    return c.json(fraqConfig.getPluginConfig(c.req.param('id')))
+  } catch (error) {
+    return c.json({ error: error instanceof Error ? error.message : '无法读取配置' }, 404)
+  }
+})
+
+app.put('/api/plugins/:id/config', async (c) => {
+  const body = await c.req.json().catch(() => ({}))
+  const id = c.req.param('id')
+  try {
+    fraqConfig.updatePluginConfig(id, body.config)
+    logService.pushEvent('info', `插件 ${id} 配置已更新，等待核心重启生效`)
+    return c.json({ ok: true })
+  } catch (error) {
+    return c.json({ error: error instanceof Error ? error.message : '保存失败' }, 400)
+  }
+})
+
 app.get('/api/logs', (c) => {
   const limit = Number(c.req.query('limit') ?? 200)
   return c.json(logService.list(Number.isFinite(limit) ? limit : 200))

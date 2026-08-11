@@ -5,6 +5,7 @@ import IconExternalLink from '~icons/tabler/external-link'
 import IconPlayerPlay from '~icons/tabler/player-play'
 import IconPlus from '~icons/tabler/plus'
 import IconSearch from '~icons/tabler/search'
+import IconSettings from '~icons/tabler/settings'
 import IconSquare from '~icons/tabler/square'
 import IconTrash from '~icons/tabler/trash'
 import { store } from '../services/store.js'
@@ -16,6 +17,7 @@ import ConfirmDialog from '../components/ConfirmDialog.vue'
 import EmptyState from '../components/EmptyState.vue'
 import ErrorBanner from '../components/ErrorBanner.vue'
 import PageHeader from '../components/PageHeader.vue'
+import PluginConfigDialog from '../components/PluginConfigDialog.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
 import StatusBadge from '../components/StatusBadge.vue'
 
@@ -65,6 +67,13 @@ async function confirmInstall() {
 
 const uninstallTarget = ref(null)
 const uninstallOpen = ref(false)
+const configTarget = ref(null)
+const configOpen = ref(false)
+
+function openConfig(plugin) {
+  configTarget.value = plugin
+  configOpen.value = true
+}
 
 function openUninstall(plugin) {
   uninstallTarget.value = plugin
@@ -198,6 +207,15 @@ function installFromStore(plugin) {
                 <IconSquare aria-hidden="true" />
               </AppButton>
               <AppButton
+                variant="ghost"
+                size="icon"
+                :aria-label="`配置 ${plugin.name}`"
+                title="配置"
+                @click="openConfig(plugin)"
+              >
+                <IconSettings aria-hidden="true" />
+              </AppButton>
+              <AppButton
                 variant="danger-ghost"
                 size="icon"
                 :loading="isBusy(plugin.id)"
@@ -326,6 +344,8 @@ function installFromStore(plugin) {
     >
       卸载会移除插件及其数据，且无法恢复。请先停用插件再卸载。
     </ConfirmDialog>
+
+    <PluginConfigDialog v-model:open="configOpen" :plugin-id="configTarget?.id ?? ''" />
   </div>
 </template>
 
@@ -509,7 +529,7 @@ function installFromStore(plugin) {
 .plugin-row {
   display: grid;
   /* 表头与行共用同一套列宽，保证标注与内容对齐 */
-  grid-template-columns: minmax(0, 1fr) 4.5rem 5rem;
+  grid-template-columns: minmax(0, 1fr) 4.5rem 8rem;
   gap: var(--space-4);
   align-items: center;
 }
