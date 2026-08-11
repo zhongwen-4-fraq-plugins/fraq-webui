@@ -3,11 +3,21 @@
 
 import { PLUGIN_REGISTRY_URL } from '../core/config.js'
 
+// 登录失效回调：任意 API 返回 401 时通知 store 切回登录页
+let unauthorizedHandler = null
+
+export function onUnauthorized(handler) {
+  unauthorizedHandler = handler
+}
+
 async function request(path, options = {}) {
   const response = await fetch(path, {
     headers: { 'Content-Type': 'application/json' },
     ...options,
   })
+  if (response.status === 401 && !path.startsWith('/api/auth/')) {
+    unauthorizedHandler?.()
+  }
   if (!response.ok) {
     let message = `请求失败（HTTP ${response.status}）`
     try {

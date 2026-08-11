@@ -10,6 +10,7 @@ import { createStorePlugin } from '../models/storePlugin.js'
 import { createMessageStats } from '../models/messageStats.js'
 import { normalizeAppearance } from '../models/appearance.js'
 import { colorToRgba } from '../data/color.js'
+import { onUnauthorized } from './httpApi.js'
 
 const APPEARANCE_KEY = 'fraq-webui.appearance'
 
@@ -57,6 +58,15 @@ const state = reactive({
 })
 
 let toastId = 0
+
+// 服务端重启后会话失效：任何接口 401 都立即回到登录页
+onUnauthorized(() => {
+  if (state.auth.authenticated) {
+    toast('info', '登录已过期，请重新登录')
+  }
+  state.auth.authenticated = false
+  state.auth.checking = false
+})
 
 function loadAppearance() {
   try {

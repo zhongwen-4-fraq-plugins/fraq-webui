@@ -10,11 +10,11 @@ onMounted(() => store.checkAuth())
 </script>
 
 <template>
+  <ToastHost />
   <div v-if="store.state.auth.checking" class="auth-splash">正在加载...</div>
   <LoginView v-else-if="!store.state.auth.authenticated" />
   <template v-else>
     <AppShell />
-    <ToastHost />
     <LogColorsDialog v-model:open="store.state.logColorsOpen" />
   </template>
 </template>
