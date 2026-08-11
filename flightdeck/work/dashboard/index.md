@@ -37,6 +37,8 @@ Current:
 - Node.js 检查与安装：node/npm 版本检测；缺失时从 nodejs.org 选 LTS 下载 Windows zip 便携版（免管理员），装好后便携 node 目录加入子进程 PATH（buildChildEnv），fraq/npm 自动优先使用。
 - 安装目录支持选择器：`GET /api/install/dirs`（列磁盘/子目录），安装页"选择"按钮弹窗浏览并填入完整路径。
 - 设置页背景图本地上传改为拖拽上传区（点击/拖放选图，显示文件名，键盘可操作）；外观模型新增 background.fileName。
+- 会话失效自动跳登录：任意 API 401（auth 接口除外）即回登录页，toast 移到登录门控外。
+- 侧栏左下角显示 fraq-webui 版本号 + 检查更新按钮：`GET /api/update/check`（git fetch 远程比对 HEAD..remote/main 提交数）；已合并远程 zhongwen-4-fraq-plugins/fraq-webui（仅 LICENSE）并推送同步。
 
 ## Open questions
 
