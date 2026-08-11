@@ -34,6 +34,7 @@ Current:
 - 新增"安装"页：环境检查（fraq CLI `fraq version`、协议端 `get_login_info`）、CLI 一键 npm 全局安装、协议端（Yogurt / LuckyLilliaBot）GitHub 版本列表选择 + 下载解压 + 启动/停止（进度轮询）。已用临时服务实测下载 Yogurt Windows 包并自动定位 yogurt.exe。
 - 修复协议端检查与代理 401：检查改直连 MILKY_URL（带 JSON body），放行 milky 代理单段端点，代理令牌回退到 fraq.yml milky.accessToken；前端区分已连接/在运行/未运行。
 - 协议端安装目录可自定义：安装页输入完整路径（存 .fraq-webui-state.json，默认 protocols/），下载时生效。
+- Node.js 检查与安装：node/npm 版本检测；缺失时从 nodejs.org 选 LTS 下载 Windows zip 便携版（免管理员），装好后便携 node 目录加入子进程 PATH（buildChildEnv），fraq/npm 自动优先使用。
 
 ## Open questions
 
