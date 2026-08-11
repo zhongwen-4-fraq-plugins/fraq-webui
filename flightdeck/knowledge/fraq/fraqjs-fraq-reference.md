@@ -40,6 +40,14 @@ READ WHEN: 当需要实现或理解 fraq 应用、fraq 插件、或 fraq-webui �
 - `fraq wizard`（别名 `init`/`setup`）— 交互式初始化新项目：项目名（默认 my-fraq-app）、fraq 版本、Milky 地址/端口（默认 localhost:30001），生成 `fraq.yml`（configVersion/fraqVersion/milky.url），**不包含 accessToken**，之后提示用户 `cd <dir> && fraq start`。
 - `fraq lock` / `fraq outdated` / `fraq update` / `fraq version`（别名 `v`）— 版本锁定、检查更新、交互更新、显示 CLI 版本。
 
+## Milky 协议端（协议实现）
+
+- Milky 是 QQ 机器人应用接口标准（milky.ntqqrev.org），协议端 = 具体实现，常见的有 Yogurt、Matcha、LuckyLilliaBot、Lagrange.Milky。
+- **Yogurt**（SaltifyDev/yogurt-releases + LagrangeDev/acidify）是官方参考实现：Windows x64 / macOS arm64 / Linux x64+arm64，PC/Android 两种登录，HTTP + WebSocket 接口（默认 30001 端口）。
+- Yogurt 安装：`npm install -g @acidify/yogurt`（预编译二进制 npm 包），装好后直接 `yogurt` 命令启动；首次启动需要扫码登录 QQ。也可从 SaltifyDev/yogurt-releases Releases 下载压缩包。
+- fraq CLI 安装：`npm install -g @fraqjs/cli`。
+- 连通性检查：向 Milky 地址 `POST /api/get_login_info`（带 accessToken 时加 `Authorization: Bearer <token>`），返回 `{status:'ok'}` 即协议端可用。
+
 ## 对 fraq-webui 的启示
 
 - 两种现成接入方式：a) 作为 fraq 插件用 webui-gateway 挂载（同进程、自带鉴权与静态托管）；b) 独立前端通过 milky-server 的 `/milky/api` 与 `/milky/event`（SSE/WS）直连（跨进程、需自管鉴权）。
