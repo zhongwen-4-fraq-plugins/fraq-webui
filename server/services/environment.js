@@ -6,7 +6,13 @@ import https from 'node:https'
 import { spawn, exec } from 'node:child_process'
 import { promisify } from 'node:util'
 import extract from 'extract-zip'
-import { PROTOCOL_DIR, MILKY_URL, MILKY_ACCESS_TOKEN } from '../core/config.js'
+import {
+  getProtocolDir,
+  setProtocolDir,
+  saveState,
+  MILKY_URL,
+  MILKY_ACCESS_TOKEN,
+} from '../core/config.js'
 import * as fraqConfig from './fraqConfig.js'
 import * as logService from './logService.js'
 import { buildChildEnv } from './processManager.js'
@@ -179,7 +185,7 @@ export async function listReleases(source) {
   return data
 }
 
-export function installProtocol({ source, tag, assetName }) {
+export function installProtocol({ source, tag, assetName, installDir }) {
   if (state.busy) {
     throw new Error('已有安装任务在进行，请稍后再试')
   }
@@ -188,6 +194,15 @@ export function installProtocol({ source, tag, assetName }) {
   if (!info) {
     state.busy = false
     throw new Error('未知的协议端来源')
+  }
+  if (installDir !== undefined && installDir !== null && String(installDir).trim()) {
+    const dir = String(installDir).trim()
+    if (!path.isAbsolute(dir)) {
+      state.busy = false
+      throw new Error('安装目录需要是完整路径，例如 D:\\bot\\yogurt')
+    }
+    setProtocolDir(dir)
+    saveState()
   }
   // 校验版本与文件，通过后再开始后台下载
   void listReleases(source).then((releases) => {
@@ -210,7 +225,7 @@ export function installProtocol({ source, tag, assetName }) {
 }
 
 async function startDownload(source, tag, assetName, release, asset) {
-  const destDir = path.join(PROTOCOL_DIR, source, tag)
+  const destDir = path.join(getProtocolDir(), source, tag)
   fs.mkdirSync(destDir, { recursive: true })
   const filePath = path.join(destDir, assetName)
 
@@ -397,7 +412,7 @@ export async function stopProtocol() {
 }
 
 export function getStatus() {
-  return { ...state }
+  return { ...state, protocolDir: getProtocolDir() }
 }
 
 function formatBytes(bytes) {

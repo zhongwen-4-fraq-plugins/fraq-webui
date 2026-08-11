@@ -11,7 +11,14 @@ export const PORT = Number(process.env.FRAQ_WEBUI_PORT ?? 8787)
 const DEFAULT_APP_DIR = 'D:/bot/fraq-plugins/my-fraq-app'
 const STATE_FILE = path.resolve('.fraq-webui-state.json')
 
-let appDir = path.resolve(process.env.FRAQ_WEBUI_APP_DIR ?? loadSavedAppDir() ?? DEFAULT_APP_DIR)
+const savedState = loadSavedState()
+
+let appDir = path.resolve(process.env.FRAQ_WEBUI_APP_DIR ?? savedState.appDir ?? DEFAULT_APP_DIR)
+
+// 协议端安装目录（下载并解压 Yogurt / LuckyLilliaBot 的位置）
+let protocolDir = path.resolve(
+  process.env.FRAQ_WEBUI_PROTOCOL_DIR ?? savedState.protocolDir ?? 'protocols',
+)
 
 export function getAppDir() {
   return appDir
@@ -21,20 +28,27 @@ export function setAppDir(dir) {
   appDir = path.resolve(dir)
 }
 
+export function getProtocolDir() {
+  return protocolDir
+}
+
+export function setProtocolDir(dir) {
+  protocolDir = path.resolve(dir)
+}
+
 export function saveState() {
   try {
-    fs.writeFileSync(STATE_FILE, JSON.stringify({ appDir }))
+    fs.writeFileSync(STATE_FILE, JSON.stringify({ appDir, protocolDir }))
   } catch {
     // 状态文件写入失败时仅本次生效
   }
 }
 
-function loadSavedAppDir() {
+function loadSavedState() {
   try {
-    const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'))
-    return typeof state?.appDir === 'string' && state.appDir ? state.appDir : null
+    return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8')) ?? {}
   } catch {
-    return null
+    return {}
   }
 }
 
@@ -49,9 +63,6 @@ export const MILKY_ACCESS_TOKEN = process.env.FRAQ_WEBUI_MILKY_TOKEN ?? ''
 
 // 前端构建产物目录（server 同时托管静态界面）
 export const DIST_DIR = path.resolve('dist')
-
-// 协议端安装目录（下载并解压 Yogurt / LuckyLilliaBot 的位置）
-export const PROTOCOL_DIR = process.env.FRAQ_WEBUI_PROTOCOL_DIR ?? path.resolve('protocols')
 
 // 日志缓冲上限
 export const MAX_LOG_LINES = 2000

@@ -254,6 +254,7 @@ app.post('/api/install/protocol', async (c) => {
       source: body.source,
       tag: body.tag,
       assetName: body.asset,
+      installDir: body.installDir,
     })
     return c.json({ ok: true })
   } catch (error) {

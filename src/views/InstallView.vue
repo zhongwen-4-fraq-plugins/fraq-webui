@@ -29,6 +29,7 @@ const releasesLoading = ref(false)
 const releaseError = ref('')
 const tag = ref('')
 const assetName = ref('')
+const protocolDir = ref('')
 
 const status = reactive({
   busy: false,
@@ -123,6 +124,7 @@ async function refreshStatus() {
   try {
     const result = await httpApi.getInstallStatus()
     Object.assign(status, result)
+    protocolDir.value = result.protocolDir ?? ''
   } catch {
     // 轮询失败时保持上次状态，下次继续
   }
@@ -168,6 +170,7 @@ async function download() {
       source: source.value,
       tag: tag.value,
       asset: assetName.value,
+      installDir: protocolDir.value,
     })
     startPolling()
   } catch (error) {
@@ -386,6 +389,21 @@ onUnmounted(stopPolling)
                 该版本没有可下载的文件
               </p>
             </div>
+          </div>
+
+          <div class="install__field">
+            <label class="install__label" for="install-dir">安装目录</label>
+            <input
+              id="install-dir"
+              v-model.trim="protocolDir"
+              class="install__input"
+              type="text"
+              placeholder="D:\bot\fraq-webui\protocols"
+              autocomplete="off"
+            />
+            <p class="install__hint">
+              协议端下载解压的位置，需为完整路径；留空使用默认目录，修改后自动保存。
+            </p>
           </div>
 
           <div class="install__actions">
