@@ -1,8 +1,15 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { httpApi } from '../services/httpApi.js'
-import { getPluginSchema, getByPath, setByPath, deleteByPath } from '../data/pluginSchemas.js'
+import {
+  AI_SDK_OPTIONS,
+  getPluginSchema,
+  getByPath,
+  setByPath,
+  deleteByPath,
+} from '../data/pluginSchemas.js'
 import { store } from '../services/store.js'
+import AppButton from './AppButton.vue'
 import ConfirmDialog from './ConfirmDialog.vue'
 import SkeletonBlock from './SkeletonBlock.vue'
 
@@ -21,6 +28,56 @@ const originalConfig = ref({})
 const form = ref({})
 const jsonText = ref('')
 
+function splitLines(text) {
+  return String(text ?? '')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+}
+
+function providersToRows(value) {
+  return Object.entries(value ?? {}).map(([name, item]) => ({
+    name,
+    sdk: item?.sdk ?? '',
+    apiKey: item?.options?.apiKey ?? '',
+    baseURL: item?.options?.baseURL ?? '',
+    models: Array.isArray(item?.models) ? item.models.join('\n') : '',
+    images: Array.isArray(item?.images) ? item.images.join('\n') : '',
+  }))
+}
+
+function rowsToProviders(rows) {
+  const out = {}
+  for (const row of rows) {
+    const name = row.name.trim()
+    if (!name || !row.sdk) continue
+    const provider = { sdk: row.sdk, options: {}, models: splitLines(row.models) }
+    if (row.apiKey.trim()) {
+      provider.options.apiKey = row.apiKey.trim()
+    }
+    if (row.baseURL.trim()) {
+      provider.options.baseURL = row.baseURL.trim()
+    }
+    const images = splitLines(row.images)
+    if (images.length) {
+      provider.images = images
+    }
+    out[name] = provider
+  }
+  return out
+}
+
+function addProvider(key) {
+  form.value[key].push({
+    name: '',
+    sdk: '@ai-sdk/openai-compatible',
+    apiKey: '',
+    baseURL: '',
+    models: '',
+    images: '',
+  })
+}
+
 watch(
   () => [props.open, props.plugin?.id],
   async ([open, id]) => {
@@ -35,7 +92,9 @@ watch(
         form.value = {}
         for (const field of schema.value.fields) {
           const value = getByPath(originalConfig.value, field.key)
-          if (field.type === 'json') {
+          if (field.type === 'providers') {
+            form.value[field.key] = providersToRows(value)
+          } else if (field.type === 'json') {
             form.value[field.key] = JSON.stringify(value ?? {}, null, 2)
           } else if (field.type === 'boolean') {
             form.value[field.key] = value ?? false
@@ -63,7 +122,14 @@ async function save() {
       config = JSON.parse(JSON.stringify(originalConfig.value))
       for (const field of schema.value.fields) {
         const value = form.value[field.key]
-        if (field.type === 'json') {
+        if (field.type === 'providers') {
+          const parsed = rowsToProviders(form.value[field.key])
+          if (Object.keys(parsed).length > 0) {
+            setByPath(config, field.key, parsed)
+          } else {
+            deleteByPath(config, field.key)
+          }
+        } else if (field.type === 'json') {
           let parsed
           try {
             parsed = JSON.parse(String(value ?? '').trim() || '{}')
@@ -138,6 +204,89 @@ async function save() {
               />
               {{ field.label }}
             </label>
+          </template>
+          <template v-else-if="field.type === 'providers'">
+            <span class="cfg-label">{{ field.label }}</span>
+            <div class="cfg-providers">
+              <div
+                v-for="(provider, index) in form[field.key]"
+                :key="index"
+                class="cfg-provider"
+              >
+                <div class="cfg-provider__head">
+                  <input
+                    v-model="provider.name"
+                    class="install-input cfg-input"
+                    type="text"
+                    placeholder="提供商名称，如 akile"
+                    aria-label="提供商名称"
+                  />
+                  <button
+                    type="button"
+                    class="cfg-provider__remove"
+                    :aria-label="`删除提供商 ${provider.name || index + 1}`"
+                    title="删除"
+                    @click="form[field.key].splice(index, 1)"
+                  >
+                    ×
+                  </button>
+                </div>
+                <label class="cfg-label" :for="`cfg-${field.key}-${index}-sdk`">SDK</label>
+                <select
+                  :id="`cfg-${field.key}-${index}-sdk`"
+                  v-model="provider.sdk"
+                  class="install-input cfg-input"
+                >
+                  <option
+                    v-for="option in AI_SDK_OPTIONS"
+                    :key="option.value"
+                    :value="option.value"
+                  >
+                    {{ option.label }}（{{ option.value }}）
+                  </option>
+                </select>
+                <label class="cfg-label" :for="`cfg-${field.key}-${index}-key`">API Key</label>
+                <input
+                  :id="`cfg-${field.key}-${index}-key`"
+                  v-model="provider.apiKey"
+                  class="install-input cfg-input"
+                  type="password"
+                  autocomplete="off"
+                  placeholder="sk-..."
+                />
+                <label class="cfg-label" :for="`cfg-${field.key}-${index}-url`">Base URL</label>
+                <input
+                  :id="`cfg-${field.key}-${index}-url`"
+                  v-model="provider.baseURL"
+                  class="install-input cfg-input"
+                  type="text"
+                  placeholder="https://api.example.com/v1"
+                />
+                <label class="cfg-label" :for="`cfg-${field.key}-${index}-models`">
+                  模型列表
+                </label>
+                <textarea
+                  :id="`cfg-${field.key}-${index}-models`"
+                  v-model="provider.models"
+                  class="install-input cfg-input cfg-input--json"
+                  rows="2"
+                  placeholder="每行一个模型，如 gpt-5.6-sol"
+                />
+                <label class="cfg-label" :for="`cfg-${field.key}-${index}-images`">
+                  生图模型（可选）
+                </label>
+                <textarea
+                  :id="`cfg-${field.key}-${index}-images`"
+                  v-model="provider.images"
+                  class="install-input cfg-input cfg-input--json"
+                  rows="2"
+                  placeholder="每行一个生图模型"
+                />
+              </div>
+              <AppButton variant="secondary" size="sm" @click="addProvider(field.key)">
+                添加提供商
+              </AppButton>
+            </div>
           </template>
           <template v-else>
             <label class="cfg-label" :for="`cfg-${field.key}`">{{ field.label }}</label>
@@ -252,6 +401,51 @@ async function save() {
   width: 1rem;
   height: 1rem;
   accent-color: var(--primary);
+}
+
+.cfg-providers {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.cfg-provider {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+
+.cfg-provider__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.cfg-provider__head .cfg-input {
+  flex: 1;
+}
+
+.cfg-provider__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  font-size: var(--text-lg);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cfg-provider__remove:hover {
+  background: var(--danger-soft);
+  color: var(--danger);
 }
 
 .cfg-hint {

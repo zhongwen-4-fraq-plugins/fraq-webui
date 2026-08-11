@@ -94,13 +94,26 @@ export const PLUGIN_SCHEMAS = {
       {
         key: 'providers',
         label: '模型提供商',
-        type: 'json',
-        hint: 'JSON 格式，包含 sdk、apiKey、baseURL、models 等',
+        type: 'providers',
+        hint: '每个提供商配置 SDK、API Key、Base URL 与模型列表',
       },
       { key: 'aliases', label: '模型别名', type: 'json' },
     ],
   },
 }
+
+// ai 插件支持的 SDK（取自 fraqjs/fraq 的 provider.ts）
+export const AI_SDK_OPTIONS = [
+  { value: '@ai-sdk/openai-compatible', label: 'OpenAI 兼容接口' },
+  { value: '@ai-sdk/openai', label: 'OpenAI' },
+  { value: '@ai-sdk/anthropic', label: 'Anthropic' },
+  { value: '@ai-sdk/deepseek', label: 'DeepSeek' },
+  { value: '@ai-sdk/google', label: 'Google Gemini' },
+  { value: '@ai-sdk/alibaba', label: '阿里通义千问' },
+  { value: '@ai-sdk/bytedance', label: '字节豆包' },
+  { value: '@ai-sdk/moonshotai', label: 'Moonshot Kimi' },
+  { value: '@ai-sdk/xai', label: 'xAI Grok' },
+]
 
 export function getByPath(obj, path) {
   return path.split('.').reduce((acc, key) => (acc == null ? undefined : acc[key]), obj)
