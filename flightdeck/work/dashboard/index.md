@@ -36,6 +36,7 @@ Current:
 - 协议端安装目录可自定义：安装页输入完整路径（存 .fraq-webui-state.json，默认 protocols/），下载时生效。
 - Node.js 检查与安装：node/npm 版本检测；缺失时从 nodejs.org 选 LTS 下载 Windows zip 便携版（免管理员），装好后便携 node 目录加入子进程 PATH（buildChildEnv），fraq/npm 自动优先使用。
 - 安装目录支持选择器：`GET /api/install/dirs`（列磁盘/子目录），安装页"选择"按钮弹窗浏览并填入完整路径。
+- 设置页背景图本地上传改为拖拽上传区（点击/拖放选图，显示文件名，键盘可操作）；外观模型新增 background.fileName。
 
 ## Open questions
 
