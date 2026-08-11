@@ -289,7 +289,7 @@ onUnmounted(stopPolling)
         <input
           id="install-dir"
           v-model.trim="protocolDir"
-          class="install__input"
+          class="install-input"
           type="text"
           placeholder="D:\bot\fraq-webui\protocols"
           autocomplete="off"
@@ -324,7 +324,7 @@ onUnmounted(stopPolling)
             <select
               id="node-version"
               v-model="nodeTag"
-              class="install__input"
+              class="install-input"
               :disabled="nodeReleasesLoading || nodeReleases.length === 0"
             >
               <option v-if="nodeReleasesLoading" value="">正在加载版本...</option>
@@ -487,7 +487,7 @@ onUnmounted(stopPolling)
             <select
               id="release-version"
               v-model="tag"
-              class="install__input"
+              class="install-input"
               :disabled="releasesLoading || releases.length === 0"
             >
               <option v-if="releasesLoading" value="">正在加载版本...</option>
@@ -689,7 +689,7 @@ onUnmounted(stopPolling)
   font-weight: 500;
 }
 
-.install__input {
+.install-input {
   width: 100%;
   height: 2.5rem;
   padding: 0 var(--space-3);
@@ -697,6 +697,10 @@ onUnmounted(stopPolling)
   background: var(--app-component-bg, var(--surface-2));
   color: var(--app-text-color, var(--ink));
   font-size: var(--text-sm);
+}
+
+.install-input::placeholder {
+  color: var(--placeholder);
 }
 
 .install__assets {
