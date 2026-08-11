@@ -41,6 +41,7 @@ Current:
 - 侧栏左下角显示 fraq-webui 版本号 + 检查更新按钮：`GET /api/update/check`（git fetch 远程比对 HEAD..remote/main 提交数）；已合并远程 zhongwen-4-fraq-plugins/fraq-webui（仅 LICENSE）并推送同步。
 - 安装目录"选择"优先弹系统原生文件夹选择器（powershell -EncodedCommand + FolderBrowserDialog，仅 Windows），失败回退页面内目录浏览。
 - 插件配置功能：官方插件（fraqjs/hono、milky-server、webui-gateway、kysely、message-store、conversation、random、milky-webhook、takumi、ai）按源码手写表单，其余插件 JSON 编辑器；`GET/PUT /api/plugins/:id/config`，密钥字段（apiKey/token/secret 等）打码 ******，保存时未改动则还原原值。
+- 核心状态接管孤儿进程：服务重启后旧 fraq 核心仍在运行时，`/api/core` 通过 netstat 探测 fraqjs/hono 端口（默认 4649）找到 PID 并接管，状态不再误报未运行，停止也能正常 kill。
 
 ## Open questions
 

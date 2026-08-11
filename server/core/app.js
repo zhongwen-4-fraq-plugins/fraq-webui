@@ -84,7 +84,8 @@ app.post('/api/auth/logout', (c) => {
 
 app.get('/api/health', (c) => c.json({ ok: true }))
 
-app.get('/api/core', (c) => {
+app.get('/api/core', async (c) => {
+  await processManager.detectRunningCore()
   const info = processManager.getProcessInfo()
   const settings = fraqConfig.getSettings()
   const doc = safeReadConfig()

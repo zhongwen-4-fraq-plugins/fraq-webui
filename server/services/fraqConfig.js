@@ -168,6 +168,16 @@ export function savePluginConfig(id, config) {
   writeConfig(doc)
 }
 
+// Hono 插件监听地址：用于探测 fraq 核心是否已在运行（接管孤儿进程）
+export function getHonoConfig() {
+  const doc = readConfig()
+  const hono = doc.plugins?.['fraqjs/hono'] ?? {}
+  return {
+    host: typeof hono.host === 'string' && hono.host ? hono.host : '127.0.0.1',
+    port: Number.isFinite(Number(hono.port)) ? Number(hono.port) : 4649,
+  }
+}
+
 export function getSettings() {
   const doc = readConfig()
   return settings({

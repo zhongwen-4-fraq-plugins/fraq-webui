@@ -5,6 +5,7 @@ import { promisify } from 'node:util'
 import os from 'node:os'
 import path from 'node:path'
 import { getAppDir, getPortableNodeDir } from '../core/config.js'
+import * as fraqConfig from './fraqConfig.js'
 import * as logService from './logService.js'
 
 const execAsync = promisify(exec)
@@ -27,21 +28,59 @@ export function buildChildEnv() {
 let child = null
 let startedAt = null
 let stopping = false
+let adoptedPid = null // 服务重启后接管到的仍在运行的 fraq 进程
+let adoptedStartedAt = null
 
 export function isRunning() {
-  return child !== null
+  return child !== null || adoptedPid !== null
 }
 
 export function getProcessInfo() {
+  if (child) {
+    return { running: true, pid: child.pid, startedAt }
+  }
+  if (adoptedPid) {
+    return { running: true, pid: adoptedPid, startedAt: adoptedStartedAt }
+  }
   return {
-    running: isRunning(),
-    pid: child?.pid ?? null,
+    running: false,
+    pid: null,
     startedAt,
   }
 }
 
+// 服务重启后，若 fraq 核心仍在运行（孤儿进程），探测 Hono 端口并接管
+export async function detectRunningCore() {
+  if (child || adoptedPid) {
+    return isRunning()
+  }
+  const { port } = fraqConfig.getHonoConfig()
+  const pid = await findPidByPort(port)
+  if (pid) {
+    adoptedPid = pid
+    adoptedStartedAt = Date.now()
+    logService.pushEvent('info', `检测到已在运行的 fraq 进程（PID ${pid}），已接管`)
+  }
+  return isRunning()
+}
+
+async function findPidByPort(port) {
+  try {
+    const { stdout } = await execAsync('netstat -ano')
+    for (const line of stdout.split(/\r?\n/)) {
+      const match = line.match(/TCP\s+\S+:(\d+)\s+\S+:\S+\s+LISTENING\s+(\d+)/i)
+      if (match && Number(match[1]) === port) {
+        return Number(match[2])
+      }
+    }
+  } catch {
+    // 探测失败视为未运行
+  }
+  return null
+}
+
 export async function start() {
-  if (child) {
+  if (child || adoptedPid) {
     throw new Error('fraq 已经在运行')
   }
 
@@ -78,18 +117,20 @@ export async function start() {
 }
 
 export async function stop() {
-  if (!child) {
+  const targetPid = child?.pid ?? adoptedPid
+  if (!targetPid) {
     return
   }
   stopping = true
-  const pid = child.pid
   child = null
+  adoptedPid = null
+  adoptedStartedAt = null
 
   try {
     if (process.platform === 'win32') {
-      await execAsync(`taskkill /PID ${pid} /T /F`)
+      await execAsync(`taskkill /PID ${targetPid} /T /F`)
     } else {
-      process.kill(pid, 'SIGTERM')
+      process.kill(targetPid, 'SIGTERM')
     }
   } catch {
     // 进程可能已经退出，忽略
