@@ -1,13 +1,16 @@
 <script setup>
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import IconArrowUp from '~icons/tabler/arrow-up'
 import IconBrandGithub from '~icons/tabler/brand-github'
 import IconDownload from '~icons/tabler/download'
+import IconFolder from '~icons/tabler/folder'
 import IconPlayerPlay from '~icons/tabler/player-play'
 import IconPlayerStop from '~icons/tabler/player-stop'
 import IconRefresh from '~icons/tabler/refresh'
 import { httpApi } from '../services/httpApi.js'
 import { formatBytes, formatDate } from '../data/format.js'
 import AppButton from '../components/AppButton.vue'
+import ConfirmDialog from '../components/ConfirmDialog.vue'
 import ErrorBanner from '../components/ErrorBanner.vue'
 import PageHeader from '../components/PageHeader.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
@@ -54,6 +57,13 @@ const nodeReleases = ref([])
 const nodeReleasesLoading = ref(false)
 const nodeReleaseError = ref('')
 const nodeTag = ref('')
+
+const dirOpen = ref(false)
+const dirPath = ref('')
+const dirParent = ref('')
+const dirs = ref([])
+const dirLoading = ref(false)
+const dirError = ref('')
 
 let pollTimer = null
 
@@ -128,6 +138,32 @@ async function loadNodeReleases() {
   } finally {
     nodeReleasesLoading.value = false
   }
+}
+
+async function loadDirs(dir) {
+  dirLoading.value = true
+  dirError.value = ''
+  try {
+    const result = await httpApi.getDirList(dir)
+    dirPath.value = result.path
+    dirParent.value = result.parent
+    dirs.value = result.dirs
+  } catch (error) {
+    dirError.value = error instanceof Error ? error.message : '无法读取目录'
+  } finally {
+    dirLoading.value = false
+  }
+}
+
+function openDirPicker() {
+  dirOpen.value = true
+  loadDirs(protocolDir.value || '')
+}
+
+function applyDir() {
+  if (!dirPath.value) return
+  protocolDir.value = dirPath.value
+  dirOpen.value = false
 }
 
 async function refreshCheck() {
@@ -286,19 +322,60 @@ onUnmounted(stopPolling)
     <div v-else class="install">
       <section class="install__group" aria-labelledby="dir-heading">
         <h3 id="dir-heading" class="install__heading">安装目录</h3>
-        <input
-          id="install-dir"
-          v-model.trim="protocolDir"
-          class="install-input"
-          type="text"
-          placeholder="D:\bot\fraq-webui\protocols"
-          autocomplete="off"
-          aria-label="安装目录"
-        />
+        <div class="install__dir-row">
+          <input
+            id="install-dir"
+            v-model.trim="protocolDir"
+            class="install-input"
+            type="text"
+            placeholder="D:\bot\fraq-webui\protocols"
+            autocomplete="off"
+            aria-label="安装目录"
+          />
+          <AppButton variant="secondary" @click="openDirPicker">
+            <IconFolder aria-hidden="true" />
+            选择
+          </AppButton>
+        </div>
         <p class="install__hint">
           Node.js 与协议端的下载解压位置，需为完整路径；留空使用默认目录，修改后自动保存。
         </p>
       </section>
+
+      <ConfirmDialog
+        v-model:open="dirOpen"
+        title="选择安装目录"
+        confirm-label="使用此目录"
+        @confirm="applyDir"
+      >
+        <div class="dir-picker">
+          <div class="dir-picker__path">
+            <span class="dir-picker__path-text">{{ dirPath || '请选择磁盘' }}</span>
+            <AppButton
+              v-if="dirParent"
+              variant="ghost"
+              size="sm"
+              @click="loadDirs(dirParent)"
+            >
+              <IconArrowUp aria-hidden="true" />
+              上一级
+            </AppButton>
+          </div>
+          <p v-if="dirError" class="install__error">{{ dirError }}</p>
+          <SkeletonBlock v-if="dirLoading" :lines="4" />
+          <ul v-else class="dir-picker__list">
+            <li v-if="dirs.length === 0" class="dir-picker__empty">
+              此目录没有子文件夹，可直接使用
+            </li>
+            <li v-for="item in dirs" :key="item">
+              <button type="button" class="dir-picker__item" @click="loadDirs(item)">
+                <IconFolder class="dir-picker__icon" aria-hidden="true" />
+                <span>{{ item }}</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </ConfirmDialog>
 
       <section class="install__group" aria-labelledby="node-heading">
         <h3 id="node-heading" class="install__heading">Node.js</h3>
@@ -620,8 +697,72 @@ onUnmounted(stopPolling)
   font-size: var(--text-xs);
 }
 
+.install__dir-row {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.install__dir-row .install-input {
+  flex: 1;
+}
+
 .install__hint--notice {
   color: var(--primary);
+}
+
+.dir-picker__path {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.dir-picker__path-text {
+  color: var(--app-text-color, var(--ink));
+  font-size: var(--text-sm);
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.dir-picker__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 18rem;
+  overflow-y: auto;
+}
+
+.dir-picker__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--app-text-color, var(--ink));
+  font-size: var(--text-sm);
+  text-align: left;
+  cursor: pointer;
+}
+
+.dir-picker__item:hover {
+  background: var(--surface-2);
+}
+
+.dir-picker__icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.dir-picker__empty {
+  padding: var(--space-3);
+  color: var(--muted);
+  font-size: var(--text-sm);
 }
 
 .install__error {

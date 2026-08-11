@@ -516,6 +516,56 @@ export function getStatus() {
   return { ...state, protocolDir: getProtocolDir() }
 }
 
+// 目录选择：列出指定目录的子文件夹；path 为空时列出磁盘根
+export function listDirs(dir) {
+  if (!dir || !String(dir).trim()) {
+    return { path: '', parent: '', dirs: listRoots() }
+  }
+  const absolute = path.resolve(String(dir).trim())
+  try {
+    if (!fs.statSync(absolute).isDirectory()) {
+      throw new Error('不是目录')
+    }
+  } catch {
+    throw new Error('目录不存在或无法访问')
+  }
+  let names = []
+  try {
+    names = fs
+      .readdirSync(absolute, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+      .filter((name) => !name.startsWith('.'))
+      .sort((a, b) => a.localeCompare(b))
+  } catch {
+    // 无权限读取时仍允许"使用此目录"
+  }
+  const parent = path.dirname(absolute)
+  return {
+    path: absolute,
+    parent: parent === absolute ? '' : parent,
+    dirs: names.map((name) => path.join(absolute, name)),
+  }
+}
+
+function listRoots() {
+  if (process.platform === 'win32') {
+    const roots = []
+    for (let i = 65; i <= 90; i += 1) {
+      const letter = `${String.fromCharCode(i)}:\\`
+      try {
+        if (fs.existsSync(letter)) {
+          roots.push(letter)
+        }
+      } catch {
+        // 跳过不可访问的盘符
+      }
+    }
+    return roots
+  }
+  return ['/']
+}
+
 function applyInstallDir(installDir) {
   if (installDir !== undefined && installDir !== null && String(installDir).trim()) {
     const dir = String(installDir).trim()

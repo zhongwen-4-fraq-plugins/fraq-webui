@@ -258,6 +258,14 @@ app.post('/api/install/node', async (c) => {
   }
 })
 
+app.get('/api/install/dirs', (c) => {
+  try {
+    return c.json(environment.listDirs(c.req.query('path')))
+  } catch (error) {
+    return c.json({ error: error instanceof Error ? error.message : '无法读取目录' }, 400)
+  }
+})
+
 app.get('/api/install/releases', async (c) => {
   try {
     const releases = await environment.listReleases(c.req.query('source'))

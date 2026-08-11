@@ -128,6 +128,11 @@ export const httpApi = {
     return request('/api/install/status')
   },
 
+  async getDirList(dir) {
+    const query = dir ? `?path=${encodeURIComponent(dir)}` : ''
+    return request(`/api/install/dirs${query}`)
+  },
+
   async getProtocolReleases(source) {
     return request(`/api/install/releases?source=${encodeURIComponent(source)}`)
   },
