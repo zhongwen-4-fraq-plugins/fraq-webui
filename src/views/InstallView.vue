@@ -21,7 +21,7 @@ const sources = [
 const checking = ref(true)
 const checkError = ref('')
 const cli = reactive({ installed: false, version: '' })
-const protocol = reactive({ reachable: false, detail: '' })
+const protocol = reactive({ reachable: false, running: false, detail: '' })
 
 const source = ref('yogurt')
 const releases = ref([])
@@ -109,6 +109,7 @@ async function refreshCheck() {
     cli.installed = result.cli.installed
     cli.version = result.cli.version
     protocol.reachable = result.protocol.reachable
+    protocol.running = result.protocol.running === true
     protocol.detail = result.protocol.detail
     Object.assign(status, result.status)
   } catch (error) {
@@ -275,6 +276,33 @@ onUnmounted(stopPolling)
             </AppButton>
           </div>
           <p class="install__hint">{{ protocol.detail }}</p>
+          <div v-if="status.running" class="install__row">
+            <StatusBadge tone="success">协议端运行中（PID {{ status.pid }}）</StatusBadge>
+            <AppButton
+              variant="danger-ghost"
+              size="sm"
+              :loading="stopping"
+              @click="stopProtocol"
+            >
+              <IconPlayerStop aria-hidden="true" />
+              停止协议端
+            </AppButton>
+          </div>
+        </template>
+
+        <template v-else-if="protocol.running">
+          <div class="install__row">
+            <StatusBadge tone="warning">协议端在运行</StatusBadge>
+            <AppButton variant="ghost" size="sm" @click="refreshCheck">
+              <IconRefresh aria-hidden="true" />
+              重新检查
+            </AppButton>
+          </div>
+          <p class="install__hint">{{ protocol.detail }}</p>
+          <p class="install__hint">
+            fraq 核心通过 webui 代理调用协议端，令牌不匹配会导致 API 调用失败（401）。
+            请设置 FRAQ_WEBUI_MILKY_TOKEN 环境变量，或在设置页填写访问令牌后重启服务。
+          </p>
           <div v-if="status.running" class="install__row">
             <StatusBadge tone="success">协议端运行中（PID {{ status.pid }}）</StatusBadge>
             <AppButton

@@ -6,7 +6,7 @@ import https from 'node:https'
 import { spawn, exec } from 'node:child_process'
 import { promisify } from 'node:util'
 import extract from 'extract-zip'
-import { PROTOCOL_DIR } from '../core/config.js'
+import { PROTOCOL_DIR, MILKY_URL, MILKY_ACCESS_TOKEN } from '../core/config.js'
 import * as fraqConfig from './fraqConfig.js'
 import * as logService from './logService.js'
 import { buildChildEnv } from './processManager.js'
@@ -68,32 +68,37 @@ export async function checkCli() {
 }
 
 export async function checkProtocol() {
-  const { baseUrl, accessToken } = fraqConfig.getMilkyConfig()
-  if (!baseUrl) {
-    return { reachable: false, detail: '未配置协议端地址，请先在设置页填写' }
-  }
-  const url = `${baseUrl.replace(/\/+$/, '')}/api/get_login_info`
+  const url = `${MILKY_URL.replace(/\/+$/, '')}/api/get_login_info`
+  const token = MILKY_ACCESS_TOKEN || fraqConfig.getMilkyConfig().accessToken
   try {
     const response = await fetch(url, {
       method: 'POST',
-      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: '{}',
     })
+    if (response.status === 401) {
+      return {
+        reachable: false,
+        running: true,
+        detail: '协议端在运行，但访问令牌未配置或不正确',
+      }
+    }
     if (!response.ok) {
-      const message =
-        response.status === 401
-          ? '协议端返回 401，请检查访问令牌配置'
-          : `协议端返回 HTTP ${response.status}`
-      return { reachable: false, detail: message }
+      return { reachable: false, running: true, detail: `协议端返回 HTTP ${response.status}` }
     }
     const body = await response.json().catch(() => null)
     if (body?.status !== 'ok') {
-      return { reachable: false, detail: body?.message ?? '协议端返回异常' }
+      return { reachable: false, running: true, detail: body?.message ?? '协议端返回异常' }
     }
-    return { reachable: true, detail: `已连接 ${baseUrl}` }
+    return { reachable: true, running: true, detail: `已连接 ${MILKY_URL}` }
   } catch (error) {
     return {
       reachable: false,
-      detail: error instanceof Error ? error.message : '无法连接协议端',
+      running: false,
+      detail: '无法连接协议端，请安装或启动协议端',
     }
   }
 }

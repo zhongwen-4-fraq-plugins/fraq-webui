@@ -35,7 +35,12 @@ const COOKIE_NAME = 'fraq_webui_session'
 // 登录校验：未登录的 /api 请求返回 401（health 与 auth 路由除外）
 app.use('/api/*', async (c, next) => {
   const path = c.req.path
-  if (path === '/api/health' || path.startsWith('/api/auth/')) {
+  // milky 代理（POST /api/<单段端点>）由 fraq 核心直接调用，不受 webui 登录限制
+  if (
+    path === '/api/health' ||
+    path.startsWith('/api/auth/') ||
+    (c.req.method === 'POST' && /^\/api\/[a-z0-9_]+$/.test(path))
+  ) {
     return next()
   }
   const sid = getCookie(c, COOKIE_NAME)
@@ -272,13 +277,15 @@ app.post('/api/install/protocol/stop', async (c) => {
 // milky 协议代理：fraq 的 milky.url 指向本服务，
 // 转发发送类 API 时计数“发出”，转发事件流时计数“收到”。
 const SEND_ENDPOINTS = new Set(['send_private_message', 'send_group_message'])
+const milkyToken = () => MILKY_ACCESS_TOKEN || fraqConfig.getMilkyConfig().accessToken
 
 app.post('/api/:endpoint', async (c) => {
   const endpoint = c.req.param('endpoint')
   const body = await c.req.text()
   const headers = { 'Content-Type': 'application/json' }
-  if (MILKY_ACCESS_TOKEN) {
-    headers.Authorization = `Bearer ${MILKY_ACCESS_TOKEN}`
+  const token = milkyToken()
+  if (token) {
+    headers.Authorization = `Bearer ${token}`
   }
   try {
     const response = await fetch(`${MILKY_URL}/api/${endpoint}`, {
@@ -312,8 +319,9 @@ app.get(
     return {
       onOpen(_event, ws) {
         const url = new URL(`${MILKY_WS_URL}/event`)
-        if (MILKY_ACCESS_TOKEN) {
-          url.searchParams.set('access_token', MILKY_ACCESS_TOKEN)
+        const token = milkyToken()
+        if (token) {
+          url.searchParams.set('access_token', token)
         }
         target = new WebSocket(url)
         target.onmessage = (event) => {
