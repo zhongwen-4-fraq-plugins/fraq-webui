@@ -64,6 +64,7 @@ const dirParent = ref('')
 const dirs = ref([])
 const dirLoading = ref(false)
 const dirError = ref('')
+const picking = ref(false)
 
 let pollTimer = null
 
@@ -158,6 +159,22 @@ async function loadDirs(dir) {
 function openDirPicker() {
   dirOpen.value = true
   loadDirs(protocolDir.value || '')
+}
+
+// 优先弹出系统原生文件夹选择器，不可用时回退到页面内目录浏览
+async function pickDir() {
+  if (picking.value) return
+  picking.value = true
+  try {
+    const result = await httpApi.pickDirectory()
+    if (result.picked && result.path) {
+      protocolDir.value = result.path
+    }
+  } catch {
+    openDirPicker()
+  } finally {
+    picking.value = false
+  }
 }
 
 function applyDir() {
@@ -332,9 +349,9 @@ onUnmounted(stopPolling)
             autocomplete="off"
             aria-label="安装目录"
           />
-          <AppButton variant="secondary" @click="openDirPicker">
+          <AppButton variant="secondary" :loading="picking" @click="pickDir">
             <IconFolder aria-hidden="true" />
-            选择
+            {{ picking ? '选择中' : '选择' }}
           </AppButton>
         </div>
         <p class="install__hint">

@@ -516,6 +516,34 @@ export function getStatus() {
   return { ...state, protocolDir: getProtocolDir() }
 }
 
+// 弹出系统原生"选择文件夹"对话框（仅 Windows），返回用户选择的路径
+export async function pickDirectory() {
+  if (process.platform !== 'win32') {
+    throw new Error('当前系统不支持原生文件夹选择器')
+  }
+  const current = getProtocolDir()
+  const script = [
+    'Add-Type -AssemblyName System.Windows.Forms',
+    '$dialog = New-Object System.Windows.Forms.FolderBrowserDialog',
+    `$dialog.SelectedPath = '${current.replace(/'/g, "''")}'`,
+    "$dialog.Description = '选择安装目录'",
+    '$dialog.ShowNewFolderButton = $true',
+    "if ($dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {",
+    '  Write-Output $dialog.SelectedPath',
+    '}',
+  ].join('\n')
+  const encoded = Buffer.from(script, 'utf16le').toString('base64')
+  const { stdout } = await execAsync(
+    `powershell -NoProfile -EncodedCommand ${encoded}`,
+    { windowsHide: true },
+  )
+  const dir = stdout.trim()
+  if (!dir) {
+    return { picked: false, path: '' }
+  }
+  return { picked: true, path: dir }
+}
+
 // 检查 webui 自身更新：拉取 git 远程并比对本地/远程提交数
 export async function checkUpdates() {
   const remote = await detectRemote()

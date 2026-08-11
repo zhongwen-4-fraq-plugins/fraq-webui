@@ -147,6 +147,10 @@ export const httpApi = {
     return request(`/api/install/dirs${query}`)
   },
 
+  async pickDirectory() {
+    return request('/api/install/dir/pick', { method: 'POST' })
+  },
+
   async getProtocolReleases(source) {
     return request(`/api/install/releases?source=${encodeURIComponent(source)}`)
   },

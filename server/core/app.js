@@ -277,6 +277,17 @@ app.get('/api/install/releases', async (c) => {
 
 app.get('/api/install/status', (c) => c.json(environment.getStatus()))
 
+app.post('/api/install/dir/pick', async (c) => {
+  try {
+    return c.json(await environment.pickDirectory())
+  } catch (error) {
+    return c.json(
+      { error: error instanceof Error ? error.message : '无法打开文件夹选择器' },
+      400,
+    )
+  }
+})
+
 app.get('/api/update/check', async (c) => {
   try {
     return c.json(await environment.checkUpdates())
