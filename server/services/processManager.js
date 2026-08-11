@@ -47,12 +47,17 @@ export async function start() {
 
   stopping = false
   startedAt = Date.now()
-  child = spawn('fraq', ['start'], {
+  // Windows 下 fraq 是 .cmd 垫片，需经 cmd 执行；用受控命令串避免 shell:true 弃用警告
+  const isWindows = process.platform === 'win32'
+  child = spawn(
+    isWindows ? process.env.ComSpec ?? 'cmd.exe' : 'fraq',
+    isWindows ? ['/d', '/c', 'fraq start'] : ['start'],
+    {
     cwd: getAppDir(),
-    shell: process.platform === 'win32',
     windowsHide: true,
     env: buildChildEnv(),
-  })
+    },
+  )
 
   child.stdout?.on('data', (chunk) => logService.push(String(chunk)))
   child.stderr?.on('data', (chunk) => logService.push(String(chunk)))
