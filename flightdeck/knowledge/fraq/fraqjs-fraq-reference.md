@@ -33,6 +33,13 @@ READ WHEN: 当需要实现或理解 fraq 应用、fraq 插件、或 fraq-webui �
 - **@fraqjs/plugin-milky-server**：把 Milky 服务代理成 HTTP：`POST {prefix}/api/:api`（转发 `ctx.client`，响应 `{status, retcode, data|message}`）；`GET {prefix}/event` 同时支持 SSE 和 WebSocket 推送事件；prefix 默认 `/milky`，可配 accessToken。
 - **@fraqjs/plugin-webui-gateway**：统一 SPA 挂载 `/webui/<plugin-id>/`，登录页 `/webui/login`（accessToken 换取签名 HttpOnly Cookie，默认 7 天），`/webui/auth/session` 查会话；插件通过 `WebuiGatewayService.mount({ assets, entry?, routes(api){get/post/put/patch/delete} })` 挂载自己的 SPA + `/api` 路由；静态文件走 serveStatic，仅 Accept: text/html 的无扩展名 GET 回退 index.html；默认安全头 + CSP。自带登录/索引小 SPA（React + Vite，在 `plugins/webui-gateway/webui/`）。
 
+## fraq CLI 命令（packages/cli/src/index.ts）
+
+- `fraq start [--no-install] [--watch]` — 启动应用；默认先 `lock` 自动补全插件版本再安装依赖。`--watch` 与 `--no-install`/`--frozen-lockfile` 互斥。
+- `fraq install`（别名 `i`）— 只安装依赖，不启动应用。
+- `fraq wizard`（别名 `init`/`setup`）— 交互式初始化新项目：项目名（默认 my-fraq-app）、fraq 版本、Milky 地址/端口（默认 localhost:30001），生成 `fraq.yml`（configVersion/fraqVersion/milky.url），**不包含 accessToken**，之后提示用户 `cd <dir> && fraq start`。
+- `fraq lock` / `fraq outdated` / `fraq update` / `fraq version`（别名 `v`）— 版本锁定、检查更新、交互更新、显示 CLI 版本。
+
 ## 对 fraq-webui 的启示
 
 - 两种现成接入方式：a) 作为 fraq 插件用 webui-gateway 挂载（同进程、自带鉴权与静态托管）；b) 独立前端通过 milky-server 的 `/milky/api` 与 `/milky/event`（SSE/WS）直连（跨进程、需自管鉴权）。
