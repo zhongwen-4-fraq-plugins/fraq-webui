@@ -516,6 +516,38 @@ export function getStatus() {
   return { ...state, protocolDir: getProtocolDir() }
 }
 
+// 检查 webui 自身更新：拉取 git 远程并比对本地/远程提交数
+export async function checkUpdates() {
+  const remote = await detectRemote()
+  if (!remote) {
+    throw new Error('未配置 git 远程仓库')
+  }
+  await runCommand('git', ['fetch', remote], { quiet: true })
+  const branch = (await execAsync('git rev-parse --abbrev-ref HEAD')).stdout.trim()
+  const remoteBranch = `${remote}/${branch}`
+  const [behind, ahead] = await Promise.all([
+    execAsync(`git rev-list --count HEAD..${remoteBranch}`),
+    execAsync(`git rev-list --count ${remoteBranch}..HEAD`),
+  ])
+  return {
+    remote,
+    branch,
+    behind: Number(behind.stdout.trim()) || 0,
+    ahead: Number(ahead.stdout.trim()) || 0,
+    upToDate: Number(behind.stdout.trim()) === 0,
+  }
+}
+
+async function detectRemote() {
+  try {
+    const { stdout } = await execAsync('git remote')
+    const remotes = stdout.split(/\s+/).filter(Boolean)
+    return remotes.find((name) => name === 'fraq-webui') ?? remotes[0] ?? ''
+  } catch {
+    return ''
+  }
+}
+
 // 目录选择：列出指定目录的子文件夹；path 为空时列出磁盘根
 export function listDirs(dir) {
   if (!dir || !String(dir).trim()) {

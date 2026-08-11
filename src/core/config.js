@@ -1,6 +1,9 @@
 // 全局配置：轮询间隔、日志分页大小、数据来源开关。
 
+import pkg from '../../package.json'
+
 export const APP_NAME = 'fraq-webui'
+export const APP_VERSION = pkg.version ?? '0.0.0'
 
 // 概览与插件的轮询间隔（毫秒）
 export const POLL_INTERVAL_MS = 5000

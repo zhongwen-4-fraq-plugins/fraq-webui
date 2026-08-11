@@ -2,16 +2,40 @@
 import IconBlocks from '~icons/tabler/blocks'
 import IconLayoutDashboard from '~icons/tabler/layout-dashboard'
 import IconListDetails from '~icons/tabler/list-details'
+import IconLoader from '~icons/tabler/loader-2'
+import IconRefresh from '~icons/tabler/refresh'
 import IconSettings from '~icons/tabler/settings'
 import IconTool from '~icons/tabler/tool'
 import IconX from '~icons/tabler/x'
-import { APP_NAME } from '../core/config.js'
+import { ref } from 'vue'
+import { APP_NAME, APP_VERSION } from '../core/config.js'
+import { httpApi } from '../services/httpApi.js'
+import { store } from '../services/store.js'
 
 defineProps({
   open: { type: Boolean, default: false },
 })
 
 defineEmits(['close'])
+
+const checking = ref(false)
+
+async function checkUpdate() {
+  if (checking.value) return
+  checking.value = true
+  try {
+    const result = await httpApi.checkUpdates()
+    if (result.upToDate) {
+      store.toast('success', `已是最新版本（v${APP_VERSION}）`)
+    } else {
+      store.toast('warning', `发现 ${result.behind} 个新提交，可在项目目录执行 git pull 更新`)
+    }
+  } catch (error) {
+    store.toast('error', error instanceof Error ? error.message : '检查更新失败')
+  } finally {
+    checking.value = false
+  }
+}
 
 const navItems = [
   { to: '/', label: '概览', icon: IconLayoutDashboard },
@@ -51,7 +75,19 @@ const navItems = [
       </RouterLink>
     </nav>
 
-    <p class="sidebar__footer">演示模式 · 数据为模拟</p>
+    <div class="sidebar__footer">
+      <span class="sidebar__version">fraq-webui v{{ APP_VERSION }}</span>
+      <button
+        type="button"
+        class="sidebar__update"
+        :disabled="checking"
+        :aria-label="checking ? '正在检查更新' : '检查更新'"
+        @click="checkUpdate"
+      >
+        <IconRefresh v-if="!checking" class="sidebar__update-icon" aria-hidden="true" />
+        <IconLoader v-else class="sidebar__update-icon sidebar__update-icon--spin" aria-hidden="true" />
+      </button>
+    </div>
   </aside>
 </template>
 
@@ -170,10 +206,56 @@ const navItems = [
 }
 
 .sidebar__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
   margin-top: auto;
   padding: var(--space-4);
   color: var(--faint);
   font-size: var(--text-xs);
+}
+
+.sidebar__version {
+  white-space: nowrap;
+}
+
+.sidebar__update {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--faint);
+  cursor: pointer;
+}
+
+.sidebar__update:hover:not(:disabled) {
+  background: var(--surface-2);
+  color: var(--app-text-color, var(--ink));
+}
+
+.sidebar__update:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.sidebar__update-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.sidebar__update-icon--spin {
+  animation: sidebar-spin 0.8s linear infinite;
+}
+
+@keyframes sidebar-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (min-width: 900px) {

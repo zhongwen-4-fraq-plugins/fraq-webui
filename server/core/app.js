@@ -277,6 +277,17 @@ app.get('/api/install/releases', async (c) => {
 
 app.get('/api/install/status', (c) => c.json(environment.getStatus()))
 
+app.get('/api/update/check', async (c) => {
+  try {
+    return c.json(await environment.checkUpdates())
+  } catch (error) {
+    return c.json(
+      { error: error instanceof Error ? error.message : '检查更新失败' },
+      502,
+    )
+  }
+})
+
 app.post('/api/install/protocol', async (c) => {
   const body = await c.req.json().catch(() => ({}))
   try {

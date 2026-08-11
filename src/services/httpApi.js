@@ -119,6 +119,10 @@ export const httpApi = {
     return request('/api/install/check')
   },
 
+  async checkUpdates() {
+    return request('/api/update/check')
+  },
+
   async installCli() {
     return request('/api/install/cli', { method: 'POST' })
   },
