@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import IconDeviceFloppy from '~icons/tabler/device-floppy'
 import IconEye from '~icons/tabler/eye'
 import IconEyeOff from '~icons/tabler/eye-off'
+import IconUpload from '~icons/tabler/upload'
 import { store } from '../services/store.js'
 import { createDefaultAppearance } from '../models/appearance.js'
 import AppButton from '../components/AppButton.vue'
@@ -20,6 +21,8 @@ const form = reactive({
 const saving = ref(false)
 const baseUrlError = ref('')
 const showToken = ref(false)
+const bgFileInput = ref(null)
+const dragActive = ref(false)
 
 // 表单有未保存的修改时，输入框边框显示主题色
 const dirty = computed(
@@ -46,21 +49,40 @@ const bgPreview = computed(() => {
   return "url('/bg.jpg')"
 })
 
+const bgFileName = computed(() =>
+  appearance.background.mode === 'file' ? appearance.background.fileName : '',
+)
+
 function onBackgroundFile(event) {
-  const file = event.target.files?.[0]
+  applyBackgroundFile(event.target.files?.[0])
+  event.target.value = ''
+}
+
+function onBackgroundDrop(event) {
+  dragActive.value = false
+  applyBackgroundFile(event.dataTransfer?.files?.[0])
+}
+
+function pickBackground() {
+  bgFileInput.value?.click()
+}
+
+function applyBackgroundFile(file) {
   if (!file) return
+  if (!file.type.startsWith('image/')) return
   const reader = new FileReader()
   reader.onload = () => {
     appearance.background.mode = 'file'
     appearance.background.value = reader.result
+    appearance.background.fileName = file.name
   }
   reader.readAsDataURL(file)
-  event.target.value = ''
 }
 
 function resetBackground() {
   appearance.background.mode = 'default'
   appearance.background.value = ''
+  appearance.background.fileName = ''
 }
 
 function resetAppearance() {
@@ -213,13 +235,32 @@ async function save() {
             class="field__input field__input--gap appearance__url-input"
             placeholder="https://example.com/background.jpg"
           />
-          <input
+          <div
             v-else-if="appearance.background.mode === 'file'"
-            type="file"
-            accept="image/*"
-            class="field__input field__input--gap"
-            @change="onBackgroundFile"
-          />
+            class="appearance__dropzone"
+            :class="{ 'appearance__dropzone--drag': dragActive }"
+            role="button"
+            tabindex="0"
+            :aria-label="bgFileName ? `更换背景图（${bgFileName}）` : '选择背景图'"
+            @click="pickBackground"
+            @keydown.enter.prevent="pickBackground"
+            @keydown.space.prevent="pickBackground"
+            @dragover.prevent="dragActive = true"
+            @dragleave.prevent="dragActive = false"
+            @drop.prevent="onBackgroundDrop"
+          >
+            <IconUpload class="appearance__dropzone-icon" aria-hidden="true" />
+            <span class="appearance__dropzone-text">
+              {{ bgFileName || '点击选择图片，或将图片拖到这里' }}
+            </span>
+            <input
+              ref="bgFileInput"
+              type="file"
+              accept="image/*"
+              class="appearance__file-input"
+              @change="onBackgroundFile"
+            />
+          </div>
           <div
             class="appearance__preview"
             :style="{ backgroundImage: bgPreview }"
@@ -343,6 +384,56 @@ async function save() {
   border-radius: var(--radius-md);
   background-size: cover;
   background-position: center;
+}
+
+.appearance__dropzone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 5rem;
+  margin-top: var(--space-2);
+  padding: var(--space-3);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  background: var(--app-component-bg, var(--surface-2));
+  color: var(--muted);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition:
+    border-color 150ms ease-out,
+    background-color 150ms ease-out,
+    color 150ms ease-out;
+}
+
+.appearance__dropzone:hover {
+  border-color: var(--primary);
+  color: var(--app-text-color, var(--ink));
+}
+
+.appearance__dropzone--drag {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--app-text-color, var(--ink));
+}
+
+.appearance__dropzone:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.appearance__dropzone-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.appearance__dropzone-text {
+  overflow-wrap: anywhere;
+}
+
+.appearance__file-input {
+  display: none;
 }
 
 .appearance__reset {
