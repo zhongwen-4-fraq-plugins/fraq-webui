@@ -39,6 +39,7 @@ Current:
 - 设置页背景图本地上传改为拖拽上传区（点击/拖放选图，显示文件名，键盘可操作）；外观模型新增 background.fileName。
 - 会话失效自动跳登录：任意 API 401（auth 接口除外）即回登录页，toast 移到登录门控外。
 - 侧栏左下角显示 fraq-webui 版本号 + 检查更新按钮：`GET /api/update/check`（git fetch 远程比对 HEAD..remote/main 提交数）；已合并远程 zhongwen-4-fraq-plugins/fraq-webui（仅 LICENSE）并推送同步。
+- 安装目录"选择"优先弹系统原生文件夹选择器（powershell -EncodedCommand + FolderBrowserDialog，仅 Windows），失败回退页面内目录浏览。
 
 ## Open questions
 
