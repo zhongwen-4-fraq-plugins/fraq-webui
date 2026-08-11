@@ -47,6 +47,7 @@ READ WHEN: 当需要实现或理解 fraq 应用、fraq 插件、或 fraq-webui �
 - Yogurt 安装：`npm install -g @acidify/yogurt`（预编译二进制 npm 包），装好后直接 `yogurt` 命令启动；首次启动需要扫码登录 QQ。也可从 SaltifyDev/yogurt-releases Releases 下载压缩包。
 - fraq CLI 安装：`npm install -g @fraqjs/cli`。
 - 连通性检查：向 Milky 地址 `POST /api/get_login_info`（带 accessToken 时加 `Authorization: Bearer <token>`），返回 `{status:'ok'}` 即协议端可用。
+- GitHub 资产下载会 302 跳转到 release-assets.githubusercontent.com；Node undici `fetch` 流式下载对该 CDN 会间歇 `UND_ERR_CONNECT_TIMEOUT`（国内网络），用 `node:https` 手写重定向 + 30s 超时 + 一次重试更稳。
 
 ## 对 fraq-webui 的启示
 

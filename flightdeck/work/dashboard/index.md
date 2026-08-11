@@ -8,6 +8,7 @@
 
 - 浏览器打开 `npm run dev` 检查视觉效果（本环境无截图能力，未做视觉确认）。
 - 浏览器验证管理界面（http://127.0.0.1:8787）。
+- 重启 8787 服务后浏览器打开 /install 验证安装页。
 
 ## Read now
 
@@ -30,8 +31,9 @@ Done:
 - 消息收发统计：milky 透明代理（fraq.yml milky.url 指向本服务），收=事件流 message_receive、发=发送 API 计数，概览展示
 
 Current:
-- 浏览器视觉确认与打磨；插件级运行状态（目前以进程运行近似）
+- 新增"安装"页：环境检查（fraq CLI `fraq version`、协议端 `get_login_info`）、CLI 一键 npm 全局安装、协议端（Yogurt / LuckyLilliaBot）GitHub 版本列表选择 + 下载解压 + 启动/停止（进度轮询）。已用临时服务实测下载 Yogurt Windows 包并自动定位 yogurt.exe。
 
 ## Open questions
 
 - 已解决：采用配套管理服务（server/）。剩余：单个插件的真实运行状态无法从外部获取（近似为进程运行即全部运行）。
+- 协议端下载依赖 GitHub 网络（release-assets CDN 偶发超时，已加重试）；LuckyLilliaBot 的 .msi/.exe 安装包只下载不自动装，需手动运行。
