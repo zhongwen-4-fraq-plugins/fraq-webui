@@ -315,15 +315,6 @@ async function uninstallPlugin(id) {
   }
 }
 
-async function getPluginConfig(id) {
-  return api.getPluginConfig(id)
-}
-
-async function updatePluginConfig(id, config) {
-  await api.updatePluginConfig(id, config)
-  toast('success', '插件配置已保存')
-}
-
 async function saveSettings(settings) {
   await api.saveSettings(settings)
   state.settings = normalizeSettings(await api.getSettings())
@@ -349,8 +340,6 @@ export const store = {
   installPlugin,
   setPluginEnabled,
   uninstallPlugin,
-  getPluginConfig,
-  updatePluginConfig,
   saveSettings,
   toast,
   dismissToast,

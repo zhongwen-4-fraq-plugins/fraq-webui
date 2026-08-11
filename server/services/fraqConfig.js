@@ -115,59 +115,6 @@ export function uninstallPlugin(id) {
   writeConfig(doc)
 }
 
-const SECRET_KEY_PATTERN = /(key|token|secret|password|authorization|api[_-]?key)/i
-const MASK = '******'
-
-function maskConfig(config) {
-  const result = {}
-  for (const [key, value] of Object.entries(config ?? {})) {
-    if (value && typeof value === 'object' && !Array.isArray(value)) {
-      result[key] = maskConfig(value)
-    } else {
-      result[key] = SECRET_KEY_PATTERN.test(key) ? MASK : value
-    }
-  }
-  return result
-}
-
-function unmaskConfig(current, edited) {
-  const result = {}
-  for (const [key, value] of Object.entries(edited ?? {})) {
-    if (value && typeof value === 'object' && !Array.isArray(value)) {
-      result[key] = unmaskConfig(current?.[key] ?? {}, value)
-    } else if (value === MASK && SECRET_KEY_PATTERN.test(key)) {
-      // 打码占位：保留原值
-      result[key] = current?.[key]
-    } else {
-      result[key] = value
-    }
-  }
-  return result
-}
-
-// 获取插件当前配置（密钥字段打码）
-export function getPluginConfig(id) {
-  const doc = readConfig()
-  const config = doc.plugins?.[id]
-  if (config === undefined) {
-    throw new Error('插件不存在')
-  }
-  return maskConfig(config ?? {})
-}
-
-// 更新插件配置（打码占位保留原值）
-export function updatePluginConfig(id, config) {
-  if (!config || typeof config !== 'object' || Array.isArray(config)) {
-    throw new Error('配置必须是 JSON 对象')
-  }
-  const doc = readConfig()
-  if (!(id in (doc.plugins ?? {}))) {
-    throw new Error('插件不存在')
-  }
-  doc.plugins[id] = unmaskConfig(doc.plugins[id] ?? {}, config)
-  writeConfig(doc)
-}
-
 export function getSettings() {
   const doc = readConfig()
   return settings({

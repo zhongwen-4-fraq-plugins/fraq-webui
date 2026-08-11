@@ -94,17 +94,6 @@ export const httpApi = {
     return request(`/api/plugins/${encodeURIComponent(id)}/uninstall`, { method: 'POST' })
   },
 
-  async getPluginConfig(id) {
-    return request(`/api/plugins/${encodeURIComponent(id)}/config`)
-  },
-
-  async updatePluginConfig(id, config) {
-    return request(`/api/plugins/${encodeURIComponent(id)}/config`, {
-      method: 'PUT',
-      body: JSON.stringify({ config }),
-    })
-  },
-
   async getSettings() {
     return request('/api/settings')
   },
