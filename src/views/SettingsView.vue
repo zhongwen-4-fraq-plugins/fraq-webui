@@ -99,7 +99,9 @@ function resetAppearance() {
   appearance.colors.topbar = defaults.colors.topbar
   appearance.colors.sidebar = defaults.colors.sidebar
   appearance.colors.area = defaults.colors.area
+  appearance.colors.components = defaults.colors.components
   appearance.colors.dialog = defaults.colors.dialog
+  appearance.colors.text = defaults.colors.text
 }
 
 onMounted(async () => {

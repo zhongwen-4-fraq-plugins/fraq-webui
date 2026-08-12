@@ -50,14 +50,6 @@ const argb = computed(() => {
         :aria-label="`${label}透明度`"
       />
     </div>
-    <input
-      v-model.number="alphaPercent"
-      type="number"
-      min="0"
-      max="100"
-      class="argb__number"
-      :aria-label="`${label}透明度数值`"
-    />
     <div class="argb__slider">
       <span class="argb__slider-label">模糊</span>
       <input
@@ -178,18 +170,6 @@ const argb = computed(() => {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: var(--text-xs);
   color: var(--muted);
-}
-
-.argb__number {
-  width: 3.5rem;
-  height: 2rem;
-  padding: 0 var(--space-2);
-  border: none;
-  border-radius: var(--radius-sm);
-  background: var(--app-component-bg, var(--surface-2));
-  color: var(--app-text-color, var(--ink));
-  font-size: var(--text-xs);
-  font-variant-numeric: tabular-nums;
 }
 
 .argb__value {

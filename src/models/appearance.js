@@ -1,7 +1,7 @@
 // 界面外观数据模型：背景图与各区域 ARGB 颜色。
 
 const DEFAULT_COLOR = { color: '#ffffff', alpha: 0.72, blur: 16 }
-const DEFAULT_COMPONENT = { color: '#fbfbfb', alpha: 1, blur: 0 }
+const DEFAULT_COMPONENT = { color: '#fbfbfb', alpha: 0, blur: 0 }
 const DEFAULT_DIALOG = { color: '#ffffff', alpha: 0.92, blur: 16 }
 const DEFAULT_TEXT = { color: '#2b2e33', alpha: 1, blur: 0 }
 
