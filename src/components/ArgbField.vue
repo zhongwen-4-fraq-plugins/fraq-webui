@@ -44,7 +44,7 @@ const argb = computed(() => {
       <input
         v-model="alphaPercent"
         type="range"
-        min="5"
+        min="15"
         max="100"
         class="argb__alpha"
         :aria-label="`${label}透明度`"
