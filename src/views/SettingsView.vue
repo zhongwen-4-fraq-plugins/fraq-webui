@@ -433,9 +433,11 @@ async function save() {
   height: 0.375rem;
   border: none;
   border-radius: 999px;
-  background:
-    color-mix(in srgb, var(--app-component-bg, var(--surface-2)) 60%, transparent),
-    color-mix(in srgb, var(--surface-2) 20%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--app-component-bg, var(--surface-2)) 60%,
+    color-mix(in srgb, var(--surface-2) 50%, transparent)
+  );
   outline: none;
 }
 

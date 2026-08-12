@@ -127,9 +127,12 @@ const argb = computed(() => {
   height: 0.375rem;
   border: none;
   border-radius: 999px;
-  background:
-    color-mix(in srgb, var(--app-component-bg, var(--surface-2)) 60%, transparent),
-    color-mix(in srgb, var(--surface-2) 20%, transparent);
+  /* 轨道保底 20% 可见：组件色 60% 混合 50% 表面色 */
+  background: color-mix(
+    in srgb,
+    var(--app-component-bg, var(--surface-2)) 60%,
+    color-mix(in srgb, var(--surface-2) 50%, transparent)
+  );
   outline: none;
 }
 
@@ -141,9 +144,11 @@ const argb = computed(() => {
   height: 0.375rem;
   border: none;
   border-radius: 999px;
-  background:
-    color-mix(in srgb, var(--app-component-bg, var(--surface-2)) 60%, transparent),
-    color-mix(in srgb, var(--surface-2) 20%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--app-component-bg, var(--surface-2)) 60%,
+    color-mix(in srgb, var(--surface-2) 50%, transparent)
+  );
   outline: none;
 }
 
