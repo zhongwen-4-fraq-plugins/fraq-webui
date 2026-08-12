@@ -4,11 +4,13 @@
 
 已接入真实后端（2026-08-06）：配套管理服务（server/，Node + Hono）拉起真实 fraq 进程（CLI 已升级 0.9.0），核心启停/插件/日志/设置均为真实数据；前端 mock 已移除。
 
+外观与设置页持续迭代至 2026-08-12：液态玻璃、ARGB 分区外观、日志配色、透明度滑杆、安装页等均已落地并提交。
+
 ## Next
 
-- 浏览器打开 `npm run dev` 检查视觉效果（本环境无截图能力，未做视觉确认）。
-- 浏览器验证管理界面（http://127.0.0.1:8787）。
-- 重启 8787 服务后浏览器打开 /install 验证安装页。
+- 刷新 http://127.0.0.1:8787 验证：组件透明度默认 0、透明度数值输入框已删（注意 localStorage 旧值，需点"恢复默认外观"）。
+- 浏览器打开 /install 验证安装页（环境检查、版本选择下载、自定义目录、Node 便携安装）。
+- 需要时 git push 推送远程。
 
 ## Read now
 
@@ -42,6 +44,11 @@ Current:
 - 安装目录"选择"优先弹系统原生文件夹选择器（powershell -EncodedCommand + FolderBrowserDialog，仅 Windows），失败回退页面内目录浏览。
 - 插件配置功能：官方插件（fraqjs/hono、milky-server、webui-gateway、kysely、message-store、conversation、random、milky-webhook、takumi、ai）按源码手写表单，其余插件 JSON 编辑器；`GET/PUT /api/plugins/:id/config`，密钥字段（apiKey/token/secret 等）打码 ******，保存时未改动则还原原值。
 - 核心状态接管孤儿进程：服务重启后旧 fraq 核心仍在运行时，`/api/core` 通过 netstat 探测 fraqjs/hono 端口（默认 4649）找到 PID 并接管，状态不再误报未运行，停止也能正常 kill。
+- ai 插件配置改为 SDK 下拉选择（9 个 SDK 选项）。
+- 透明度滑杆标注"透明度/模糊"；滑杆下限固定 20%、数值输入框可输到 0%；2026-08-12 组件透明度默认改为 0，透明度数值输入框整体删除。
+- 弹窗独立外观（--app-dialog-bg/--app-dialog-blur）、背景图模糊设置、toast 进度条动画（4500ms）。
+- 日志页"日志"旁设置图标（右 15px、文字间距 10px、背景透明），可改各日志级别文字颜色与底色；错误/警告整行变色（底色去掉）；长错误报告折叠为一行可点击展开。
+- 警告文字色 #d9b500。
 
 ## Open questions
 
