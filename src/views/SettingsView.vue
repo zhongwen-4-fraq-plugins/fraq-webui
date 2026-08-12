@@ -60,6 +60,13 @@ const backgroundBlur = computed({
   },
 })
 
+const alphaMin = computed({
+  get: () => appearance.alphaMin,
+  set: (value) => {
+    appearance.alphaMin = Number(value)
+  },
+})
+
 function onBackgroundFile(event) {
   applyBackgroundFile(event.target.files?.[0])
   event.target.value = ''
@@ -95,6 +102,7 @@ function resetBackground() {
 
 function resetAppearance() {
   const defaults = createDefaultAppearance()
+  appearance.alphaMin = defaults.alphaMin
   appearance.background = defaults.background
   appearance.colors.topbar = defaults.colors.topbar
   appearance.colors.sidebar = defaults.colors.sidebar
@@ -301,12 +309,26 @@ async function save() {
         </div>
 
         <div class="appearance__colors">
-          <ArgbField label="顶栏" :model="appearance.colors.topbar" />
-          <ArgbField label="侧边栏" :model="appearance.colors.sidebar" />
-          <ArgbField label="内容区域" :model="appearance.colors.area" />
-          <ArgbField label="组件" :model="appearance.colors.components" />
-          <ArgbField label="弹窗" :model="appearance.colors.dialog" />
-          <ArgbField label="文字" :model="appearance.colors.text" />
+          <div class="appearance__alpha-min">
+            <label for="alpha-min">透明度下限</label>
+            <input
+              id="alpha-min"
+              v-model="alphaMin"
+              type="range"
+              min="0"
+              max="50"
+              step="5"
+              class="appearance__blur-input"
+            />
+            <span class="appearance__blur-value">{{ alphaMin }}%</span>
+          </div>
+          <p class="field__hint">所有颜色滑杆最低只能拖到这个透明度。</p>
+          <ArgbField label="顶栏" :model="appearance.colors.topbar" :min-alpha="alphaMin" />
+          <ArgbField label="侧边栏" :model="appearance.colors.sidebar" :min-alpha="alphaMin" />
+          <ArgbField label="内容区域" :model="appearance.colors.area" :min-alpha="alphaMin" />
+          <ArgbField label="组件" :model="appearance.colors.components" :min-alpha="alphaMin" />
+          <ArgbField label="弹窗" :model="appearance.colors.dialog" :min-alpha="alphaMin" />
+          <ArgbField label="文字" :model="appearance.colors.text" :min-alpha="alphaMin" />
         </div>
         <AppButton variant="secondary" size="sm" class="appearance__reset" @click="resetAppearance">
           恢复默认外观
@@ -414,6 +436,19 @@ async function save() {
   align-items: center;
   gap: var(--space-3);
   margin-top: var(--space-3);
+}
+
+.appearance__alpha-min {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.appearance__alpha-min label {
+  width: 4.5rem;
+  flex-shrink: 0;
+  font-size: var(--text-sm);
+  font-weight: 500;
 }
 
 .appearance__blur label {

@@ -5,6 +5,7 @@ import { hexToRgb, toHex } from '../data/color.js'
 const props = defineProps({
   label: { type: String, required: true },
   model: { type: Object, required: true }, // { color: '#rrggbb', alpha: 0..1 }
+  minAlpha: { type: Number, default: 0 }, // 透明度滑杆下限（%）
 })
 
 const hex = computed({
@@ -44,7 +45,7 @@ const argb = computed(() => {
       <input
         v-model="alphaPercent"
         type="range"
-        min="30"
+        :min="minAlpha"
         max="100"
         class="argb__alpha"
         :aria-label="`${label}透明度`"

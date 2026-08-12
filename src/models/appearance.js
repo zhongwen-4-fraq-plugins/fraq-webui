@@ -9,6 +9,7 @@ const DEFAULT_LOG_COLOR = { color: '', bgColor: '#ffffff', bgAlpha: 0 }
 
 export const DEFAULT_APPEARANCE = {
   background: { mode: 'default', value: '', fileName: '', blur: 0 }, // default | url | file
+  alphaMin: 30, // 透明度滑杆下限（%）
   colors: {
     topbar: { ...DEFAULT_COLOR },
     sidebar: { color: '#fbfbfb', alpha: 0.72, blur: 16 },
@@ -45,6 +46,9 @@ function normalizeLogColor(raw, fallback) {
 
 export function normalizeAppearance(raw = {}) {
   return {
+    alphaMin: Number.isFinite(raw.alphaMin)
+      ? Math.min(100, Math.max(0, Math.round(raw.alphaMin)))
+      : DEFAULT_APPEARANCE.alphaMin,
     background: {
       mode: ['default', 'url', 'file'].includes(raw.background?.mode) ? raw.background.mode : 'default',
       value: typeof raw.background?.value === 'string' ? raw.background.value : '',
