@@ -72,6 +72,7 @@
   --app-sidebar-bg: oklch(0.984 0.003 210 / 0.72);
   --app-area-bg: oklch(0.984 0.003 210 / 0.72);
   --app-component-bg: oklch(0.965 0.005 210);
+  --app-slider-track-bg: oklch(0.965 0.005 210 / 0.6);
   --app-dialog-bg: oklch(1 0 0 / 0.92);
   --app-text-color: var(--ink);
   --app-topbar-blur: 16px;

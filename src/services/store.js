@@ -87,6 +87,11 @@ function applyAppearance() {
   root.style.setProperty('--app-area-bg', colorToRgba(colors.area))
   root.style.setProperty('--app-component-bg', colorToRgba(colors.components))
   root.style.setProperty('--app-dialog-bg', colorToRgba(colors.dialog))
+  // 滑杆轨道颜色跟随组件颜色选择器，透明度 ×60% 且保底 20% 可见
+  root.style.setProperty(
+    '--app-slider-track-bg',
+    colorToRgba({ color: colors.components.color, alpha: Math.max(colors.components.alpha * 0.6, 0.2) }),
+  )
   root.style.setProperty('--app-text-color', colorToRgba(colors.text))
   root.style.setProperty('--app-topbar-blur', `${colors.topbar.blur}px`)
   root.style.setProperty('--app-sidebar-blur', `${colors.sidebar.blur}px`)
