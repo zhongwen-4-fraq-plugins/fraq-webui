@@ -17,7 +17,7 @@ const hex = computed({
 const alphaPercent = computed({
   get: () => Math.round(props.model.alpha * 100),
   set: (value) => {
-    props.model.alpha = Number(value) / 100
+    props.model.alpha = Math.min(100, Math.max(0, Number(value))) / 100
   },
 })
 
@@ -44,12 +44,20 @@ const argb = computed(() => {
       <input
         v-model="alphaPercent"
         type="range"
-        min="0"
+        min="20"
         max="100"
         class="argb__alpha"
         :aria-label="`${label}透明度`"
       />
     </div>
+    <input
+      v-model.number="alphaPercent"
+      type="number"
+      min="0"
+      max="100"
+      class="argb__number"
+      :aria-label="`${label}透明度数值`"
+    />
     <div class="argb__slider">
       <span class="argb__slider-label">模糊</span>
       <input
@@ -170,6 +178,18 @@ const argb = computed(() => {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: var(--text-xs);
   color: var(--muted);
+}
+
+.argb__number {
+  width: 3.5rem;
+  height: 2rem;
+  padding: 0 var(--space-2);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--app-component-bg, var(--surface-2));
+  color: var(--app-text-color, var(--ink));
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
 }
 
 .argb__value {
