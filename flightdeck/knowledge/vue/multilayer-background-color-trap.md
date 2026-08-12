@@ -8,10 +8,10 @@ READ WHEN: 写多层 background 时；或滑杆轨道/背景突然消失时
 
 CSS 规范：background 多个图层时，只有最后一层可以包含颜色，其余层必须是可以平铺的图像（如 gradient）。`color-mix()` 的返回值是 `<color>`，所以两层都写颜色会令整条声明在解析时失效，元素背景退回透明。
 
-本项目滑杆轨道最终方案（2026-08-12）：不用多层 background，由 `store.js` 用组件颜色选择器的颜色预计算轨道色（透明度 ×60%、保底 20%）写入 `--app-slider-track-bg`，CSS 直接 `background: var(--app-slider-track-bg, var(--surface-2))`。
+本项目滑杆轨道最终方案（2026-08-12）：不用多层 background，由 `store.js` 用组件颜色选择器的颜色预计算轨道色（透明度 ×60%、保底 25%）写入 `--app-slider-track-bg`，CSS 直接 `background: var(--app-slider-track-bg, var(--surface-2))`。
 
 ```css
 background: var(--app-slider-track-bg, var(--surface-2));
 ```
 
-轨道色 = 组件选择器颜色，透明度 = max(组件透明度 × 0.6, 0.2)，保证轨道不消失且颜色跟随组件。曾用两层颜色实现导致轨道消失，提交 eb91cfc 修复；后改为 JS 预计算，提交 16ccaf9。
+轨道色 = 组件选择器颜色，透明度 = max(组件透明度 × 0.6, 0.25)，保证轨道不消失且颜色跟随组件。曾用两层颜色实现导致轨道消失，提交 eb91cfc 修复；后改为 JS 预计算，提交 16ccaf9。
