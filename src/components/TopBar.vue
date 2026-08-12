@@ -75,6 +75,7 @@ const pageTitle = computed(() => route.meta.title ?? '')
 </template>
 
 <style scoped>
+/* 顶栏：吸顶，半透明毛玻璃 */
 .topbar {
   position: sticky;
   top: 0;
@@ -84,12 +85,14 @@ const pageTitle = computed(() => route.meta.title ?? '')
   backdrop-filter: blur(var(--app-topbar-blur, 16px)) saturate(1.5);
 }
 
+/* 不支持毛玻璃的浏览器：回退为纯色底 */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .topbar {
     background: var(--bg);
   }
 }
 
+/* 顶栏内容：居中限宽，左右留白 */
 .topbar__inner {
   display: flex;
   align-items: center;
@@ -100,6 +103,7 @@ const pageTitle = computed(() => route.meta.title ?? '')
   padding: 0 var(--space-4);
 }
 
+/* 移动端菜单按钮 */
 .topbar__menu {
   display: inline-flex;
   align-items: center;
@@ -113,20 +117,24 @@ const pageTitle = computed(() => route.meta.title ?? '')
   cursor: pointer;
 }
 
+/* 菜单按钮悬停 */
 .topbar__menu:hover {
   background: var(--surface-2);
 }
 
+/* 菜单图标尺寸 */
 .topbar__menu svg {
   width: 1.25rem;
   height: 1.25rem;
 }
 
+/* 页面标题 */
 .topbar__title {
   font-size: var(--text-base);
   font-weight: 600;
 }
 
+/* 右侧操作区：推到最右 */
 .topbar__right {
   display: flex;
   align-items: center;
@@ -134,6 +142,7 @@ const pageTitle = computed(() => route.meta.title ?? '')
   margin-left: auto;
 }
 
+/* 退出登录按钮 */
 .topbar__logout {
   display: inline-flex;
   align-items: center;
@@ -147,16 +156,19 @@ const pageTitle = computed(() => route.meta.title ?? '')
   cursor: pointer;
 }
 
+/* 退出按钮悬停 */
 .topbar__logout:hover {
   background: var(--surface-2);
   color: var(--app-text-color, var(--ink));
 }
 
+/* 退出图标尺寸 */
 .topbar__logout svg {
   width: 1.125rem;
   height: 1.125rem;
 }
 
+/* 宽屏：隐藏菜单按钮，内容边距加大 */
 @media (min-width: 900px) {
   .topbar__menu {
     display: none;

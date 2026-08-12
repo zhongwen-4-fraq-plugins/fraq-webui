@@ -43,42 +43,48 @@ defineEmits(['click'])
 </template>
 
 <style scoped>
+/* 按钮基础：inline-flex 让图标与文字垂直居中，统一圆角与过渡 */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
-  border: 1px solid transparent;
+  gap: var(--space-2); /* 图标与文字间距 */
+  border: 1px solid transparent; /* 占位边框，悬停时变边框色 */
   border-radius: var(--radius-md);
   font-weight: 500;
   cursor: pointer;
-  text-decoration: none;
+  text-decoration: none; /* 链接形态按钮去掉下划线 */
+  /* 背景、边框、文字色统一做过渡 */
   transition:
     background-color 150ms ease-out,
     border-color 150ms ease-out,
     color 150ms ease-out;
 }
 
+/* 禁用态：不可点击 + 半透明 */
 .btn:disabled {
   cursor: not-allowed;
-  opacity: 0.55;
+  opacity: 0.55; /* 弱化视觉 */
 }
 
+/* 中等尺寸（默认） */
 .btn--md {
-  min-height: 2.5rem;
+  min-height: 2.5rem; /* 保证最小点击高度 */
   padding: 0 var(--space-4);
   font-size: var(--text-sm);
 }
 
+/* 小尺寸（工具栏、行内操作） */
 .btn--sm {
   min-height: 2rem;
   padding: 0 var(--space-3);
-  font-size: var(--text-xs);
+  font-size: var(--text-xs); /* 更小字号 */
 }
 
+/* 纯图标按钮：正方形、无内边距 */
 .btn--icon {
   position: relative;
-  width: 2.25rem;
+  width: 2.25rem; /* 36px */
   height: 2.25rem;
   padding: 0;
 }
@@ -87,9 +93,10 @@ defineEmits(['click'])
 .btn--icon::before {
   content: '';
   position: absolute;
-  inset: -4px;
+  inset: -4px; /* 四周各扩 4px */
 }
 
+/* 图标按钮内的图标统一 18px */
 .btn--icon svg {
   width: 1.125rem;
   height: 1.125rem;
@@ -108,67 +115,81 @@ defineEmits(['click'])
   gap: var(--space-2);
 }
 
+/* 主按钮：主色实底 + 白字保证对比度 */
 .btn--primary {
   background: var(--primary);
   color: #fff;
 }
 
+/* 主按钮悬停：加深 */
 .btn--primary:hover:not(:disabled) {
   background: var(--primary-hover);
 }
 
+/* 主按钮按下：进一步加深 */
 .btn--primary:active:not(:disabled) {
   background: var(--primary-active);
 }
 
+/* 次级按钮：浅色底 + 正文文字色，底色跟随组件外观 */
 .btn--secondary {
   background: var(--app-component-bg, var(--surface-2));
   color: var(--app-text-color, var(--ink));
 }
 
+/* 次级按钮悬停：用边框色做底 */
 .btn--secondary:hover:not(:disabled) {
   background: var(--border);
 }
 
+/* 幽灵按钮：透明底 + 正文文字色 */
 .btn--ghost {
   background: var(--app-component-bg, transparent);
   color: var(--app-text-color, var(--ink));
 }
 
+/* 幽灵按钮悬停：文字色 10% 混入做底 */
 .btn--ghost:hover:not(:disabled) {
   background: color-mix(in srgb, var(--ink) 10%, var(--app-component-bg, var(--surface-2)));
 }
 
+/* 危险按钮：红底白字 */
 .btn--danger {
   background: var(--danger);
   color: #fff;
 }
 
+/* 危险按钮悬停 */
 .btn--danger:hover:not(:disabled) {
   background: var(--danger-hover);
 }
 
+/* 危险幽灵按钮：透明底 + 红色文字 */
 .btn--danger-ghost {
   background: var(--app-component-bg, transparent);
   color: var(--danger);
 }
 
+/* 危险幽灵按钮悬停：红色浅底 */
 .btn--danger-ghost:hover:not(:disabled) {
   background: var(--danger-soft);
 }
 
+/* 加载中旋转图标 */
 .btn__spinner {
-  width: 1em;
+  width: 1em; /* 跟随当前字号 */
   height: 1em;
-  animation: btn-spin 0.8s linear infinite;
+  animation: btn-spin 0.8s linear infinite; /* 匀速旋转 */
 }
 
+/* 旋转动画 */
 @keyframes btn-spin {
   to {
     transform: rotate(360deg);
   }
 }
 
+/* 触屏设备：中等按钮加高，方便手指点击 */
 @media (pointer: coarse) {
   .btn--md {
     min-height: 2.75rem;

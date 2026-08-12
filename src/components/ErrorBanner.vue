@@ -20,28 +20,32 @@ defineEmits(['retry'])
 </template>
 
 <style scoped>
+/* 错误横幅：浅红底 + 图标 + 信息 + 重试按钮 */
 .error-banner {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-2); /* 元素间间距 */
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
-  background: var(--danger-soft);
+  background: var(--danger-soft); /* 危险浅底 */
 }
 
+/* 左侧警示图标 */
 .error-banner__icon {
   width: 1rem;
   height: 1rem;
-  color: var(--danger);
-  flex-shrink: 0;
+  color: var(--danger); /* 图标用危险色 */
+  flex-shrink: 0; /* 不随内容挤压 */
 }
 
+/* 错误信息：占满剩余宽度，超长省略 */
 .error-banner__message {
   flex: 1;
   min-width: 0;
   font-size: var(--text-sm);
 }
 
+/* 重试按钮：不收缩 */
 .error-banner__retry {
   flex-shrink: 0;
 }

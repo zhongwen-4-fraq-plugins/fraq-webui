@@ -53,15 +53,17 @@ watch(
 </template>
 
 <style scoped>
+/* 日志配色列表：纵向排列，行间留小间距 */
 .log-colors {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-1); /* 行与行间距 */
 }
 
+/* 底部提示文字 */
 .log-colors__hint {
   margin-top: var(--space-3);
-  color: var(--muted);
+  color: var(--muted); /* 次要文字色 */
   font-size: var(--text-xs);
 }
 </style>

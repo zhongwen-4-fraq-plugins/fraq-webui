@@ -20,12 +20,13 @@ onMounted(() => store.checkAuth())
 </template>
 
 <style scoped>
+/* 登录状态检查期间的全屏加载提示 */
 .auth-splash {
-  display: flex;
+  display: flex; /* 水平垂直居中 */
   align-items: center;
   justify-content: center;
-  min-height: 100dvh;
-  color: var(--muted);
+  min-height: 100dvh; /* 铺满整个视口 */
+  color: var(--muted); /* 次要文字色 */
   font-size: var(--text-sm);
 }
 </style>

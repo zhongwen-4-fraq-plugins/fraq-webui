@@ -350,14 +350,16 @@ function installFromStore(plugin) {
 </template>
 
 <style scoped>
+/* 来源切换（本地/商店）：胶囊形分段控件 */
 .source-tabs {
   display: inline-flex;
-  padding: 2px;
-  margin-bottom: var(--space-4);
+  padding: 2px; /* 内边距形成分段底色 */
+  margin-bottom: var(--space-4); /* 与列表间距 */
   border-radius: var(--radius-md);
-  background: var(--app-component-bg, var(--surface));
+  background: var(--app-component-bg, var(--surface)); /* 分段底色 */
 }
 
+/* 单个来源按钮 */
 .source-tab {
   display: inline-flex;
   align-items: center;
@@ -366,37 +368,42 @@ function installFromStore(plugin) {
   border: none;
   border-radius: var(--radius-sm);
   background: transparent;
-  color: var(--muted);
+  color: var(--muted); /* 未选中：次要色 */
   font-size: var(--text-xs);
   font-weight: 500;
   cursor: pointer;
 }
 
+/* 悬停：文字变正文色 */
 .source-tab:hover {
   color: var(--app-text-color, var(--ink));
 }
 
+/* 选中：主色 + 加粗 */
 .source-tab--active {
   background: transparent;
-  color: var(--primary);
+  color: var(--primary); /* 高亮主色 */
   font-weight: 600;
 }
 
+/* 本地插件数量徽标 */
 .source-tab__count {
   padding: 0 6px;
-  border-radius: 999px;
-  background: var(--primary-soft);
+  border-radius: 999px; /* 胶囊形 */
+  background: var(--primary-soft); /* 主色浅底 */
   color: var(--app-text-color, var(--ink));
   font-size: var(--text-xs);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: tabular-nums; /* 数字对齐 */
 }
 
+/* 商店区：纵向排列 */
 .store {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-4); /* 区块间距 */
 }
 
+/* 商店工具栏：搜索 + 计数 + 官方商店链接 */
 .store__toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -404,47 +411,54 @@ function installFromStore(plugin) {
   gap: var(--space-3);
 }
 
+/* 搜索框包裹：相对定位放图标 */
 .store__search {
   position: relative;
   display: flex;
   align-items: center;
   flex: 1;
-  min-width: 12rem;
+  min-width: 12rem; /* 窄屏不缩得太小 */
 }
 
+/* 搜索图标：绝对定位在左侧 */
 .store__search-icon {
   position: absolute;
   left: var(--space-3);
   width: 1rem;
   height: 1rem;
   color: var(--muted);
-  pointer-events: none;
+  pointer-events: none; /* 点击穿透 */
 }
 
+/* 搜索输入框：左侧留出图标空间 */
 .store__search-input {
   width: 100%;
   height: 2.5rem;
-  padding: 0 var(--space-3) 0 2.25rem;
+  padding: 0 var(--space-3) 0 2.25rem; /* 左 36px 放图标 */
   border-radius: var(--radius-md);
   background: var(--app-component-bg, var(--surface-2));
   color: var(--app-text-color, var(--ink));
   font-size: var(--text-sm);
 }
 
+/* 搜索占位文字颜色 */
 .store__search-input::placeholder {
   color: var(--placeholder);
 }
 
+/* 安装输入框占位文字 */
 .install-input::placeholder {
   color: var(--placeholder);
 }
 
+/* 插件计数 */
 .store__count {
   color: var(--muted);
   font-size: var(--text-xs);
   white-space: nowrap;
 }
 
+/* 商店列表：毛玻璃卡片，裁掉圆角外的内容 */
 .store-list {
   margin: 0;
   padding: 0;
@@ -453,87 +467,98 @@ function installFromStore(plugin) {
   background: var(--app-area-bg, var(--surface));
   -webkit-backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
   backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
-  overflow: hidden;
+  overflow: hidden; /* 配合圆角裁边 */
 }
 
+/* 商店行：信息 + 分类 + 操作三列 */
 .store-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
   gap: var(--space-4);
   align-items: center;
   padding: var(--space-4);
-  background: var(--app-area-bg, var(--bg));
+  background: var(--app-area-bg, var(--bg)); /* 行底色 */
 }
 
+/* 插件名：允许长名换行 */
 .store-row__name {
   font-size: var(--text-sm);
   font-weight: 600;
-  word-break: break-all;
+  word-break: break-all; /* 长包名可断行 */
 }
 
+/* 插件描述：最多两行省略 */
 .store-row__description {
   margin-top: 2px;
   color: var(--muted);
   font-size: var(--text-xs);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
+  display: -webkit-box; /* 两行截断需要 webkit box */
+  -webkit-line-clamp: 2; /* 最多两行 */
   -webkit-box-orient: vertical;
-  overflow: hidden;
+  overflow: hidden; /* 超出省略 */
 }
 
+/* 分类列：右对齐 */
 .store-row__meta {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-end; /* 靠右 */
   gap: var(--space-1);
 }
 
+/* 版本号：等宽弱化 */
 .store-row__version {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: var(--text-xs);
-  color: var(--faint);
+  color: var(--faint); /* 弱化 */
   font-weight: 400;
 }
 
+/* 操作列 */
 .store-row__actions {
   display: flex;
   align-items: center;
   gap: var(--space-2);
 }
 
+/* 窄屏：商店行改为两列，操作按钮独占一行 */
 @media (max-width: 720px) {
   .store-row {
     grid-template-columns: minmax(0, 1fr) auto;
   }
 
   .store-row__actions {
-    grid-column: 1 / -1;
+    grid-column: 1 / -1; /* 跨整行 */
   }
 }
 
+/* 空状态图标 */
 .empty-icon {
   width: 1.25rem;
   height: 1.25rem;
-  color: var(--primary);
+  color: var(--primary); /* 主色 */
 }
 
+/* 本地插件列表：毛玻璃卡片 */
 .plugin-list {
   border-radius: var(--radius-lg);
   background: var(--app-area-bg, var(--surface));
   -webkit-backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
   backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
-  overflow: hidden;
+  overflow: hidden; /* 配合圆角裁边 */
 }
 
+/* 表头与行共用同一套列宽，保证标注与内容对齐 */
 .plugin-list__head,
 .plugin-row {
   display: grid;
   /* 表头与行共用同一套列宽，保证标注与内容对齐 */
-  grid-template-columns: minmax(0, 1fr) 4.5rem 8rem;
+  grid-template-columns: minmax(0, 1fr) 4.5rem 8rem; /* 信息 / 状态 / 操作 */
   gap: var(--space-4);
   align-items: center;
 }
 
+/* 表头 */
 .plugin-list__head {
   padding: var(--space-2) var(--space-4);
   background: transparent;
@@ -551,43 +576,50 @@ function installFromStore(plugin) {
   text-align: center;
 }
 
+/* 行内容 */
 .plugin-list__body {
   margin: 0;
   padding: 0;
-  list-style: none;
+  list-style: none; /* 去掉默认圆点 */
 }
 
+/* 插件行：底色与列表区分 */
 .plugin-row {
   padding: var(--space-4);
   background: var(--app-area-bg, var(--bg));
 }
 
+/* 插件名 */
 .plugin-row__name {
   font-size: var(--text-sm);
   font-weight: 600;
 }
 
+/* 插件描述：超长省略为一行 */
 .plugin-row__description {
   margin-top: 2px;
   color: var(--muted);
   font-size: var(--text-xs);
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: nowrap; /* 单行 */
 }
 
+/* 插件版本号 */
 .plugin-row__version {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: var(--text-xs);
-  color: var(--faint);
+  color: var(--faint); /* 弱化 */
   font-weight: 400;
 }
 
+/* 行内操作按钮组 */
 .plugin-row__actions {
   display: flex;
   gap: var(--space-2);
 }
 
+/* 安装弹窗字段标签 */
 .install-field {
   display: block;
   margin-bottom: var(--space-2);
@@ -595,34 +627,39 @@ function installFromStore(plugin) {
   font-weight: 500;
 }
 
+/* 安装弹窗输入框 */
 .install-input {
   width: 100%;
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
-  background: var(--app-component-bg, var(--surface-2));
+  background: var(--app-component-bg, var(--surface-2)); /* 组件底色 */
   color: var(--app-text-color, var(--ink));
   font-size: var(--text-sm);
 }
 
+/* 输入框占位文字 */
 .install-input::placeholder {
   color: var(--muted);
 }
 
+/* 安装错误提示 */
 .install-error {
   margin-top: var(--space-2);
-  color: var(--danger);
+  color: var(--danger); /* 危险色 */
   font-size: var(--text-xs);
 }
 
+/* 安装提示文字 */
 .install-hint {
   margin-top: var(--space-2);
-  color: var(--muted);
+  color: var(--muted); /* 次要文字色 */
   font-size: var(--text-xs);
 }
 
+/* 窄屏：隐藏表头，行改为两列，操作独占一行 */
 @media (max-width: 720px) {
   .plugin-list__head {
-    display: none;
+    display: none; /* 表头在窄屏不适用 */
   }
 
   .plugin-row {
@@ -631,7 +668,7 @@ function installFromStore(plugin) {
   }
 
   .plugin-row__actions {
-    grid-column: 1 / -1;
+    grid-column: 1 / -1; /* 跨整行 */
   }
 }
 </style>

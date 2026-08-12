@@ -75,25 +75,28 @@ async function submit() {
 </template>
 
 <style scoped>
+/* 登录页：整屏垂直水平居中 */
 .login {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100dvh;
+  min-height: 100dvh; /* 铺满视口 */
   padding: var(--space-4);
 }
 
+/* 登录卡片：半透明毛玻璃，居中限宽 */
 .login__card {
-  width: min(24rem, 100%);
+  width: min(24rem, 100%); /* 最大 24rem，窄屏自适应 */
   padding: var(--space-6);
   border-radius: var(--radius-lg);
-  background: var(--app-component-bg, oklch(1 0 0 / 0.9));
-  -webkit-backdrop-filter: blur(var(--app-component-blur, 0px)) saturate(1.4);
+  background: var(--app-component-bg, oklch(1 0 0 / 0.9)); /* 组件底色，跟随外观 */
+  -webkit-backdrop-filter: blur(var(--app-component-blur, 0px)) saturate(1.4); /* 毛玻璃 */
   backdrop-filter: blur(var(--app-component-blur, 0px)) saturate(1.4);
   box-shadow: var(--shadow-sm);
-  text-align: center;
+  text-align: center; /* 品牌区居中 */
 }
 
+/* 品牌方块：主色底 + 白色字母 F */
 .login__brand {
   display: inline-flex;
   align-items: center;
@@ -107,23 +110,27 @@ async function submit() {
   font-size: var(--text-lg);
 }
 
+/* 标题 */
 .login__title {
   margin-top: var(--space-4);
   font-size: var(--text-xl);
   font-weight: 600;
 }
 
+/* 副标题说明 */
 .login__description {
   margin-top: var(--space-1);
   color: var(--muted);
   font-size: var(--text-sm);
 }
 
+/* 表单：与上方拉开距离，文字左对齐 */
 .login__form {
   margin-top: var(--space-5);
-  text-align: left;
+  text-align: left; /* 覆盖卡片的居中 */
 }
 
+/* 输入框标签 */
 .login__label {
   display: block;
   margin-bottom: var(--space-2);
@@ -131,46 +138,52 @@ async function submit() {
   font-weight: 500;
 }
 
+/* 输入框包裹层：用于绝对定位图标和显示按钮 */
 .login__input-wrap {
   position: relative;
 }
 
+/* 令牌输入框：左右留出图标和按钮空间 */
 .login__input {
   width: 100%;
   height: 2.5rem;
-  padding: 0 2.75rem 0 2.25rem;
-  border: 1px solid var(--ink);
+  padding: 0 2.75rem 0 2.25rem; /* 右 44px 放显示按钮，左 36px 放锁图标 */
+  border: 1px solid var(--ink); /* 墨色边框 */
   border-radius: var(--radius-md);
   background: var(--app-component-bg, var(--surface-2));
   color: var(--app-text-color, var(--ink));
   font-size: var(--text-sm);
 }
 
+/* 聚焦：边框变绿色 */
 .login__input:focus {
   border-color: var(--success);
-  outline: none;
+  outline: none; /* 用边框色代替系统焦点框 */
 }
 
+/* 登录失败：输入框浅红底 */
 .login__input[aria-invalid='true'] {
   background: var(--danger-soft);
 }
 
+/* 左侧锁图标：垂直居中，不拦截点击 */
 .login__input-icon {
   position: absolute;
   left: var(--space-3);
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-50%); /* 垂直居中 */
   width: 1rem;
   height: 1rem;
   color: var(--muted);
-  pointer-events: none;
+  pointer-events: none; /* 点击穿透到输入框 */
 }
 
+/* 显示/隐藏令牌按钮：输入框右侧垂直居中 */
 .login__toggle {
   position: absolute;
   top: 50%;
   right: var(--space-2);
-  transform: translateY(-50%);
+  transform: translateY(-50%); /* 垂直居中 */
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -183,31 +196,36 @@ async function submit() {
   cursor: pointer;
 }
 
+/* 按钮悬停 */
 .login__toggle:hover {
   background: var(--surface-2);
   color: var(--app-text-color, var(--ink));
 }
 
+/* 按钮图标尺寸 */
 .login__toggle svg {
   width: 1.125rem;
   height: 1.125rem;
 }
 
+/* 错误提示文字 */
 .login__error {
   margin-top: var(--space-2);
   color: var(--danger);
   font-size: var(--text-xs);
 }
 
+/* 提交按钮：通栏 */
 .login__submit {
   width: 100%;
   margin-top: var(--space-4);
 }
 
+/* 底部使用说明 */
 .login__hint {
   margin-top: var(--space-4);
   color: var(--muted);
   font-size: var(--text-xs);
-  line-height: 1.5;
+  line-height: 1.5; /* 宽松行高便于阅读 */
 }
 </style>

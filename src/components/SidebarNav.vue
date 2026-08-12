@@ -92,6 +92,7 @@ const navItems = [
 </template>
 
 <style scoped>
+/* 侧边栏：窄屏为左侧抽屉（默认移出屏幕），宽屏为常驻栏 */
 .sidebar {
   position: fixed;
   inset: 0 auto 0 0;
@@ -106,10 +107,12 @@ const navItems = [
   transition: transform 200ms ease-out;
 }
 
+/* 打开状态：滑入屏幕 */
 .sidebar--open {
   transform: translateX(0);
 }
 
+/* 顶部品牌区 */
 .sidebar__brand {
   display: flex;
   align-items: center;
@@ -118,6 +121,7 @@ const navItems = [
   padding: 0 var(--space-4);
 }
 
+/* 品牌方块：主色底 + 白色 F */
 .sidebar__logo {
   display: inline-flex;
   align-items: center;
@@ -131,11 +135,13 @@ const navItems = [
   font-weight: 700;
 }
 
+/* 应用名 */
 .sidebar__name {
   font-weight: 600;
   font-size: var(--text-sm);
 }
 
+/* 关闭按钮（仅窄屏显示）：推到最右 */
 .sidebar__close {
   display: inline-flex;
   align-items: center;
@@ -150,16 +156,19 @@ const navItems = [
   cursor: pointer;
 }
 
+/* 关闭按钮悬停 */
 .sidebar__close:hover {
   background: var(--surface-2);
   color: var(--app-text-color, var(--ink));
 }
 
+/* 关闭图标尺寸 */
 .sidebar__close svg {
   width: 1.125rem;
   height: 1.125rem;
 }
 
+/* 导航区：纵向排列 */
 .sidebar__nav {
   display: flex;
   flex-direction: column;
@@ -168,6 +177,7 @@ const navItems = [
 }
 
 
+/* 导航链接 */
 .sidebar__link {
   display: flex;
   align-items: center;
@@ -183,28 +193,33 @@ const navItems = [
     color 150ms ease-out;
 }
 
+/* 悬停：文字变正文色 */
 .sidebar__link:hover {
   background: transparent;
   color: var(--app-text-color, var(--ink));
 }
 
+/* 当前页：主色 + 加粗 */
 .sidebar__link--active {
   background: transparent;
   color: var(--primary);
   font-weight: 600;
 }
 
+/* 当前页悬停：保持主色 */
 .sidebar__link--active:hover {
   background: transparent;
   color: var(--primary);
 }
 
+/* 导航图标 */
 .sidebar__icon {
   width: 1.125rem;
   height: 1.125rem;
   flex-shrink: 0;
 }
 
+/* 底部：版本号 + 检查更新，推到最底 */
 .sidebar__footer {
   display: flex;
   align-items: center;
@@ -216,10 +231,12 @@ const navItems = [
   font-size: var(--text-xs);
 }
 
+/* 版本号不换行 */
 .sidebar__version {
   white-space: nowrap;
 }
 
+/* 检查更新按钮 */
 .sidebar__update {
   display: inline-flex;
   align-items: center;
@@ -233,31 +250,37 @@ const navItems = [
   cursor: pointer;
 }
 
+/* 更新按钮悬停（非禁用时） */
 .sidebar__update:hover:not(:disabled) {
   background: var(--surface-2);
   color: var(--app-text-color, var(--ink));
 }
 
+/* 更新按钮禁用（检查中） */
 .sidebar__update:disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }
 
+/* 更新图标尺寸 */
 .sidebar__update-icon {
   width: 1rem;
   height: 1rem;
 }
 
+/* 检查中：图标旋转 */
 .sidebar__update-icon--spin {
   animation: sidebar-spin 0.8s linear infinite;
 }
 
+/* 旋转动画 */
 @keyframes sidebar-spin {
   to {
     transform: rotate(360deg);
   }
 }
 
+/* 宽屏：侧栏常驻（sticky 随页面滚动），隐藏关闭按钮 */
 @media (min-width: 900px) {
   .sidebar {
     position: sticky;
@@ -272,6 +295,7 @@ const navItems = [
   }
 }
 
+/* 不支持毛玻璃的浏览器：侧栏回退为纯色 */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .sidebar {
     background: var(--surface);

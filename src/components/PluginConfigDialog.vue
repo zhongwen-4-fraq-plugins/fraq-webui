@@ -350,44 +350,50 @@ async function save() {
 </template>
 
 <style scoped>
+/* 配置表单：字段纵向排列，字段间留大间距 */
 .cfg-form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-4); /* 字段间距 */
 }
 
+/* 单个字段：纵向排列（标签在上，控件在下） */
 .cfg-field {
   display: flex;
   flex-direction: column;
 }
 
+/* 字段标签 */
 .cfg-label {
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-2); /* 与控件间距 */
   color: var(--app-text-color, var(--ink));
   font-size: var(--text-sm);
   font-weight: 500;
 }
 
+/* 普通输入框：通栏，跟随组件外观 */
 .cfg-input {
   width: 100%;
-  height: 2.5rem;
+  height: 2.5rem; /* 统一高度 */
   padding: 0 var(--space-3);
   border-radius: var(--radius-md);
-  background: var(--app-component-bg, var(--surface-2));
+  background: var(--app-component-bg, var(--surface-2)); /* 组件底色 */
   color: var(--app-text-color, var(--ink));
   font-size: var(--text-sm);
 }
 
+/* JSON/多行输入：取消固定高度，用等宽字体 */
 .cfg-input--json {
-  height: auto;
-  min-height: 7rem;
+  height: auto; /* 由内容撑高 */
+  min-height: 7rem; /* 最小可读高度 */
   padding: var(--space-2) var(--space-3);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; /* 等宽字体 */
   font-size: var(--text-xs);
   line-height: 1.5;
-  resize: vertical;
+  resize: vertical; /* 只允许上下拉伸 */
 }
 
+/* 开关字段行：开关 + 文字横排 */
 .cfg-check {
   display: flex;
   align-items: center;
@@ -397,37 +403,43 @@ async function save() {
   font-weight: 500;
 }
 
+/* 复选方块：用主色渲染 */
 .cfg-checkbox {
   width: 1rem;
   height: 1rem;
-  accent-color: var(--primary);
+  accent-color: var(--primary); /* 系统复选框主色 */
 }
 
+/* 提供商列表：纵向排列 */
 .cfg-providers {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-4); /* 卡片间距 */
 }
 
+/* 单个提供商卡片：纵向排列 */
 .cfg-provider {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  padding: var(--space-3);
+  padding: var(--space-3); /* 卡片内边距 */
   border-radius: var(--radius-md);
-  background: var(--app-component-bg, var(--surface-2));
+  background: var(--app-component-bg, var(--surface-2)); /* 卡片底色 */
 }
 
+/* 卡片头部：名称输入 + 删除按钮横排 */
 .cfg-provider__head {
   display: flex;
   align-items: center;
   gap: var(--space-2);
 }
 
+/* 头部输入框占满剩余宽度 */
 .cfg-provider__head .cfg-input {
   flex: 1;
 }
 
+/* 删除提供商按钮 */
 .cfg-provider__remove {
   display: inline-flex;
   align-items: center;
@@ -438,25 +450,28 @@ async function save() {
   border-radius: var(--radius-sm);
   background: transparent;
   color: var(--muted);
-  font-size: var(--text-lg);
+  font-size: var(--text-lg); /* 用大号 × 符号 */
   line-height: 1;
   cursor: pointer;
 }
 
+/* 删除按钮悬停：红色浅底 */
 .cfg-provider__remove:hover {
-  background: var(--danger-soft);
-  color: var(--danger);
+  background: var(--danger-soft); /* 危险浅底 */
+  color: var(--danger); /* 红色图标 */
 }
 
+/* 字段提示文字 */
 .cfg-hint {
   margin-top: var(--space-1);
-  color: var(--muted);
+  color: var(--muted); /* 次要文字色 */
   font-size: var(--text-xs);
 }
 
+/* 错误提示 */
 .cfg-error {
   margin-bottom: var(--space-3);
-  color: var(--danger);
+  color: var(--danger); /* 危险色 */
   font-size: var(--text-xs);
 }
 </style>

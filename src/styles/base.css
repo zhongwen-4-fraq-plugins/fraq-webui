@@ -3,18 +3,19 @@
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
+  box-sizing: border-box; /* 统一盒模型，宽高包含内边距与边框 */
 }
 
 html {
-  color-scheme: light;
+  color-scheme: light; /* 让表单控件跟随浅色主题渲染 */
 }
 
 body {
   margin: 0;
   /* 页面背景：白色半透明遮罩保证正文可读；背景图由 body::before 承载以支持模糊 */
-  background: var(--bg);
-  color: var(--app-text-color, var(--ink));
+  background: var(--bg); /* 无背景图时的兜底底色 */
+  color: var(--app-text-color, var(--ink)); /* 全局文字色（可被外观设置覆盖） */
+  /* 中文字体优先的字体栈，覆盖常见系统 */
   font-family:
     ui-sans-serif,
     system-ui,
@@ -26,10 +27,10 @@ body {
     'Microsoft YaHei',
     'Noto Sans CJK SC',
     sans-serif;
-  font-size: var(--text-base);
-  line-height: var(--leading-normal);
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+  font-size: var(--text-base); /* 基础字号 */
+  line-height: var(--leading-normal); /* 正文行高 */
+  -webkit-font-smoothing: antialiased; /* 字体抗锯齿（macOS） */
+  text-rendering: optimizeLegibility; /* 更清晰的文字渲染 */
 }
 
 /* 背景图：固定铺满，支持模糊（scale 放大避免模糊露出边缘） */
@@ -37,93 +38,65 @@ body::before {
   content: '';
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: -1; /* 垫在所有内容下面 */
   background:
-    linear-gradient(oklch(1 0 0 / 0.55), oklch(1 0 0 / 0.55)),
-    var(--app-bg-image, url('/bg.jpg')) center / cover no-repeat;
-  filter: blur(var(--app-bg-blur, 0px));
-  transform: scale(1.06);
+    linear-gradient(oklch(1 0 0 / 0.55), oklch(1 0 0 / 0.55)), /* 白色半透明遮罩保证正文可读 */
+    var(--app-bg-image, url('/bg.jpg')) center / cover no-repeat; /* 背景图铺满 */
+  filter: blur(var(--app-bg-blur, 0px)); /* 背景模糊强度由外观设置控制 */
+  transform: scale(1.06); /* 放大一圈，模糊后边缘不露白 */
 }
 
 h1,
 h2,
 h3 {
   margin: 0;
-  text-wrap: balance;
-  line-height: var(--leading-tight);
+  text-wrap: balance; /* 标题自动平衡断行 */
+  line-height: var(--leading-tight); /* 标题紧凑行高 */
 }
 
 p {
-  margin: 0;
+  margin: 0; /* 去掉段落默认外边距，间距交给父容器控制 */
 }
 
 button {
-  font: inherit;
-  color: inherit;
+  font: inherit; /* 按钮继承全局字体，避免系统默认字体不一致 */
+  color: inherit; /* 按钮文字跟随所在区域 */
 }
 
 input,
 select {
-  font: inherit;
-  color: inherit;
+  font: inherit; /* 表单控件继承字体 */
+  color: inherit; /* 表单控件继承文字色 */
 }
 
 a {
-  color: var(--primary);
-  text-underline-offset: 3px;
+  color: var(--primary); /* 链接统一用主色 */
+  text-underline-offset: 3px; /* 下划线离文字稍远，更易读 */
 }
 
 ::selection {
-  background: var(--primary-soft);
-}
-
-:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
-}
-
-/* 输入框：默认墨色边框，聚焦时不显示选中外框；未保存修改的主题色由页面级规则覆盖 */
-.field__input,
-.store__search-input,
-.log-toolbar__search-input,
-.install-input,
-.appearance__glass-input {
-  border: 1px solid var(--ink);
-}
-
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: none;
-}
-
-.field__input:focus,
-.store__search-input:focus,
-.log-toolbar__search-input:focus,
-.install-input:focus,
-.appearance__glass-input:focus {
-  border-color: var(--success);
+  background: var(--primary-soft); /* 选中文字用主色浅底 */
 }
 
 .skip-link {
   position: fixed;
   top: var(--space-3);
   left: var(--space-3);
-  z-index: var(--z-toast);
+  z-index: var(--z-toast); /* 跳到最顶层，任何页面可见 */
   padding: var(--space-2) var(--space-3);
-  background: var(--ink);
+  background: var(--ink); /* 深底白字，与页面反差最大 */
   color: var(--bg);
   border-radius: var(--radius-md);
   text-decoration: none;
-  transform: translateY(-200%);
-  transition: transform 150ms ease-out;
+  transform: translateY(-200%); /* 默认移出屏幕 */
+  transition: transform 150ms ease-out; /* 聚焦时平滑滑入 */
 }
 
 .skip-link:focus {
-  transform: translateY(0);
+  transform: translateY(0); /* 键盘聚焦时显示出来 */
 }
 
+/* 用户偏好减少动效：所有动画/过渡几乎瞬间完成 */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

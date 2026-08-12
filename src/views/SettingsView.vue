@@ -344,31 +344,37 @@ async function save() {
 </template>
 
 <style scoped>
+/* 设置表单：纵向排列，限宽，区块间距统一 */
 .settings {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
-  max-width: 40rem;
+  max-width: 40rem; /* 表单最大宽度 */
 }
 
+/* 设置分组卡片：毛玻璃 */
 .settings__group {
   padding: var(--space-5);
   border-radius: var(--radius-lg);
-  background: var(--app-area-bg, var(--surface));
+  background: var(--app-area-bg, var(--surface)); /* 面板底色，跟随外观 */
+  /* 毛玻璃效果 */
   -webkit-backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
   backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
 }
 
+/* 分组标题 */
 .settings__heading {
   font-size: var(--text-base);
   font-weight: 600;
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-4); /* 与字段间距 */
 }
 
+/* 相邻字段间距 */
 .field + .field {
   margin-top: var(--space-4);
 }
 
+/* 字段标签 */
 .field__label {
   display: block;
   margin-bottom: var(--space-2);
@@ -376,58 +382,69 @@ async function save() {
   font-weight: 500;
 }
 
+/* 输入框：通栏，跟随组件外观 */
 .field__input {
   width: 100%;
   height: 2.5rem;
   padding: 0 var(--space-3);
   border-radius: var(--radius-md);
-  background: var(--app-component-bg, var(--surface-2));
+  background: var(--app-component-bg, var(--surface-2)); /* 组件底色 */
   color: var(--app-text-color, var(--ink));
   font-size: var(--text-sm);
 }
 
+/* 输入框占位文字 */
 .field__input::placeholder {
   color: var(--placeholder);
 }
 
+/* 校验失败：浅红底 */
 .field__input[aria-invalid='true'] {
-  background: var(--danger-soft);
+  background: var(--danger-soft); /* 危险浅底 */
 }
 
+/* 有未保存修改：主色边框 */
 .field__input.field__input--dirty {
-  border-color: var(--primary);
+  border-color: var(--primary); /* 主色描边提示 */
 }
 
+/* 聚焦：边框变绿色 */
 .field__input:focus {
   border-color: var(--success);
 }
 
+/* 提示与错误共用布局 */
 .field__hint,
 .field__error {
   margin-top: var(--space-2);
   font-size: var(--text-xs);
 }
 
+/* 提示文字 */
 .field__hint {
-  color: var(--muted);
+  color: var(--muted); /* 次要文字色 */
 }
 
+/* 错误文字 */
 .field__error {
-  color: var(--danger);
+  color: var(--danger); /* 危险色 */
 }
 
+/* 次级输入（如背景图链接）：与上方控件留间距 */
 .field__input--gap {
   margin-top: var(--space-2);
 }
 
+/* 背景图预览区：固定高度，cover 铺满 */
 .appearance__preview {
-  height: 8rem;
+  height: 8rem; /* 预览区高度 */
   margin-top: var(--space-3);
   border-radius: var(--radius-md);
-  background-size: cover;
-  background-position: center;
+  background-size: cover; /* 铺满不拉伸 */
+  background-position: center; /* 居中 */
 }
 
+/* 背景模糊行 */
 .appearance__blur {
   display: flex;
   align-items: center;
@@ -435,6 +452,7 @@ async function save() {
   margin-top: var(--space-3);
 }
 
+/* 模糊标签：固定宽度对齐 */
 .appearance__blur label {
   width: 4.5rem;
   flex-shrink: 0;
@@ -442,20 +460,22 @@ async function save() {
   font-weight: 500;
 }
 
+/* 模糊滑杆 */
 .appearance__blur-input {
-  -webkit-appearance: none;
+  -webkit-appearance: none; /* 去掉默认样式 */
   appearance: none;
   flex: 1;
-  max-width: 12rem;
-  height: 0.375rem;
+  max-width: 12rem; /* 限制宽度 */
+  height: 0.375rem; /* 轨道高度 */
   border: none;
   border-radius: 999px;
-  background: var(--app-slider-track-bg, var(--surface-2));
-  outline: none;
+  background: var(--app-slider-track-bg, var(--surface-2)); /* 轨道色 */
+  outline: none; /* 去掉默认焦点框 */
 }
 
+/* 滑杆滑块（WebKit） */
 .appearance__blur-input::-webkit-slider-thumb {
-  -webkit-appearance: none;
+  -webkit-appearance: none; /* 去掉默认滑块 */
   appearance: none;
   width: 1rem;
   height: 1rem;
@@ -465,6 +485,7 @@ async function save() {
   cursor: pointer;
 }
 
+/* 滑杆滑块（Firefox） */
 .appearance__blur-input::-moz-range-thumb {
   width: 1rem;
   height: 1rem;
@@ -474,102 +495,119 @@ async function save() {
   cursor: pointer;
 }
 
+/* 模糊数值：等宽字体 */
 .appearance__blur-value {
   width: 2.5rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; /* 等宽字体 */
   font-size: var(--text-xs);
   color: var(--muted);
 }
 
+/* 背景图拖拽/点击区 */
 .appearance__dropzone {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  min-height: 5rem;
+  min-height: 5rem; /* 保证可点区域 */
   margin-top: var(--space-2);
   padding: var(--space-3);
   border-radius: var(--radius-md);
   background: var(--app-component-bg, var(--surface-2));
   color: var(--muted);
   font-size: var(--text-sm);
-  cursor: pointer;
+  cursor: pointer; /* 整块可点 */
+  /* 底色与文字色过渡 */
   transition:
     background-color 150ms ease-out,
     color 150ms ease-out;
 }
 
+/* 悬停：底色加深 */
 .appearance__dropzone:hover {
   background: var(--border);
   color: var(--app-text-color, var(--ink));
 }
 
+/* 拖拽经过：主色浅底 */
 .appearance__dropzone--drag {
-  background: var(--primary-soft);
+  background: var(--primary-soft); /* 主色浅底 */
   color: var(--app-text-color, var(--ink));
 }
 
+/* 键盘聚焦：主色外圈 */
 .appearance__dropzone:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
 
+/* 拖拽区图标 */
 .appearance__dropzone-icon {
   width: 1.25rem;
   height: 1.25rem;
-  flex-shrink: 0;
+  flex-shrink: 0; /* 不收缩 */
 }
 
+/* 文件名/提示文字：长名可换行 */
 .appearance__dropzone-text {
-  overflow-wrap: anywhere;
+  overflow-wrap: anywhere; /* 超长文件名断行 */
 }
 
+/* 隐藏原生文件输入，用整块区域代替 */
 .appearance__file-input {
-  display: none;
+  display: none; /* 视觉上隐藏，仍可被点击触发 */
 }
 
+/* 恢复默认按钮：与上方留间距 */
 .appearance__reset {
   margin-top: var(--space-2);
 }
 
+/* 自定义 CSS 区块 */
 .appearance__css {
   margin-top: var(--space-4);
 }
 
+/* 代码输入框：等宽字体，可垂直拉伸 */
 .field__input--code {
-  height: auto;
-  min-height: 10rem;
+  height: auto; /* 由内容撑高 */
+  min-height: 10rem; /* 最小可读高度 */
   padding: var(--space-2) var(--space-3);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; /* 等宽字体 */
   font-size: var(--text-xs);
   line-height: 1.5;
-  resize: vertical;
+  resize: vertical; /* 只允许上下拉伸 */
 }
 
+/* 背景图链接占位文字 */
 .appearance__url-input::placeholder {
   color: var(--placeholder);
 }
 
+/* 各区域 ARGB 配色行 */
 .appearance__colors {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-3); /* 行间距 */
   margin-top: var(--space-4);
 }
 
+/* 令牌输入框包裹：相对定位放显示按钮 */
 .field__token {
   position: relative;
 }
 
+/* 右侧留出按钮空间 */
 .field__token .field__input {
-  padding-right: 2.75rem;
+  padding-right: 2.75rem; /* 右 44px 放显示按钮 */
 }
 
+/* 显示/隐藏令牌按钮：输入框右侧垂直居中 */
 .field__toggle {
   position: absolute;
   top: 50%;
   right: var(--space-2);
-  transform: translateY(-50%);
+  transform: translateY(-50%); /* 垂直居中 */
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -582,22 +620,26 @@ async function save() {
   cursor: pointer;
 }
 
+/* 按钮悬停 */
 .field__toggle:hover {
   background: var(--surface-2);
   color: var(--app-text-color, var(--ink));
 }
 
+/* 按钮图标尺寸 */
 .field__toggle svg {
   width: 1.125rem;
   height: 1.125rem;
 }
 
+/* 复选框字段行 */
 .field--check {
   display: flex;
   align-items: center;
   gap: var(--space-3);
 }
 
+/* 复选框标签 */
 .field__check-label {
   display: inline-flex;
   align-items: center;
@@ -606,16 +648,19 @@ async function save() {
   font-weight: 500;
 }
 
+/* 复选框：主色渲染 */
 .field__checkbox {
   width: 1rem;
   height: 1rem;
-  accent-color: var(--primary);
+  accent-color: var(--primary); /* 系统复选框主色 */
 }
 
+/* 复选框行内的提示：不需要额外上边距 */
 .field--check .field__hint {
-  margin-top: 0;
+  margin-top: 0; /* 与复选框同行对齐 */
 }
 
+/* 底部保存按钮：靠右 */
 .settings__save {
   display: flex;
   justify-content: flex-end;

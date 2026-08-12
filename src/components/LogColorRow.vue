@@ -38,21 +38,24 @@ const bgAlphaPercent = computed({
 </template>
 
 <style scoped>
+/* 单行日志配色：标签 + 文字色 + 底色 + 透明度滑杆 */
 .log-color {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: wrap; /* 窄屏自动换行 */
   gap: var(--space-3);
-  padding: var(--space-2) 0;
+  padding: var(--space-2) 0; /* 上下留出分隔空间 */
 }
 
+/* 级别标签（错误/警告/信息/调试） */
 .log-color__label {
-  width: 2.5rem;
+  width: 2.5rem; /* 固定宽度，各行对齐 */
   flex-shrink: 0;
   font-size: var(--text-sm);
   font-weight: 500;
 }
 
+/* 文字/底色选择：小标签 + 取色器横排 */
 .log-color__field {
   display: inline-flex;
   align-items: center;
@@ -61,6 +64,7 @@ const bgAlphaPercent = computed({
   color: var(--muted);
 }
 
+/* 取色器输入框 */
 .log-color__input {
   width: 2rem;
   height: 1.5rem;
@@ -71,34 +75,39 @@ const bgAlphaPercent = computed({
   cursor: pointer;
 }
 
+/* 去掉取色器默认内边距，让色块贴边 */
 .log-color__input::-webkit-color-swatch-wrapper {
   padding: 0;
   border: none;
 }
 
+/* 色块本身无边框无圆角（WebKit） */
 .log-color__input::-webkit-color-swatch {
   border: none;
   border-radius: var(--radius-sm);
 }
 
+/* 色块样式（Firefox） */
 .log-color__input::-moz-color-swatch {
   border: none;
   border-radius: var(--radius-sm);
 }
 
+/* 透明度滑杆：细长圆头轨道 */
 .log-color__alpha {
-  -webkit-appearance: none;
+  -webkit-appearance: none; /* 去掉浏览器默认样式 */
   appearance: none;
   width: 6rem;
-  height: 0.375rem;
+  height: 0.375rem; /* 轨道高度 */
   border: none;
-  border-radius: 999px;
-  background: var(--app-slider-track-bg, var(--surface-2));
-  outline: none;
+  border-radius: 999px; /* 圆头轨道 */
+  background: var(--app-slider-track-bg, var(--surface-2)); /* 轨道色跟随组件外观 */
+  outline: none; /* 去掉默认焦点框，用滑块颜色代替 */
 }
 
+/* 滑杆滑块（WebKit）：圆形主色 */
 .log-color__alpha::-webkit-slider-thumb {
-  -webkit-appearance: none;
+  -webkit-appearance: none; /* 去掉默认滑块 */
   appearance: none;
   width: 1rem;
   height: 1rem;
@@ -108,6 +117,7 @@ const bgAlphaPercent = computed({
   cursor: pointer;
 }
 
+/* 滑杆滑块（Firefox） */
 .log-color__alpha::-moz-range-thumb {
   width: 1rem;
   height: 1rem;
@@ -117,9 +127,10 @@ const bgAlphaPercent = computed({
   cursor: pointer;
 }
 
+/* 透明度数值：等宽字体，固定宽度 */
 .log-color__alpha-value {
   width: 2.5rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; /* 等宽字体 */
   font-size: var(--text-xs);
   color: var(--muted);
 }

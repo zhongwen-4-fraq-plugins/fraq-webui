@@ -1,35 +1,39 @@
-/* 设计令牌：颜色（OKLCH）、间距、字号、层级、阴影。 */
+/* 设计令牌：颜色（OKLCH）、间距、字号、层级、阴影。
+   所有组件统一从这里取变量，避免散落魔法值。 */
 
 :root {
-  /* 颜色 */
-  --bg: oklch(1 0 0);
-  --surface: oklch(0.984 0.003 210);
-  --surface-2: oklch(0.965 0.005 210);
-  --ink: oklch(0.22 0.015 220);
-  --muted: oklch(0.46 0.012 220);
-  --faint: oklch(0.56 0.01 220);
-  --border: oklch(0.9 0.005 220);
+  /* ---- 颜色：基础中性色 ---- */
+  --bg: oklch(1 0 0); /* 页面最底层背景（纯白） */
+  --surface: oklch(0.984 0.003 210); /* 面板/卡片背景 */
+  --surface-2: oklch(0.965 0.005 210); /* 次级面板、按钮等更深的背景 */
+  --ink: oklch(0.22 0.015 220); /* 正文主文字色 */
+  --muted: oklch(0.46 0.012 220); /* 次要文字（说明、描述） */
+  --faint: oklch(0.56 0.01 220); /* 弱化文字（版本号、辅助信息） */
+  --border: oklch(0.9 0.005 220); /* 分隔线/描边 */
 
-  --primary: oklch(0.52 0.12 205);
-  --primary-hover: oklch(0.47 0.125 205);
-  --primary-active: oklch(0.43 0.12 205);
-  --primary-soft: oklch(0.93 0.035 205);
-  --primary-soft-hover: oklch(0.9 0.045 205);
+  /* ---- 颜色：品牌主色（天青） ---- */
+  --primary: oklch(0.52 0.12 205); /* 主操作色 */
+  --primary-hover: oklch(0.47 0.125 205); /* 悬停加深 */
+  --primary-active: oklch(0.43 0.12 205); /* 按下进一步加深 */
+  --primary-soft: oklch(0.93 0.035 205); /* 主色浅底（选中背景、计数徽标） */
+  --primary-soft-hover: oklch(0.9 0.045 205); /* 浅底悬停 */
 
-  --success: oklch(0.55 0.14 155);
-  --success-soft: oklch(0.92 0.05 155);
-  --warning: oklch(0.72 0.13 70);
-  --warning-text: #d9b500;
-  --warning-soft: oklch(0.93 0.06 80);
-  --danger: oklch(0.55 0.2 25);
-  --danger-hover: oklch(0.5 0.2 25);
-  --danger-soft: oklch(0.93 0.05 25);
-  --info-soft: oklch(0.92 0.04 220);
+  /* ---- 颜色：语义状态色（只在状态处使用） ---- */
+  --success: oklch(0.55 0.14 155); /* 成功/运行中 */
+  --success-soft: oklch(0.92 0.05 155); /* 成功浅底 */
+  --warning: oklch(0.72 0.13 70); /* 警告 */
+  --warning-text: #d9b500; /* 警告文字（保证对比度） */
+  --warning-soft: oklch(0.93 0.06 80); /* 警告浅底 */
+  --danger: oklch(0.55 0.2 25); /* 错误/危险操作 */
+  --danger-hover: oklch(0.5 0.2 25); /* 危险按钮悬停 */
+  --danger-soft: oklch(0.93 0.05 25); /* 危险浅底 */
+  --info-soft: oklch(0.92 0.04 220); /* 信息浅底 */
 
-  --focus: oklch(0.55 0.14 210);
-  --placeholder: oklch(0.22 0.015 220 / 0.35);
+  /* ---- 颜色：交互与占位 ---- */
+  --focus: oklch(0.55 0.14 210); /* 键盘焦点外圈 */
+  --placeholder: oklch(0.22 0.015 220 / 0.35); /* 输入框占位文字 */
 
-  /* 间距（4pt 基准） */
+  /* ---- 间距（4pt 基准，向上递增） ---- */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -39,57 +43,57 @@
   --space-7: 3rem;
   --space-8: 4rem;
 
-  /* 字号（固定 rem 阶梯，产品界面） */
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.375rem;
-  --text-2xl: 1.75rem;
+  /* ---- 字号（固定 rem 阶梯，产品界面） ---- */
+  --text-xs: 0.75rem; /* 辅助信息 */
+  --text-sm: 0.875rem; /* 正文/表单 */
+  --text-base: 1rem; /* 标准字号 */
+  --text-lg: 1.125rem; /* 弹窗标题 */
+  --text-xl: 1.375rem; /* 页面标题 */
+  --text-2xl: 1.75rem; /* 大标题 */
 
-  /* 行高 */
-  --leading-tight: 1.3;
-  --leading-normal: 1.6;
+  /* ---- 行高 ---- */
+  --leading-tight: 1.3; /* 标题紧凑行高 */
+  --leading-normal: 1.6; /* 正文舒适行高 */
 
-  /* 语义化层级 */
-  --z-dropdown: 10;
-  --z-sticky: 20;
-  --z-modal-backdrop: 30;
-  --z-modal: 40;
-  --z-toast: 50;
+  /* ---- 语义化层级（z-index，按覆盖关系递增） ---- */
+  --z-dropdown: 10; /* 下拉/浮层 */
+  --z-sticky: 20; /* 吸顶顶栏 */
+  --z-modal-backdrop: 30; /* 弹窗遮罩 */
+  --z-modal: 40; /* 弹窗本体 */
+  --z-toast: 50; /* 顶部提示 */
 
-  /* 阴影（轻微，8px 以内模糊） */
-  --shadow-sm: 0 2px 8px oklch(0.22 0.015 220 / 0.08);
-  --shadow-md: 0 4px 8px oklch(0.22 0.015 220 / 0.1);
+  /* ---- 阴影（轻微，8px 以内模糊） ---- */
+  --shadow-sm: 0 2px 8px oklch(0.22 0.015 220 / 0.08); /* 卡片/浮层 */
+  --shadow-md: 0 4px 8px oklch(0.22 0.015 220 / 0.1); /* 弹窗 */
 
-  /* 圆角 */
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  /* ---- 圆角 ---- */
+  --radius-sm: 6px; /* 小控件/标签 */
+  --radius-md: 8px; /* 按钮/输入框 */
+  --radius-lg: 12px; /* 卡片/面板 */
 
-  /* 外观覆盖（由设置页动态修改） */
-  --app-topbar-bg: oklch(1 0 0 / 0.72);
-  --app-sidebar-bg: oklch(0.984 0.003 210 / 0.72);
-  --app-area-bg: oklch(0.984 0.003 210 / 0.72);
-  --app-component-bg: oklch(0.965 0.005 210);
-  --app-slider-track-bg: oklch(0.965 0.005 210 / 0.6);
-  --app-dialog-bg: oklch(1 0 0 / 0.92);
-  --app-text-color: var(--ink);
-  --app-topbar-blur: 16px;
-  --app-sidebar-blur: 16px;
-  --app-area-blur: 16px;
-  --app-component-blur: 0px;
-  --app-dialog-blur: 16px;
-  --app-bg-image: url('/bg.jpg');
-  --app-bg-blur: 0px;
+  /* ---- 外观覆盖（由设置页动态修改，body 级 CSS 变量） ---- */
+  --app-topbar-bg: oklch(1 0 0 / 0.72); /* 顶栏底色（半透明白） */
+  --app-sidebar-bg: oklch(0.984 0.003 210 / 0.72); /* 侧边栏底色 */
+  --app-area-bg: oklch(0.984 0.003 210 / 0.72); /* 内容面板底色 */
+  --app-component-bg: oklch(0.965 0.005 210); /* 组件（按钮/输入框）底色 */
+  --app-slider-track-bg: oklch(0.965 0.005 210 / 0.6); /* 滑杆轨道底色 */
+  --app-dialog-bg: oklch(1 0 0 / 0.92); /* 弹窗底色 */
+  --app-text-color: var(--ink); /* 全局文字色覆盖 */
+  --app-topbar-blur: 16px; /* 顶栏模糊强度 */
+  --app-sidebar-blur: 16px; /* 侧边栏模糊强度 */
+  --app-area-blur: 16px; /* 内容面板模糊强度 */
+  --app-component-blur: 0px; /* 组件模糊强度 */
+  --app-dialog-blur: 16px; /* 弹窗模糊强度 */
+  --app-bg-image: url('/bg.jpg'); /* 页面背景图 */
+  --app-bg-blur: 0px; /* 背景图模糊强度 */
 
-  /* 日志级别颜色（由日志设置页动态修改） */
-  --log-error-color: var(--danger);
-  --log-error-bg: transparent;
-  --log-warn-color: var(--warning-text);
-  --log-warn-bg: transparent;
-  --log-info-color: inherit;
-  --log-info-bg: transparent;
-  --log-debug-color: inherit;
-  --log-debug-bg: transparent;
+  /* ---- 日志级别颜色（由日志设置页动态修改） ---- */
+  --log-error-color: var(--danger); /* 错误行文字 */
+  --log-error-bg: transparent; /* 错误行底色 */
+  --log-warn-color: var(--warning-text); /* 警告行文字 */
+  --log-warn-bg: transparent; /* 警告行底色 */
+  --log-info-color: inherit; /* 信息行文字（跟随正文） */
+  --log-info-bg: transparent; /* 信息行底色 */
+  --log-debug-color: inherit; /* 调试行文字 */
+  --log-debug-bg: transparent; /* 调试行底色 */
 }

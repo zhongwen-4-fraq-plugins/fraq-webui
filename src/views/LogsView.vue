@@ -269,10 +269,12 @@ const toneOf = (entry) => {
 </template>
 
 <style scoped>
+/* 日志页标题区 */
 .logs-header {
   margin-bottom: var(--space-6);
 }
 
+/* 标题：内联弹性布局，容纳右侧设置图标 */
 .logs-header__title {
   display: inline-flex;
   align-items: center;
@@ -280,15 +282,18 @@ const toneOf = (entry) => {
   font-weight: 600;
 }
 
+/* 日志颜色设置图标：与标题拉开距离 */
 .logs-header__gear {
   margin-left: 10px;
 }
 
+/* 设置图标：保持透明底（含悬停） */
 .logs-header__gear.logs-header__gear,
 .logs-header__gear.logs-header__gear:hover {
   background: transparent;
 }
 
+/* 副标题描述 */
 .logs-header__description {
   margin-top: var(--space-1);
   color: var(--muted);
@@ -296,12 +301,14 @@ const toneOf = (entry) => {
   max-width: 60ch;
 }
 
+/* 空状态图标 */
 .empty-icon {
   width: 1.25rem;
   height: 1.25rem;
   color: var(--primary);
 }
 
+/* 工具栏：级别过滤 + 搜索 + 跟随按钮 */
 .log-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -310,6 +317,7 @@ const toneOf = (entry) => {
   margin-bottom: var(--space-4);
 }
 
+/* 级别过滤：胶囊形分段控件 */
 .log-toolbar__levels {
   display: inline-flex;
   padding: 2px;
@@ -317,6 +325,7 @@ const toneOf = (entry) => {
   background: var(--app-component-bg, var(--surface));
 }
 
+/* 单个级别按钮 */
 .level-button {
   padding: var(--space-1) var(--space-3);
   border: none;
@@ -328,16 +337,19 @@ const toneOf = (entry) => {
   cursor: pointer;
 }
 
+/* 悬停 */
 .level-button:hover {
   color: var(--app-text-color, var(--ink));
 }
 
+/* 选中级别：白底 + 阴影凸起 */
 .level-button--active {
   background: var(--bg);
   color: var(--app-text-color, var(--ink));
   box-shadow: var(--shadow-sm);
 }
 
+/* 搜索框包裹：相对定位放图标 */
 .log-toolbar__search {
   position: relative;
   display: flex;
@@ -346,6 +358,7 @@ const toneOf = (entry) => {
   min-width: 12rem;
 }
 
+/* 搜索图标：绝对定位在左侧 */
 .log-toolbar__search-icon {
   position: absolute;
   left: var(--space-3);
@@ -355,6 +368,7 @@ const toneOf = (entry) => {
   pointer-events: none;
 }
 
+/* 搜索输入框：左侧留出图标空间 */
 .log-toolbar__search-input {
   width: 100%;
   height: 2.5rem;
@@ -365,10 +379,12 @@ const toneOf = (entry) => {
   font-size: var(--text-sm);
 }
 
+/* 搜索占位文字 */
 .log-toolbar__search-input::placeholder {
   color: var(--placeholder);
 }
 
+/* 日志面板：毛玻璃卡片 */
 .log-panel {
   border-radius: var(--radius-lg);
   background: var(--app-area-bg, var(--surface));
@@ -377,16 +393,19 @@ const toneOf = (entry) => {
   padding: var(--space-4);
 }
 
+/* 日志流：限制最大高度，内部滚动 */
 .log-stream {
   max-height: min(32rem, 65dvh);
   overflow-y: auto;
 }
 
+/* “加载更早”按钮：通栏 */
 .log-stream__older {
   width: 100%;
   margin-bottom: var(--space-2);
 }
 
+/* 日志行列表 */
 .log-stream__list {
   display: flex;
   flex-direction: column;
@@ -396,6 +415,7 @@ const toneOf = (entry) => {
   list-style: none;
 }
 
+/* 单行日志：时间 / 级别 / 模块 / 消息 四列网格 */
 .log-line {
   display: grid;
   grid-template-columns: auto 3rem minmax(5rem, 10rem) minmax(0, 1fr);
@@ -407,15 +427,18 @@ const toneOf = (entry) => {
   font-size: var(--text-xs);
 }
 
+/* 行悬停：浅色底便于定位 */
 .log-line:hover {
   background: var(--app-area-bg, var(--bg));
 }
 
+/* 错误行：底色与文字色由日志配色设置控制 */
 .log-line--error {
   background: var(--log-error-bg, transparent);
   color: var(--log-error-color, var(--danger));
 }
 
+/* 错误行所有文字统一用错误色 */
 .log-line--error .log-line__time,
 .log-line--error .log-line__level,
 .log-line--error .log-line__module,
@@ -423,11 +446,13 @@ const toneOf = (entry) => {
   color: var(--log-error-color, var(--danger));
 }
 
+/* 警告行 */
 .log-line--warning {
   background: var(--log-warn-bg, transparent);
   color: var(--log-warn-color, var(--warning-text));
 }
 
+/* 警告行所有文字统一用警告色 */
 .log-line--warning .log-line__time,
 .log-line--warning .log-line__level,
 .log-line--warning .log-line__module,
@@ -435,51 +460,62 @@ const toneOf = (entry) => {
   color: var(--log-warn-color, var(--warning-text));
 }
 
+/* 信息行 */
 .log-line--info {
   background: var(--log-info-bg, transparent);
 }
 
+/* 信息行文字跟随自定义颜色 */
 .log-line--info .log-line__time,
 .log-line--info .log-line__module,
 .log-line--info .log-line__message {
   color: var(--log-info-color, inherit);
 }
 
+/* 调试行 */
 .log-line--debug {
   background: var(--log-debug-bg, transparent);
 }
 
+/* 调试行文字跟随自定义颜色 */
 .log-line--debug .log-line__time,
 .log-line--debug .log-line__module,
 .log-line--debug .log-line__message {
   color: var(--log-debug-color, inherit);
 }
 
+/* 时间：弱化 + 等宽数字 */
 .log-line__time {
   color: var(--faint);
   font-variant-numeric: tabular-nums;
 }
 
+/* 级别文字：加粗 */
 .log-line__level {
   font-weight: 600;
 }
 
+/* 级别颜色：信息主色 */
 .log-line__level--info {
   color: var(--primary);
 }
 
+/* 级别颜色：警告 */
 .log-line__level--warning {
   color: var(--warning);
 }
 
+/* 级别颜色：错误 */
 .log-line__level--danger {
   color: var(--danger);
 }
 
+/* 级别颜色：中性 */
 .log-line__level--neutral {
   color: var(--muted);
 }
 
+/* 模块名：次要色，超长省略 */
 .log-line__module {
   color: var(--muted);
   overflow: hidden;
@@ -487,12 +523,14 @@ const toneOf = (entry) => {
   white-space: nowrap;
 }
 
+/* 消息：保留换行，长词可断 */
 .log-line__message {
   min-width: 0;
   word-break: break-word;
   white-space: pre-wrap;
 }
 
+/* 折叠态：超长消息省略为一行，可点击 */
 .log-line__message--collapsed {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -501,6 +539,7 @@ const toneOf = (entry) => {
 }
 
 
+/* 窄屏：隐藏模块列 */
 @media (max-width: 640px) {
   .log-line {
     grid-template-columns: auto 3rem minmax(0, 1fr);

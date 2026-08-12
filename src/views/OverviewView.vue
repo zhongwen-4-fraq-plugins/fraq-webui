@@ -203,152 +203,176 @@ const onlineDuration = computed(() => {
 </template>
 
 <style scoped>
+/* 概览面板：毛玻璃卡片 */
 .panel {
   padding: var(--space-5);
   border-radius: var(--radius-lg);
-  background: var(--app-area-bg, var(--surface));
-  -webkit-backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
+  background: var(--app-area-bg, var(--surface)); /* 面板底色，跟随外观 */
+  -webkit-backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4); /* 毛玻璃 */
   backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
 }
 
+/* 相邻面板间距 */
 .panel + .panel {
   margin-top: var(--space-5);
 }
 
+/* 面板标题：图标 + 文字 */
 .panel__heading {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-2); /* 图标与文字间距 */
   font-size: var(--text-base);
   font-weight: 600;
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-4); /* 与内容间距 */
 }
 
+/* 标题图标 */
 .panel__heading-icon {
   width: 1.125rem;
   height: 1.125rem;
-  color: var(--primary);
+  color: var(--primary); /* 主色图标 */
 }
 
+/* 标题前的小圆点（最近日志） */
 .panel__heading-dot {
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary); /* 主色圆点 */
 }
 
+/* 标题行：标题 + 右侧链接两端对齐 */
 .panel__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-4); /* 与内容间距 */
 }
 
+/* 标题行内不再重复下边距 */
 .panel__header .panel__heading {
   margin-bottom: 0;
 }
 
+/* “查看全部”链接 */
 .panel__more {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
   font-size: var(--text-sm);
   text-decoration: none;
-  white-space: nowrap;
+  white-space: nowrap; /* 不换行 */
 }
 
+/* 链接悬停：加下划线 */
 .panel__more:hover {
   text-decoration: underline;
 }
 
+/* 链接内箭头图标 */
 .panel__more svg {
   width: 1rem;
   height: 1rem;
 }
 
+/* 状态事实网格：自动换列 */
 .facts {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-  gap: var(--space-4) var(--space-5);
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); /* 每列至少 11rem */
+  gap: var(--space-4) var(--space-5); /* 行间距 列间距 */
   margin: 0;
 }
 
+/* 事实标签：小号次要色 */
 .facts__item dt {
   color: var(--muted);
   font-size: var(--text-xs);
-  margin-bottom: var(--space-1);
+  margin-bottom: var(--space-1); /* 与值间距 */
 }
 
+/* 事实值 */
 .facts__item dd {
   margin: 0;
   font-size: var(--text-sm);
-  font-weight: 500;
+  font-weight: 500; /* 稍加粗 */
 }
 
+/* 等宽值（地址/版本）：等宽字体，允许换行 */
 .facts__mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; /* 等宽字体 */
   font-size: var(--text-xs) !important;
-  word-break: break-all;
+  word-break: break-all; /* 长地址可断行 */
 }
 
+/* 数字值：等宽数字，避免跳动 */
 .facts__num {
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: tabular-nums; /* 数字对齐 */
 }
 
+/* 插件健康摘要行 */
 .summary-line {
   font-size: var(--text-sm);
   color: var(--muted);
 }
 
+/* “一切正常”安静提示 */
 .summary-quiet {
   margin-top: var(--space-3);
   font-size: var(--text-sm);
   color: var(--muted);
 }
 
+/* 异常插件列表 */
 .abnormal-list {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
   margin: var(--space-3) 0 0;
   padding: 0;
-  list-style: none;
+  list-style: none; /* 去掉默认圆点 */
 }
 
+/* 异常项行 */
 .abnormal-list li {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
-  background: var(--app-area-bg, var(--bg));
+  background: var(--app-area-bg, var(--bg)); /* 行底色 */
 }
 
+/* 异常插件名 */
 .abnormal-list__name {
   font-size: var(--text-sm);
   font-weight: 500;
 }
 
+/* 错误日志链接：靠右 */
 .abnormal-list__link {
-  margin-left: auto;
+  margin-left: auto; /* 推到最右 */
   font-size: var(--text-xs);
   text-decoration: none;
 }
 
+/* 链接悬停 */
 .abnormal-list__link:hover {
   text-decoration: underline;
 }
 
+/* 最近日志列表 */
 .log-list {
   display: flex;
   flex-direction: column;
   gap: 2px;
   margin: 0;
   padding: 0;
-  list-style: none;
+  list-style: none; /* 去掉默认圆点 */
 }
 
+/* 单行日志 */
 .log-row {
   display: flex;
   align-items: baseline;
@@ -356,10 +380,11 @@ const onlineDuration = computed(() => {
   min-width: 0;
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
-  background: var(--app-area-bg, var(--bg));
+  background: var(--app-area-bg, var(--bg)); /* 行底色 */
   font-size: var(--text-sm);
 }
 
+/* 日志模块名：等宽字体 */
 .log-row__module {
   flex-shrink: 0;
   color: var(--muted);
@@ -367,10 +392,11 @@ const onlineDuration = computed(() => {
   font-size: var(--text-xs);
 }
 
+/* 日志消息：超长省略为一行 */
 .log-row__message {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: nowrap; /* 单行 */
 }
 </style>

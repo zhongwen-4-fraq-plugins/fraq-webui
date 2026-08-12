@@ -677,56 +677,67 @@ onUnmounted(stopPolling)
 </template>
 
 <style scoped>
+/* 安装页内容：纵向排列，限宽 */
 .install {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
-  max-width: 44rem;
+  max-width: 44rem; /* 表单最大宽度 */
 }
 
+/* 分组卡片：毛玻璃 */
 .install__group {
   padding: var(--space-5);
   border-radius: var(--radius-lg);
-  background: var(--app-area-bg, var(--surface));
+  background: var(--app-area-bg, var(--surface)); /* 面板底色，跟随外观 */
+  /* 毛玻璃效果 */
   -webkit-backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
   backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
 }
 
+/* 分组标题 */
 .install__heading {
   font-size: var(--text-base);
   font-weight: 600;
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-4); /* 与内容间距 */
 }
 
+/* 状态行：徽标 + 操作按钮横排 */
 .install__row {
   display: flex;
   align-items: center;
   gap: var(--space-3);
 }
 
+/* 相邻状态行间距 */
 .install__row + .install__row {
   margin-top: var(--space-3);
 }
 
+/* 说明文字 */
 .install__hint {
   margin-top: var(--space-2);
-  color: var(--muted);
+  color: var(--muted); /* 次要文字色 */
   font-size: var(--text-xs);
 }
 
+/* 安装目录行：输入框 + 选择按钮 */
 .install__dir-row {
   display: flex;
   gap: var(--space-2);
 }
 
+/* 目录输入框占满剩余宽度 */
 .install__dir-row .install-input {
-  flex: 1;
+  flex: 1; /* 撑满 */
 }
 
+/* 完成提示：主色强调 */
 .install__hint--notice {
-  color: var(--primary);
+  color: var(--primary); /* 主色 */
 }
 
+/* 目录选择器路径行 */
 .dir-picker__path {
   display: flex;
   align-items: center;
@@ -735,21 +746,24 @@ onUnmounted(stopPolling)
   margin-bottom: var(--space-3);
 }
 
+/* 当前路径文字 */
 .dir-picker__path-text {
   color: var(--app-text-color, var(--ink));
   font-size: var(--text-sm);
   font-weight: 500;
-  overflow-wrap: anywhere;
+  overflow-wrap: anywhere; /* 长路径可断行 */
 }
 
+/* 目录列表：限高滚动 */
 .dir-picker__list {
   margin: 0;
   padding: 0;
   list-style: none;
-  max-height: 18rem;
-  overflow-y: auto;
+  max-height: 18rem; /* 列表最大高度 */
+  overflow-y: auto; /* 超出滚动 */
 }
 
+/* 单个目录项 */
 .dir-picker__item {
   display: flex;
   align-items: center;
@@ -762,84 +776,97 @@ onUnmounted(stopPolling)
   color: var(--app-text-color, var(--ink));
   font-size: var(--text-sm);
   text-align: left;
-  cursor: pointer;
+  cursor: pointer; /* 整行可点 */
 }
 
+/* 目录项悬停：浅色底 */
 .dir-picker__item:hover {
   background: var(--surface-2);
 }
 
+/* 文件夹图标 */
 .dir-picker__icon {
   width: 1.125rem;
   height: 1.125rem;
   flex-shrink: 0;
-  color: var(--muted);
+  color: var(--muted); /* 次要色 */
 }
 
+/* 空目录提示 */
 .dir-picker__empty {
   padding: var(--space-3);
-  color: var(--muted);
+  color: var(--muted); /* 次要文字色 */
   font-size: var(--text-sm);
 }
 
+/* 错误提示 */
 .install__error {
   margin-top: var(--space-2);
-  color: var(--danger);
+  color: var(--danger); /* 危险色 */
   font-size: var(--text-xs);
 }
 
+/* 协议端实现选择列表 */
 .install__sources {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  margin-top: var(--space-4);
+  margin-top: var(--space-4); /* 与上方内容间距 */
 }
 
+/* 单个实现选项：带边框卡片 */
 .install__source {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-3);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border); /* 常规边框 */
   border-radius: var(--radius-md);
   background: var(--app-component-bg, var(--surface-2));
-  cursor: pointer;
+  cursor: pointer; /* 整块可点 */
 }
 
+/* 选中实现：主色边框 */
 .install__source--active {
-  border-color: var(--primary);
+  border-color: var(--primary); /* 主色高亮 */
 }
 
+/* 隐藏原生 radio，用卡片高亮代替 */
 .install__radio {
   width: 1rem;
   height: 1rem;
-  accent-color: var(--primary);
+  accent-color: var(--primary); /* 主色 */
   flex-shrink: 0;
 }
 
+/* 实现名称 */
 .install__source-name {
   font-size: var(--text-sm);
-  font-weight: 600;
+  font-weight: 600; /* 加粗 */
 }
 
+/* GitHub 仓库地址：靠右弱化 */
 .install__source-repo {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  margin-left: auto;
-  color: var(--faint);
+  margin-left: auto; /* 推到最右 */
+  color: var(--faint); /* 弱化 */
   font-size: var(--text-xs);
 }
 
+/* 仓库图标尺寸 */
 .install__source-repo svg {
   width: 1rem;
   height: 1rem;
 }
 
+/* 字段区块（版本、下载文件等） */
 .install__field {
   margin-top: var(--space-4);
 }
 
+/* 字段标签 */
 .install__label {
   display: block;
   margin-bottom: var(--space-2);
@@ -847,75 +874,86 @@ onUnmounted(stopPolling)
   font-weight: 500;
 }
 
+/* 通用输入框/选择框 */
 .install-input {
   width: 100%;
   height: 2.5rem;
   padding: 0 var(--space-3);
   border-radius: var(--radius-md);
-  background: var(--app-component-bg, var(--surface-2));
+  background: var(--app-component-bg, var(--surface-2)); /* 组件底色 */
   color: var(--app-text-color, var(--ink));
   font-size: var(--text-sm);
 }
 
+/* 输入框占位文字 */
 .install-input::placeholder {
   color: var(--placeholder);
 }
 
+/* 下载文件列表 */
 .install__assets {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
 }
 
+/* 单个下载项：带边框卡片 */
 .install__asset {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border); /* 常规边框 */
   border-radius: var(--radius-md);
   background: var(--app-component-bg, var(--surface-2));
-  cursor: pointer;
+  cursor: pointer; /* 整块可点 */
 }
 
+/* 选中下载项：主色边框 */
 .install__asset--active {
-  border-color: var(--primary);
+  border-color: var(--primary); /* 主色高亮 */
 }
 
+/* 文件名：长名可换行 */
 .install__asset-name {
   font-size: var(--text-sm);
-  overflow-wrap: anywhere;
+  overflow-wrap: anywhere; /* 超长文件名断行 */
 }
 
+/* 文件大小：靠右弱化 */
 .install__asset-size {
-  margin-left: auto;
-  color: var(--faint);
+  margin-left: auto; /* 推到最右 */
+  color: var(--faint); /* 弱化 */
   font-size: var(--text-xs);
   white-space: nowrap;
 }
 
+/* 操作按钮组 */
 .install__actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
-  margin-top: var(--space-4);
+  margin-top: var(--space-4); /* 与上方内容间距 */
 }
 
+/* 进度区 */
 .install__progress {
   margin-top: var(--space-4);
 }
 
+/* 进度条：主色圆头 */
 .install__bar {
-  height: 0.375rem;
-  border-radius: 999px;
-  background: var(--primary);
-  transition: width 300ms ease-out;
+  height: 0.375rem; /* 进度条高度 */
+  border-radius: 999px; /* 圆头 */
+  background: var(--primary); /* 主色 */
+  transition: width 300ms ease-out; /* 宽度平滑过渡 */
 }
 
+/* 进度文字 */
 .install__progress-text {
   display: block;
   margin-top: var(--space-2);
-  color: var(--muted);
+  color: var(--muted); /* 次要文字色 */
   font-size: var(--text-xs);
 }
 </style>
