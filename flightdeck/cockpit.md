@@ -8,7 +8,7 @@ Focus: fraq-webui：用 Vue 3 + Vite 为 fraq 构建轻量 Web 管理界面（�
 
 ## Next
 
-* 刷新 http://127.0.0.1:8787 验证组件透明度默认 0 与输入框删除（旧 localStorage 值需点"恢复默认外观"）；随后验证 /install 安装页
+* 刷新 http://127.0.0.1:8787 验证组件透明度默认 0、滑杆下限 0 与输入框删除（旧 localStorage 值需点"恢复默认外观"）；随后验证 /install 安装页
 
 ## Open questions
 
