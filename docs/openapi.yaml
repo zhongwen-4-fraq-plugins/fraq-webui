@@ -1,0 +1,794 @@
+openapi: 3.0.3
+info:
+  title: fraq-webui API
+  description: |
+    fraq 轻量 Web 管理界面后端 API（Hono）。
+    鉴权：登录后通过 httpOnly cookie（fraq_webui_session）维持会话，也可用
+    Authorization: Bearer <FRAQ_WEBUI_TOKEN>（配置了令牌时）。
+    免登录例外：/api/health、/api/auth/*、POST /api/<单段端点>（milky 协议代理）。
+    失败统一返回 401/400/409/502 与 { error: string }。
+  version: 0.1.0
+servers:
+  - url: http://127.0.0.1:8787
+    description: 本地默认地址（FRAQ_WEBUI_PORT 可改）
+security:
+  - sessionCookie: []
+  - bearerAuth: []
+tags:
+  - name: 认证
+  - name: 核心
+  - name: 插件
+  - name: 日志
+  - name: 设置
+  - name: 安装
+  - name: 其它
+paths:
+  /api/auth/me:
+    get:
+      tags: [认证]
+      summary: 当前登录状态
+      security: []
+      responses:
+        "200":
+          description: 是否已登录
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authenticated:
+                    type: boolean
+  /api/auth/login:
+    post:
+      tags: [认证]
+      summary: 登录（令牌）
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token:
+                  type: string
+                  description: 登录令牌（FRAQ_WEBUI_TOKEN 或启动时自动生成）
+      responses:
+        "200":
+          description: 登录成功，写入会话 cookie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+        "401":
+          $ref: "#/components/responses/Error"
+  /api/auth/logout:
+    post:
+      tags: [认证]
+      summary: 退出登录
+      responses:
+        "200":
+          $ref: "#/components/responses/Ok"
+  /api/health:
+    get:
+      tags: [认证]
+      summary: 健康检查
+      security: []
+      responses:
+        "200":
+          description: 服务正常
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+  /api/core:
+    get:
+      tags: [核心]
+      summary: 核心状态
+      responses:
+        "200":
+          description: fraq 核心运行状态
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoreStatus"
+  /api/core/start:
+    post:
+      tags: [核心]
+      summary: 启动核心
+      responses:
+        "200":
+          $ref: "#/components/responses/Ok"
+        "409":
+          $ref: "#/components/responses/Error"
+  /api/core/stop:
+    post:
+      tags: [核心]
+      summary: 停止核心
+      responses:
+        "200":
+          $ref: "#/components/responses/Ok"
+  /api/stats:
+    get:
+      tags: [核心]
+      summary: 消息收发统计
+      responses:
+        "200":
+          description: 累计收发与每分钟发送数
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Stats"
+  /api/stats/stream:
+    get:
+      tags: [核心]
+      summary: 消息统计实时推送（SSE）
+      responses:
+        "200":
+          description: SSE 流，每帧 data 为 Stats JSON
+  /api/plugins:
+    get:
+      tags: [插件]
+      summary: 已安装插件列表
+      responses:
+        "200":
+          description: 插件数组
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Plugin"
+  /api/plugins/install:
+    post:
+      tags: [插件]
+      summary: 安装插件
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PluginInstallRequest"
+      responses:
+        "200":
+          description: 安装成功，返回写入 fraq.yml 的插件键
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  plugins:
+                    type: array
+                    items:
+                      type: string
+        "400":
+          $ref: "#/components/responses/Error"
+  /api/plugins/{id}/enable:
+    post:
+      tags: [插件]
+      summary: 启用插件
+      parameters:
+        - $ref: "#/components/parameters/PluginId"
+      responses:
+        "200":
+          $ref: "#/components/responses/Ok"
+  /api/plugins/{id}/disable:
+    post:
+      tags: [插件]
+      summary: 停用插件
+      parameters:
+        - $ref: "#/components/parameters/PluginId"
+      responses:
+        "200":
+          $ref: "#/components/responses/Ok"
+  /api/plugins/{id}/uninstall:
+    post:
+      tags: [插件]
+      summary: 卸载插件
+      parameters:
+        - $ref: "#/components/parameters/PluginId"
+      responses:
+        "200":
+          $ref: "#/components/responses/Ok"
+  /api/plugins/{id}/config:
+    get:
+      tags: [插件]
+      summary: 读取插件配置
+      parameters:
+        - $ref: "#/components/parameters/PluginId"
+      responses:
+        "200":
+          description: 插件配置对象
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  config:
+                    type: object
+    put:
+      tags: [插件]
+      summary: 保存插件配置
+      parameters:
+        - $ref: "#/components/parameters/PluginId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [config]
+              properties:
+                config:
+                  type: object
+      responses:
+        "200":
+          $ref: "#/components/responses/Ok"
+        "400":
+          $ref: "#/components/responses/Error"
+  /api/logs:
+    get:
+      tags: [日志]
+      summary: 最近日志
+      parameters:
+        - name: limit
+          in: query
+          description: 返回条数
+          schema:
+            type: integer
+            default: 200
+      responses:
+        "200":
+          description: 日志数组
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LogEntry"
+  /api/logs/older:
+    get:
+      tags: [日志]
+      summary: 更早的日志（分页）
+      parameters:
+        - name: before
+          in: query
+          description: 从第几条之前开始取
+          schema:
+            type: integer
+            default: 0
+        - name: count
+          in: query
+          description: 取多少条
+          schema:
+            type: integer
+            default: 100
+      responses:
+        "200":
+          description: 日志数组
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LogEntry"
+  /api/logs/stream:
+    get:
+      tags: [日志]
+      summary: 实时日志流（SSE）
+      responses:
+        "200":
+          description: SSE 流，每帧 data 为一条 LogEntry
+  /api/settings:
+    get:
+      tags: [设置]
+      summary: 读取设置
+      responses:
+        "200":
+          description: 设置（不返回令牌明文）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settings"
+    put:
+      tags: [设置]
+      summary: 保存设置
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SettingsUpdate"
+      responses:
+        "200":
+          $ref: "#/components/responses/Ok"
+        "400":
+          $ref: "#/components/responses/Error"
+  /api/install/check:
+    get:
+      tags: [安装]
+      summary: 环境检查
+      responses:
+        "200":
+          description: Node / fraq CLI / 协议端检测结果
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InstallCheck"
+  /api/install/cli:
+    post:
+      tags: [安装]
+      summary: 安装 fraq CLI（异步）
+      responses:
+        "200":
+          $ref: "#/components/responses/Ok"
+        "409":
+          $ref: "#/components/responses/Error"
+  /api/install/node-releases:
+    get:
+      tags: [安装]
+      summary: Node.js 版本列表
+      responses:
+        "200":
+          description: releases 数组
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  releases:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/NodeRelease"
+        "400":
+          $ref: "#/components/responses/Error"
+  /api/install/node:
+    post:
+      tags: [安装]
+      summary: 下载安装便携 Node（异步）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NodeInstallRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/Ok"
+        "409":
+          $ref: "#/components/responses/Error"
+  /api/install/dirs:
+    get:
+      tags: [安装]
+      summary: 浏览目录
+      parameters:
+        - name: path
+          in: query
+          description: 目录路径，空则列出磁盘根
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 当前路径与子目录
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DirList"
+        "400":
+          $ref: "#/components/responses/Error"
+  /api/install/dir/pick:
+    post:
+      tags: [安装]
+      summary: 系统文件夹选择器（Windows）
+      responses:
+        "200":
+          description: 是否选择成功及路径
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  picked:
+                    type: boolean
+                  path:
+                    type: string
+        "400":
+          $ref: "#/components/responses/Error"
+  /api/install/releases:
+    get:
+      tags: [安装]
+      summary: 协议端版本列表（GitHub）
+      parameters:
+        - name: source
+          in: query
+          required: true
+          description: 协议端来源
+          schema:
+            type: string
+            enum: [yogurt, lucky]
+      responses:
+        "200":
+          description: releases 数组
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  releases:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Release"
+        "400":
+          $ref: "#/components/responses/Error"
+  /api/install/protocol:
+    post:
+      tags: [安装]
+      summary: 下载安装协议端（异步）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProtocolInstallRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/Ok"
+        "409":
+          $ref: "#/components/responses/Error"
+  /api/install/protocol/start:
+    post:
+      tags: [安装]
+      summary: 启动协议端
+      responses:
+        "200":
+          description: 启动成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  running:
+                    type: boolean
+                  pid:
+                    type: integer
+                    nullable: true
+        "409":
+          $ref: "#/components/responses/Error"
+  /api/install/protocol/stop:
+    post:
+      tags: [安装]
+      summary: 停止协议端
+      responses:
+        "200":
+          $ref: "#/components/responses/Ok"
+  /api/install/status:
+    get:
+      tags: [安装]
+      summary: 安装任务进度
+      responses:
+        "200":
+          description: 进度状态
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InstallStatus"
+  /api/update/check:
+    get:
+      tags: [其它]
+      summary: 检查 webui 更新
+      responses:
+        "200":
+          description: 与远程仓库的提交差距
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateCheck"
+        "502":
+          $ref: "#/components/responses/Error"
+  /api/{endpoint}:
+    post:
+      tags: [其它]
+      summary: Milky 协议代理
+      description: fraq 核心把 milky.url 指向本服务后调用；免登录。发送类端点会累计"发出"计数。
+      security: []
+      parameters:
+        - name: endpoint
+          in: path
+          required: true
+          description: Milky 协议端点名，如 send_private_message
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Milky 协议端原样返回
+        "502":
+          $ref: "#/components/responses/Error"
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: fraq_webui_session
+      description: 登录成功后由服务端写入的会话 cookie
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: 配置了 FRAQ_WEBUI_TOKEN 时可用 Bearer 令牌直接调用
+  parameters:
+    PluginId:
+      name: id
+      in: path
+      required: true
+      description: 插件 id（fraq.yml 中的键）
+      schema:
+        type: string
+  responses:
+    Ok:
+      description: 操作成功
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ok:
+                type: boolean
+    Error:
+      description: 请求失败（具体状态码见各接口）
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+    CoreStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [running, stopped]
+        connected:
+          type: boolean
+        baseUrl:
+          type: string
+        version:
+          type: string
+        startedAt:
+          type: integer
+          nullable: true
+        onlineSeconds:
+          type: integer
+    Stats:
+      type: object
+      properties:
+        available:
+          type: boolean
+        received:
+          type: integer
+        sent:
+          type: integer
+        sentPerMinute:
+          type: integer
+    Plugin:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        version:
+          type: string
+        status:
+          type: string
+          enum: [running, stopped]
+        enabled:
+          type: boolean
+    PluginInstallRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          description: 插件名，如 @fraqjs/plugin-hono
+        version:
+          type: string
+          description: 可选，指定版本
+    LogEntry:
+      type: object
+      properties:
+        time:
+          type: integer
+        level:
+          type: string
+          enum: [debug, info, warn, error]
+        module:
+          type: string
+        message:
+          type: string
+    Settings:
+      type: object
+      properties:
+        baseUrl:
+          type: string
+        accessToken:
+          type: string
+          description: 始终为空，避免回传令牌明文
+        hasAccessToken:
+          type: boolean
+        secureCookies:
+          type: boolean
+        appDir:
+          type: string
+    SettingsUpdate:
+      type: object
+      required: [baseUrl]
+      properties:
+        baseUrl:
+          type: string
+          description: 必须是 http/https 地址
+        accessToken:
+          type: string
+          description: 可选；留空表示不修改
+        appDir:
+          type: string
+          description: 可选；需存在且包含 fraq.yml
+    InstallCheck:
+      type: object
+      properties:
+        node:
+          type: object
+          properties:
+            installed:
+              type: boolean
+            nodeVersion:
+              type: string
+            npmVersion:
+              type: string
+        cli:
+          type: object
+          properties:
+            installed:
+              type: boolean
+            version:
+              type: string
+        protocol:
+          type: object
+          properties:
+            reachable:
+              type: boolean
+            running:
+              type: boolean
+            detail:
+              type: string
+        status:
+          $ref: "#/components/schemas/InstallStatus"
+    NodeRelease:
+      type: object
+      properties:
+        version:
+          type: string
+        lts:
+          type: string
+          nullable: true
+    NodeInstallRequest:
+      type: object
+      required: [version]
+      properties:
+        version:
+          type: string
+        installDir:
+          type: string
+          description: 可选；安装目录
+    DirList:
+      type: object
+      properties:
+        path:
+          type: string
+        parent:
+          type: string
+          description: 父目录，无则为空
+        dirs:
+          type: array
+          items:
+            type: string
+          description: 子目录完整路径
+    Release:
+      type: object
+      properties:
+        tag:
+          type: string
+        prerelease:
+          type: boolean
+        publishedAt:
+          type: string
+        assets:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReleaseAsset"
+    ReleaseAsset:
+      type: object
+      properties:
+        name:
+          type: string
+        size:
+          type: integer
+    ProtocolInstallRequest:
+      type: object
+      required: [source, tag, asset]
+      properties:
+        source:
+          type: string
+          enum: [yogurt, lucky]
+        tag:
+          type: string
+        asset:
+          type: string
+          description: 下载文件名
+        installDir:
+          type: string
+          description: 可选；安装目录
+    InstallStatus:
+      type: object
+      properties:
+        busy:
+          type: boolean
+        phase:
+          type: string
+          enum: [idle, installing-cli, downloading, extracting, done, error]
+        progress:
+          type: integer
+        message:
+          type: string
+        error:
+          type: string
+        exePath:
+          type: string
+        task:
+          type: string
+          description: cli / protocol / node
+        source:
+          type: string
+        tag:
+          type: string
+        asset:
+          type: string
+        running:
+          type: boolean
+        pid:
+          type: integer
+          nullable: true
+        protocolDir:
+          type: string
+    UpdateCheck:
+      type: object
+      properties:
+        remote:
+          type: string
+        branch:
+          type: string
+        behind:
+          type: integer
+        ahead:
+          type: integer
+        upToDate:
+          type: boolean

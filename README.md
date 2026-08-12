@@ -41,7 +41,18 @@ npm run dev          # Vite 开发服务器（/api 自动代理到 8787）
 | `FRAQ_WEBUI_MILKY_URL` | `http://localhost:30001` | 真实 Milky 协议端地址 |
 | `FRAQ_WEBUI_MILKY_TOKEN` | 空 | 转发到 Milky 协议端时使用的访问令牌 |
 
-支持根目录 `.env` 文件：服务启动时自动加载（已存在的系统环境变量优先），示例见 `.env.example`；`.env` 已加入 `.gitignore`，不会提交。
+支持根目录 `.env` 文件：服务启动时自动加载（已存在的系统环境变量优先），示例见 `.env.example`。
+
+## 导入 Apifox
+
+项目提供 OpenAPI 3.0 规范文件 [`docs/openapi.yaml`](docs/openapi.yaml)，覆盖全部 HTTP 接口：
+
+1. Apifox 中新建或打开项目，进入"接口管理"。
+2. 右上角"导入数据"→ 选择 **OpenAPI/Swagger** 格式。
+3. 上传 `docs/openapi.yaml`（或把文件内容粘贴进去）。
+4. 环境变量里的服务器地址保持 `http://127.0.0.1:8787`。
+
+鉴权说明：登录接口成功后 Apifox 会自动保存会话 cookie，后续请求即可通过；配置了 `FRAQ_WEBUI_TOKEN` 时，也可在请求头加 `Authorization: Bearer <令牌>`。`POST /api/<单段端点>` 与 `GET /event`（WebSocket）属于 milky 协议代理/事件流，WebSocket 可在 Apifox 里单独新建。
 
 ## 说明
 
