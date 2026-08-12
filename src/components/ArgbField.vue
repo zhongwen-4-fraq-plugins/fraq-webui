@@ -127,7 +127,9 @@ const argb = computed(() => {
   height: 0.375rem;
   border: none;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--app-component-bg, var(--surface-2)) 60%, transparent);
+  background:
+    color-mix(in srgb, var(--app-component-bg, var(--surface-2)) 60%, transparent),
+    color-mix(in srgb, var(--surface-2) 20%, transparent);
   outline: none;
 }
 
@@ -139,7 +141,9 @@ const argb = computed(() => {
   height: 0.375rem;
   border: none;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--app-component-bg, var(--surface-2)) 60%, transparent);
+  background:
+    color-mix(in srgb, var(--app-component-bg, var(--surface-2)) 60%, transparent),
+    color-mix(in srgb, var(--surface-2) 20%, transparent);
   outline: none;
 }
 
