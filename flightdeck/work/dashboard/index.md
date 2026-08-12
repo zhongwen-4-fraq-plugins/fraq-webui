@@ -33,7 +33,7 @@ Done:
 - 消息收发统计：milky 透明代理（fraq.yml milky.url 指向本服务），收=事件流 message_receive、发=发送 API 计数，概览展示
 
 Current:
-- 2026-08-13 插件操作接口去掉路径参数，统一改为 query 参数 `id`（enable/disable/uninstall/config）；OpenAPI 规范同步更新且不含任何路径参数；milky 代理（POST /api/<单段端点>）为 fraq 核心按协议固定调用，保持原样不列入规范。
+- 2026-08-13 插件操作接口去掉路径参数，统一改为 query 参数 `id`（enable/disable/uninstall/config）；milky 代理由 `/api/:endpoint` 改为通配路由 `/api/*`（无命名路径参数，端点名从请求路径提取）；全项目已无命名路径参数，OpenAPI 规范同步且不含任何路径参数。
 - 2026-08-13 新增 `docs/openapi.yaml`（OpenAPI 3.0，覆盖 31 个路径），供导入 Apifox；README 增加导入说明。
 - 2026-08-13 支持根目录 `.env`：服务入口最先 `import 'dotenv/config'`，配置（令牌/端口/Milky 等）可放 `.env`（已 gitignore），示例见 `.env.example`；系统环境变量优先。
 - 2026-08-13 全部 CSS（tokens.css / base.css + 各组件、视图的 scoped style）补齐中文注释，无行为改动；生产构建通过。

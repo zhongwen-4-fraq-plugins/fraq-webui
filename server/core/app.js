@@ -347,8 +347,9 @@ app.post('/api/install/protocol/stop', async (c) => {
 const SEND_ENDPOINTS = new Set(['send_private_message', 'send_group_message'])
 const milkyToken = () => MILKY_ACCESS_TOKEN || fraqConfig.getMilkyConfig().accessToken
 
-app.post('/api/:endpoint', async (c) => {
-  const endpoint = c.req.param('endpoint')
+// 通配路由：不使用命名路径参数，端点名从请求路径中取出
+app.post('/api/*', async (c) => {
+  const endpoint = c.req.path.replace(/^\/api\//, '')
   const body = await c.req.text()
   const headers = { 'Content-Type': 'application/json' }
   const token = milkyToken()
