@@ -91,6 +91,7 @@ function resetAppearance() {
   appearance.colors.topbar = defaults.colors.topbar
   appearance.colors.sidebar = defaults.colors.sidebar
   appearance.colors.area = defaults.colors.area
+  appearance.colors.dialog = defaults.colors.dialog
 }
 
 onMounted(async () => {
@@ -283,6 +284,7 @@ async function save() {
           <ArgbField label="侧边栏" :model="appearance.colors.sidebar" />
           <ArgbField label="内容区域" :model="appearance.colors.area" />
           <ArgbField label="组件" :model="appearance.colors.components" />
+          <ArgbField label="弹窗" :model="appearance.colors.dialog" />
           <ArgbField label="文字" :model="appearance.colors.text" />
         </div>
         <AppButton variant="secondary" size="sm" class="appearance__reset" @click="resetAppearance">

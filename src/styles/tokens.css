@@ -72,11 +72,13 @@
   --app-sidebar-bg: oklch(0.984 0.003 210 / 0.72);
   --app-area-bg: oklch(0.984 0.003 210 / 0.72);
   --app-component-bg: oklch(0.965 0.005 210);
+  --app-dialog-bg: oklch(1 0 0 / 0.92);
   --app-text-color: var(--ink);
   --app-topbar-blur: 16px;
   --app-sidebar-blur: 16px;
   --app-area-blur: 16px;
   --app-component-blur: 0px;
+  --app-dialog-blur: 16px;
   --app-bg-image: url('/bg.jpg');
 
   /* 日志级别颜色（由日志设置页动态修改） */

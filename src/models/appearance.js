@@ -2,6 +2,7 @@
 
 const DEFAULT_COLOR = { color: '#ffffff', alpha: 0.72, blur: 16 }
 const DEFAULT_COMPONENT = { color: '#fbfbfb', alpha: 1, blur: 0 }
+const DEFAULT_DIALOG = { color: '#ffffff', alpha: 0.92, blur: 16 }
 const DEFAULT_TEXT = { color: '#2b2e33', alpha: 1, blur: 0 }
 
 const DEFAULT_LOG_COLOR = { color: '', bgColor: '#ffffff', bgAlpha: 0 }
@@ -13,6 +14,7 @@ export const DEFAULT_APPEARANCE = {
     sidebar: { color: '#fbfbfb', alpha: 0.72, blur: 16 },
     area: { color: '#fbfbfb', alpha: 0.72, blur: 16 },
     components: { ...DEFAULT_COMPONENT },
+    dialog: { ...DEFAULT_DIALOG },
     text: { ...DEFAULT_TEXT },
   },
   logColors: {
@@ -53,6 +55,7 @@ export function normalizeAppearance(raw = {}) {
       sidebar: normalizeColor(raw.colors?.sidebar, DEFAULT_APPEARANCE.colors.sidebar),
       area: normalizeColor(raw.colors?.area, DEFAULT_APPEARANCE.colors.area),
       components: normalizeColor(raw.colors?.components, DEFAULT_APPEARANCE.colors.components),
+      dialog: normalizeColor(raw.colors?.dialog, DEFAULT_APPEARANCE.colors.dialog),
       text: normalizeColor(raw.colors?.text, DEFAULT_APPEARANCE.colors.text),
     },
     logColors: {

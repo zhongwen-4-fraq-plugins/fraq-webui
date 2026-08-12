@@ -85,11 +85,13 @@ function applyAppearance() {
   root.style.setProperty('--app-sidebar-bg', colorToRgba(colors.sidebar))
   root.style.setProperty('--app-area-bg', colorToRgba(colors.area))
   root.style.setProperty('--app-component-bg', colorToRgba(colors.components))
+  root.style.setProperty('--app-dialog-bg', colorToRgba(colors.dialog))
   root.style.setProperty('--app-text-color', colorToRgba(colors.text))
   root.style.setProperty('--app-topbar-blur', `${colors.topbar.blur}px`)
   root.style.setProperty('--app-sidebar-blur', `${colors.sidebar.blur}px`)
   root.style.setProperty('--app-area-blur', `${colors.area.blur}px`)
   root.style.setProperty('--app-component-blur', `${colors.components.blur}px`)
+  root.style.setProperty('--app-dialog-blur', `${colors.dialog.blur}px`)
 
   // 日志各级别的文字颜色与底色
   for (const level of ['error', 'warn', 'info', 'debug']) {
