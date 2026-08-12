@@ -12,11 +12,8 @@ html {
 
 body {
   margin: 0;
-  /* 页面背景图：替换 public/bg.jpg 即可换图；白色半透明遮罩保证正文可读 */
-  background:
-    linear-gradient(oklch(1 0 0 / 0.55), oklch(1 0 0 / 0.55)),
-    var(--app-bg-image, url('/bg.jpg')) center / cover no-repeat fixed,
-    var(--bg);
+  /* 页面背景：白色半透明遮罩保证正文可读；背景图由 body::before 承载以支持模糊 */
+  background: var(--bg);
   color: var(--app-text-color, var(--ink));
   font-family:
     ui-sans-serif,
@@ -33,6 +30,19 @@ body {
   line-height: var(--leading-normal);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* 背景图：固定铺满，支持模糊（scale 放大避免模糊露出边缘） */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(oklch(1 0 0 / 0.55), oklch(1 0 0 / 0.55)),
+    var(--app-bg-image, url('/bg.jpg')) center / cover no-repeat;
+  filter: blur(var(--app-bg-blur, 0px));
+  transform: scale(1.06);
 }
 
 h1,

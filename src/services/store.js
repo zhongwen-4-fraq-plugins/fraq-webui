@@ -115,6 +115,7 @@ function applyAppearance() {
     image = `url('${background.value}')`
   }
   root.style.setProperty('--app-bg-image', image)
+  root.style.setProperty('--app-bg-blur', `${background.blur}px`)
 }
 
 function setAppearance(next) {

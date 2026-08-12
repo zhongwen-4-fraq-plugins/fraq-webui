@@ -8,7 +8,7 @@ const DEFAULT_TEXT = { color: '#2b2e33', alpha: 1, blur: 0 }
 const DEFAULT_LOG_COLOR = { color: '', bgColor: '#ffffff', bgAlpha: 0 }
 
 export const DEFAULT_APPEARANCE = {
-  background: { mode: 'default', value: '', fileName: '' }, // default | url | file
+  background: { mode: 'default', value: '', fileName: '', blur: 0 }, // default | url | file
   colors: {
     topbar: { ...DEFAULT_COLOR },
     sidebar: { color: '#fbfbfb', alpha: 0.72, blur: 16 },
@@ -49,6 +49,9 @@ export function normalizeAppearance(raw = {}) {
       mode: ['default', 'url', 'file'].includes(raw.background?.mode) ? raw.background.mode : 'default',
       value: typeof raw.background?.value === 'string' ? raw.background.value : '',
       fileName: typeof raw.background?.fileName === 'string' ? raw.background.fileName : '',
+      blur: Number.isFinite(raw.background?.blur)
+        ? Math.min(40, Math.max(0, raw.background.blur))
+        : 0,
     },
     colors: {
       topbar: normalizeColor(raw.colors?.topbar, DEFAULT_APPEARANCE.colors.topbar),

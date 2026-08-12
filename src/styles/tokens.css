@@ -80,6 +80,7 @@
   --app-component-blur: 0px;
   --app-dialog-blur: 16px;
   --app-bg-image: url('/bg.jpg');
+  --app-bg-blur: 0px;
 
   /* 日志级别颜色（由日志设置页动态修改） */
   --log-error-color: var(--danger);

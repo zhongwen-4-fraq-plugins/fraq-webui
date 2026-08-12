@@ -53,6 +53,13 @@ const bgFileName = computed(() =>
   appearance.background.mode === 'file' ? appearance.background.fileName : '',
 )
 
+const backgroundBlur = computed({
+  get: () => appearance.background.blur,
+  set: (value) => {
+    appearance.background.blur = Number(value)
+  },
+})
+
 function onBackgroundFile(event) {
   applyBackgroundFile(event.target.files?.[0])
   event.target.value = ''
@@ -83,6 +90,7 @@ function resetBackground() {
   appearance.background.mode = 'default'
   appearance.background.value = ''
   appearance.background.fileName = ''
+  appearance.background.blur = 0
 }
 
 function resetAppearance() {
@@ -262,6 +270,19 @@ async function save() {
               @change="onBackgroundFile"
             />
           </div>
+          <div class="appearance__blur">
+            <label for="bg-blur">背景模糊</label>
+            <input
+              id="bg-blur"
+              v-model="backgroundBlur"
+              type="range"
+              min="0"
+              max="40"
+              step="1"
+              class="appearance__blur-input"
+            />
+            <span class="appearance__blur-value">{{ backgroundBlur }}px</span>
+          </div>
           <div
             class="appearance__preview"
             :style="{ backgroundImage: bgPreview }"
@@ -386,6 +407,59 @@ async function save() {
   border-radius: var(--radius-md);
   background-size: cover;
   background-position: center;
+}
+
+.appearance__blur {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.appearance__blur label {
+  width: 4.5rem;
+  flex-shrink: 0;
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.appearance__blur-input {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  max-width: 12rem;
+  height: 0.375rem;
+  border: none;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--app-component-bg, var(--surface-2)) 60%, transparent);
+  outline: none;
+}
+
+.appearance__blur-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+}
+
+.appearance__blur-input::-moz-range-thumb {
+  width: 1rem;
+  height: 1rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+}
+
+.appearance__blur-value {
+  width: 2.5rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--text-xs);
+  color: var(--muted);
 }
 
 .appearance__dropzone {
