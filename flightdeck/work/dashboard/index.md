@@ -45,7 +45,7 @@ Current:
 - 插件配置功能：官方插件（fraqjs/hono、milky-server、webui-gateway、kysely、message-store、conversation、random、milky-webhook、takumi、ai）按源码手写表单，其余插件 JSON 编辑器；`GET/PUT /api/plugins/:id/config`，密钥字段（apiKey/token/secret 等）打码 ******，保存时未改动则还原原值。
 - 核心状态接管孤儿进程：服务重启后旧 fraq 核心仍在运行时，`/api/core` 通过 netstat 探测 fraqjs/hono 端口（默认 4649）找到 PID 并接管，状态不再误报未运行，停止也能正常 kill。
 - ai 插件配置改为 SDK 下拉选择（9 个 SDK 选项）。
-- 透明度滑杆标注"透明度/模糊"；滑杆下限曾固定 20%、数值输入框可输到 0%；2026-08-12 组件透明度默认改为 0、透明度数值输入框删除、滑杆下限改回 0。
+- 透明度滑杆标注"透明度/模糊"；2026-08-12 组件透明度默认改为 0、透明度数值输入框删除；"滑杆最低透明度 20%"按轨道可见度保底实现（轨道垫 20% 不透明层），可调值下限为 0。
 - 弹窗独立外观（--app-dialog-bg/--app-dialog-blur）、背景图模糊设置、toast 进度条动画（4500ms）。
 - 日志页"日志"旁设置图标（右 15px、文字间距 10px、背景透明），可改各日志级别文字颜色与底色；错误/警告整行变色（底色去掉）；长错误报告折叠为一行可点击展开。
 - 警告文字色 #d9b500。
