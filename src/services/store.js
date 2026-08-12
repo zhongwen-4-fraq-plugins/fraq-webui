@@ -11,6 +11,7 @@ import { createMessageStats } from '../models/messageStats.js'
 import { normalizeAppearance } from '../models/appearance.js'
 import { colorToRgba } from '../data/color.js'
 import { onUnauthorized } from './httpApi.js'
+import { TOAST_DURATION_MS } from '../core/config.js'
 
 const APPEARANCE_KEY = 'fraq-webui.appearance'
 
@@ -161,7 +162,7 @@ async function logout() {
 function toast(type, message) {
   const id = ++toastId
   state.toasts.push({ id, type, message })
-  setTimeout(() => dismissToast(id), 4500)
+  setTimeout(() => dismissToast(id), TOAST_DURATION_MS)
 }
 
 function dismissToast(id) {
