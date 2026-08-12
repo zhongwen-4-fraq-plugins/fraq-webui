@@ -14,11 +14,13 @@ import { onUnauthorized } from './httpApi.js'
 import { TOAST_DURATION_MS } from '../core/config.js'
 
 const APPEARANCE_KEY = 'fraq-webui.appearance'
+const CUSTOM_CSS_KEY = 'fraq-webui.customCss'
 
 const state = reactive({
   core: createCoreStatus(),
   stats: createMessageStats(),
   appearance: normalizeAppearance(loadAppearance()),
+  customCss: loadCustomCss(),
   auth: {
     checking: true,
     authenticated: false,
@@ -131,6 +133,35 @@ function setAppearance(next) {
     // 存储不可用时仅本次生效
   }
   applyAppearance()
+}
+
+function loadCustomCss() {
+  try {
+    return localStorage.getItem(CUSTOM_CSS_KEY) ?? ''
+  } catch {
+    return ''
+  }
+}
+
+// 把自定义 CSS 注入到页面，改动即时生效
+function applyCustomCss() {
+  let style = document.getElementById('fraq-webui-custom-css')
+  if (!style) {
+    style = document.createElement('style')
+    style.id = 'fraq-webui-custom-css'
+    document.head.appendChild(style)
+  }
+  style.textContent = state.customCss
+}
+
+function setCustomCss(css) {
+  state.customCss = String(css ?? '')
+  try {
+    localStorage.setItem(CUSTOM_CSS_KEY, state.customCss)
+  } catch {
+    // 存储不可用时仅本次生效
+  }
+  applyCustomCss()
 }
 
 async function checkAuth() {
@@ -354,6 +385,7 @@ export const store = {
   refreshLogs,
   refreshSettings,
   loadOlderLogs,
+  setCustomCss,
   startCore,
   stopCore,
   installPlugin,
@@ -366,3 +398,4 @@ export const store = {
 
 // 模块加载时应用已保存的外观
 applyAppearance()
+applyCustomCss()

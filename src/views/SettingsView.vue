@@ -33,6 +33,7 @@ const dirty = computed(
 )
 
 const appearance = reactive(JSON.parse(JSON.stringify(store.state.appearance)))
+const customCss = ref(store.state.customCss)
 
 watch(
   appearance,
@@ -41,6 +42,10 @@ watch(
   },
   { deep: true },
 )
+
+watch(customCss, (value) => {
+  store.setCustomCss(value)
+})
 
 const bgPreview = computed(() => {
   const { mode, value } = appearance.background
@@ -313,6 +318,18 @@ async function save() {
         <AppButton variant="secondary" size="sm" class="appearance__reset" @click="resetAppearance">
           恢复默认外观
         </AppButton>
+        <div class="field appearance__css">
+          <label class="field__label" for="custom-css">自定义 CSS</label>
+          <textarea
+            id="custom-css"
+            v-model="customCss"
+            class="field__input field__input--code"
+            rows="8"
+            spellcheck="false"
+            placeholder="例如 .sidebar { background: red; }"
+          />
+          <p class="field__hint">覆盖整个界面的样式，改动即时生效并保存到本浏览器。</p>
+        </div>
         <p class="field__hint">颜色格式 ARGB（#AARRGGBB）+ 模糊程度，修改即时生效并自动保存。</p>
       </section>
 
@@ -513,6 +530,20 @@ async function save() {
 
 .appearance__reset {
   margin-top: var(--space-2);
+}
+
+.appearance__css {
+  margin-top: var(--space-4);
+}
+
+.field__input--code {
+  height: auto;
+  min-height: 10rem;
+  padding: var(--space-2) var(--space-3);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  resize: vertical;
 }
 
 .appearance__url-input::placeholder {
