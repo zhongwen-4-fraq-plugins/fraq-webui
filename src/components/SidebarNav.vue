@@ -1,17 +1,13 @@
 <script setup>
-import { computed, h, ref } from 'vue'
-import { NButton, NIcon, NMenu } from 'naive-ui'
-import { useRoute, useRouter } from 'vue-router'
-import {
-  Apps,
-  LayoutGrid,
-  ListDetails,
-  Loader,
-  Refresh,
-  Settings,
-  Tool,
-  X,
-} from '@vicons/tabler'
+import IconBlocks from '~icons/tabler/blocks'
+import IconLayoutDashboard from '~icons/tabler/layout-dashboard'
+import IconListDetails from '~icons/tabler/list-details'
+import IconLoader from '~icons/tabler/loader-2'
+import IconRefresh from '~icons/tabler/refresh'
+import IconSettings from '~icons/tabler/settings'
+import IconTool from '~icons/tabler/tool'
+import IconX from '~icons/tabler/x'
+import { ref } from 'vue'
 import { APP_NAME, APP_VERSION } from '../core/config.js'
 import { httpApi } from '../services/httpApi.js'
 import { store } from '../services/store.js'
@@ -20,36 +16,9 @@ defineProps({
   open: { type: Boolean, default: false },
 })
 
-const emit = defineEmits(['close'])
+defineEmits(['close'])
 
-const route = useRoute()
-const router = useRouter()
 const checking = ref(false)
-
-function renderIcon(icon) {
-  return () => h(NIcon, null, { default: () => h(icon) })
-}
-
-const navItems = [
-  { to: '/', label: '概览', icon: LayoutGrid },
-  { to: '/plugins', label: '插件', icon: Apps },
-  { to: '/install', label: '安装', icon: Tool },
-  { to: '/logs', label: '日志', icon: ListDetails },
-  { to: '/settings', label: '设置', icon: Settings },
-]
-
-const menuOptions = navItems.map((item) => ({
-  key: item.to,
-  label: item.label,
-  icon: renderIcon(item.icon),
-}))
-
-const activeKey = computed(() => route.path)
-
-function onMenuSelect(key) {
-  if (key !== route.path) router.push(key)
-  emit('close')
-}
 
 async function checkUpdate() {
   if (checking.value) return
@@ -67,6 +36,14 @@ async function checkUpdate() {
     checking.value = false
   }
 }
+
+const navItems = [
+  { to: '/', label: '概览', icon: IconLayoutDashboard },
+  { to: '/plugins', label: '插件', icon: IconBlocks },
+  { to: '/install', label: '安装', icon: IconTool },
+  { to: '/logs', label: '日志', icon: IconListDetails },
+  { to: '/settings', label: '设置', icon: IconSettings },
+]
 </script>
 
 <template>
@@ -74,44 +51,42 @@ async function checkUpdate() {
     <div class="sidebar__brand">
       <span class="sidebar__logo" aria-hidden="true">F</span>
       <span class="sidebar__name">{{ APP_NAME }}</span>
-      <NButton
-        quaternary
-        circle
-        size="small"
+      <button
+        type="button"
         class="sidebar__close"
         aria-label="关闭导航"
-        @click="emit('close')"
+        @click="$emit('close')"
       >
-        <template #icon>
-          <NIcon><X /></NIcon>
-        </template>
-      </NButton>
+        <IconX aria-hidden="true" />
+      </button>
     </div>
 
     <nav class="sidebar__nav">
-      <NMenu
-        :value="activeKey"
-        :options="menuOptions"
-        :root-indent="0"
-        @update:value="onMenuSelect"
-      />
+      <RouterLink
+        v-for="item in navItems"
+        :key="item.to"
+        :to="item.to"
+        class="sidebar__link"
+        exact-active-class="sidebar__link--active"
+        @click="$emit('close')"
+      >
+        <component :is="item.icon" class="sidebar__icon" aria-hidden="true" />
+        {{ item.label }}
+      </RouterLink>
     </nav>
 
     <div class="sidebar__footer">
       <span class="sidebar__version">fraq-webui v{{ APP_VERSION }}</span>
-      <NButton
-        quaternary
-        circle
-        size="small"
+      <button
+        type="button"
         class="sidebar__update"
         :disabled="checking"
         :aria-label="checking ? '正在检查更新' : '检查更新'"
         @click="checkUpdate"
       >
-        <template #icon>
-          <NIcon><Refresh v-if="!checking" /><Loader v-else class="sidebar__update-icon--spin" /></NIcon>
-        </template>
-      </NButton>
+        <IconRefresh v-if="!checking" class="sidebar__update-icon" aria-hidden="true" />
+        <IconLoader v-else class="sidebar__update-icon sidebar__update-icon--spin" aria-hidden="true" />
+      </button>
     </div>
   </aside>
 </template>
@@ -162,17 +137,72 @@ async function checkUpdate() {
 }
 
 .sidebar__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
   margin-left: auto;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.sidebar__close:hover {
+  background: var(--surface-2);
+  color: var(--app-text-color, var(--ink));
+}
+
+.sidebar__close svg {
+  width: 1.125rem;
+  height: 1.125rem;
 }
 
 .sidebar__nav {
   display: flex;
   flex-direction: column;
+  gap: 2px;
   padding: var(--space-3);
 }
 
-.sidebar__nav :deep(.n-menu) {
+
+.sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    background-color 150ms ease-out,
+    color 150ms ease-out;
+}
+
+.sidebar__link:hover {
   background: transparent;
+  color: var(--app-text-color, var(--ink));
+}
+
+.sidebar__link--active {
+  background: transparent;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.sidebar__link--active:hover {
+  background: transparent;
+  color: var(--primary);
+}
+
+.sidebar__icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
 }
 
 .sidebar__footer {
@@ -188,6 +218,34 @@ async function checkUpdate() {
 
 .sidebar__version {
   white-space: nowrap;
+}
+
+.sidebar__update {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--faint);
+  cursor: pointer;
+}
+
+.sidebar__update:hover:not(:disabled) {
+  background: var(--surface-2);
+  color: var(--app-text-color, var(--ink));
+}
+
+.sidebar__update:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.sidebar__update-icon {
+  width: 1rem;
+  height: 1rem;
 }
 
 .sidebar__update-icon--spin {
@@ -207,7 +265,6 @@ async function checkUpdate() {
     height: 100dvh;
     transform: none;
     transition: none;
-    flex-shrink: 0;
   }
 
   .sidebar__close {

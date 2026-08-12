@@ -1,6 +1,5 @@
 <script setup>
 import { computed } from 'vue'
-import { NColorPicker, NSlider } from 'naive-ui'
 
 const props = defineProps({
   label: { type: String, required: true },
@@ -20,35 +19,21 @@ const bgAlphaPercent = computed({
     <span class="log-color__label">{{ label }}</span>
     <label class="log-color__field">
       文字
-      <NColorPicker
-        v-model:value="model.color"
-        :modes="['hex']"
-        :show-alpha="false"
-        size="small"
-        :aria-label="`${label}文字颜色`"
-      />
+      <input v-model="model.color" type="color" class="log-color__input" :aria-label="`${label}文字颜色`" />
     </label>
     <label class="log-color__field">
       底色
-      <NColorPicker
-        v-model:value="model.bgColor"
-        :modes="['hex']"
-        :show-alpha="false"
-        size="small"
-        :aria-label="`${label}底色`"
-      />
+      <input v-model="model.bgColor" type="color" class="log-color__input" :aria-label="`${label}底色`" />
     </label>
-    <div class="log-color__slider">
-      <NSlider
-        v-model:value="bgAlphaPercent"
-        :min="0"
-        :max="100"
-        :tooltip="false"
-        class="log-color__range"
-        :aria-label="`${label}底色透明度`"
-      />
-      <span class="log-color__alpha-value">{{ bgAlphaPercent }}%</span>
-    </div>
+    <input
+      v-model="bgAlphaPercent"
+      type="range"
+      min="0"
+      max="100"
+      class="log-color__alpha"
+      :aria-label="`${label}底色透明度`"
+    />
+    <span class="log-color__alpha-value">{{ bgAlphaPercent }}%</span>
   </div>
 </template>
 
@@ -76,14 +61,60 @@ const bgAlphaPercent = computed({
   color: var(--muted);
 }
 
-.log-color__slider {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
+.log-color__input {
+  width: 2rem;
+  height: 1.5rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  cursor: pointer;
 }
 
-.log-color__range {
-  width: 7rem;
+.log-color__input::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border: none;
+}
+
+.log-color__input::-webkit-color-swatch {
+  border: none;
+  border-radius: var(--radius-sm);
+}
+
+.log-color__input::-moz-color-swatch {
+  border: none;
+  border-radius: var(--radius-sm);
+}
+
+.log-color__alpha {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 6rem;
+  height: 0.375rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--app-slider-track-bg, var(--surface-2));
+  outline: none;
+}
+
+.log-color__alpha::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+}
+
+.log-color__alpha::-moz-range-thumb {
+  width: 1rem;
+  height: 1rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
 }
 
 .log-color__alpha-value {

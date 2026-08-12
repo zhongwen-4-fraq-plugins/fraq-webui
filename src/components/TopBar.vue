@@ -1,12 +1,15 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { NButton, NIcon, NTag } from 'naive-ui'
-import { Logout, Menu2, Power, Square } from '@vicons/tabler'
+import IconMenu from '~icons/tabler/menu-2'
+import IconPower from '~icons/tabler/power'
+import IconSquare from '~icons/tabler/square'
+import IconLogout from '~icons/tabler/logout'
 import { useRoute } from 'vue-router'
 import { store } from '../services/store.js'
 import { CORE_STATUS } from '../models/coreStatus.js'
 import AppButton from './AppButton.vue'
 import ConfirmDialog from './ConfirmDialog.vue'
+import StatusBadge from './StatusBadge.vue'
 
 defineEmits(['toggle-nav'])
 
@@ -30,45 +33,26 @@ const pageTitle = computed(() => route.meta.title ?? '')
 <template>
   <header class="topbar">
     <div class="topbar__inner">
-      <NButton
-        quaternary
-        circle
-        class="topbar__menu"
-        aria-label="打开导航"
-        @click="$emit('toggle-nav')"
-      >
-        <template #icon>
-          <NIcon><Menu2 /></NIcon>
-        </template>
-      </NButton>
+      <button type="button" class="topbar__menu" aria-label="打开导航" @click="$emit('toggle-nav')">
+        <IconMenu aria-hidden="true" />
+      </button>
       <h1 class="topbar__title">{{ pageTitle }}</h1>
 
       <div class="topbar__right">
-        <NTag :type="connectionBadge.tone === 'success' ? 'success' : connectionBadge.tone === 'warning' ? 'warning' : 'default'" size="small" :bordered="false">
-          {{ connectionBadge.label }}
-        </NTag>
+        <StatusBadge :tone="connectionBadge.tone">{{ connectionBadge.label }}</StatusBadge>
         <AppButton
           :variant="coreRunning ? 'secondary' : 'primary'"
           size="sm"
           :loading="store.state.busyCore"
           @click="dialogOpen = true"
         >
-          <NIcon v-if="coreRunning"><Square /></NIcon>
-          <NIcon v-else><Power /></NIcon>
+          <IconSquare v-if="coreRunning" aria-hidden="true" />
+          <IconPower v-else aria-hidden="true" />
           {{ coreRunning ? '停止核心' : '启动核心' }}
         </AppButton>
-        <NButton
-          quaternary
-          circle
-          class="topbar__logout"
-          aria-label="退出登录"
-          title="退出登录"
-          @click="store.logout()"
-        >
-          <template #icon>
-            <NIcon><Logout /></NIcon>
-          </template>
-        </NButton>
+        <button type="button" class="topbar__logout" aria-label="退出登录" title="退出登录" @click="store.logout()">
+          <IconLogout aria-hidden="true" />
+        </button>
       </div>
     </div>
 
@@ -117,7 +101,25 @@ const pageTitle = computed(() => route.meta.title ?? '')
 }
 
 .topbar__menu {
-  display: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--app-text-color, var(--ink));
+  cursor: pointer;
+}
+
+.topbar__menu:hover {
+  background: var(--surface-2);
+}
+
+.topbar__menu svg {
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .topbar__title {
@@ -132,15 +134,36 @@ const pageTitle = computed(() => route.meta.title ?? '')
   margin-left: auto;
 }
 
-@media (min-width: 900px) {
-  .topbar__inner {
-    padding: 0 var(--space-7);
-  }
+.topbar__logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
 }
 
-@media (max-width: 899px) {
+.topbar__logout:hover {
+  background: var(--surface-2);
+  color: var(--app-text-color, var(--ink));
+}
+
+.topbar__logout svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+@media (min-width: 900px) {
   .topbar__menu {
-    display: inline-flex;
+    display: none;
+  }
+
+  .topbar__inner {
+    padding: 0 var(--space-7);
   }
 }
 </style>

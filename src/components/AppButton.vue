@@ -1,8 +1,7 @@
 <script setup>
-import { computed } from 'vue'
-import { NButton } from 'naive-ui'
+import IconLoader from '~icons/tabler/loader-2'
 
-const props = defineProps({
+defineProps({
   variant: { type: String, default: 'primary' }, // primary | secondary | ghost | danger | danger-ghost
   size: { type: String, default: 'md' }, // md | sm | icon
   loading: { type: Boolean, default: false },
@@ -14,41 +13,165 @@ const props = defineProps({
 })
 
 defineEmits(['click'])
-
-const VARIANT_MAP = {
-  primary: 'primary',
-  secondary: 'default',
-  ghost: 'quaternary',
-  danger: 'error',
-  'danger-ghost': 'error',
-}
-
-const SIZE_MAP = {
-  md: 'medium',
-  sm: 'small',
-  icon: 'medium',
-}
-
-const buttonType = computed(() => VARIANT_MAP[props.variant] ?? 'default')
-const quaternary = computed(() => props.variant === 'ghost' || props.variant === 'danger-ghost')
-const buttonSize = computed(() => SIZE_MAP[props.size] ?? 'medium')
 </script>
 
 <template>
-  <NButton
-    :type="buttonType"
-    :quaternary="quaternary"
-    :size="buttonSize"
-    :loading="loading"
-    :disabled="disabled || loading"
-    :attr-type="href ? undefined : type"
-    :tag="href ? 'a' : 'button'"
-    :href="href || undefined"
-    :target="target || undefined"
+  <a
+    v-if="href"
+    :href="href"
+    :target="target"
     :rel="target === '_blank' ? 'noopener noreferrer' : undefined"
+    class="btn"
+    :class="[`btn--${variant}`, `btn--${size}`]"
+  >
+    <IconLoader v-if="loading" class="btn__spinner" aria-hidden="true" />
+    <span v-show="!(size === 'icon' && loading)"><slot /></span>
+  </a>
+  <button
+    v-else
+    :type="type"
+    class="btn"
+    :class="[`btn--${variant}`, `btn--${size}`]"
+    :disabled="disabled || loading"
+    :aria-busy="loading"
     :autofocus="autofocus"
     @click="$emit('click', $event)"
   >
-    <slot />
-  </NButton>
+    <IconLoader v-if="loading" class="btn__spinner" aria-hidden="true" />
+    <span v-show="!(size === 'icon' && loading)"><slot /></span>
+  </button>
 </template>
+
+<style scoped>
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background-color 150ms ease-out,
+    border-color 150ms ease-out,
+    color 150ms ease-out;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.btn--md {
+  min-height: 2.5rem;
+  padding: 0 var(--space-4);
+  font-size: var(--text-sm);
+}
+
+.btn--sm {
+  min-height: 2rem;
+  padding: 0 var(--space-3);
+  font-size: var(--text-xs);
+}
+
+.btn--icon {
+  position: relative;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+}
+
+/* 扩大触控命中区域到 44px，视觉尺寸保持不变 */
+.btn--icon::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+}
+
+.btn--icon svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+/* 文字按钮里的图标统一收敛到 18px，避免默认 24px 与文字错位 */
+.btn > span > svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+/* 图标与文字共用一个 span：用 flex 垂直居中并对齐间距 */
+.btn > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.btn--primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.btn--primary:active:not(:disabled) {
+  background: var(--primary-active);
+}
+
+.btn--secondary {
+  background: var(--app-component-bg, var(--surface-2));
+  color: var(--app-text-color, var(--ink));
+}
+
+.btn--secondary:hover:not(:disabled) {
+  background: var(--border);
+}
+
+.btn--ghost {
+  background: var(--app-component-bg, transparent);
+  color: var(--app-text-color, var(--ink));
+}
+
+.btn--ghost:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ink) 10%, var(--app-component-bg, var(--surface-2)));
+}
+
+.btn--danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+.btn--danger:hover:not(:disabled) {
+  background: var(--danger-hover);
+}
+
+.btn--danger-ghost {
+  background: var(--app-component-bg, transparent);
+  color: var(--danger);
+}
+
+.btn--danger-ghost:hover:not(:disabled) {
+  background: var(--danger-soft);
+}
+
+.btn__spinner {
+  width: 1em;
+  height: 1em;
+  animation: btn-spin 0.8s linear infinite;
+}
+
+@keyframes btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (pointer: coarse) {
+  .btn--md {
+    min-height: 2.75rem;
+  }
+}
+</style>

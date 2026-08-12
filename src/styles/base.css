@@ -77,6 +77,35 @@ a {
   background: var(--primary-soft);
 }
 
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* 输入框：默认墨色边框，聚焦时不显示选中外框；未保存修改的主题色由页面级规则覆盖 */
+.field__input,
+.store__search-input,
+.log-toolbar__search-input,
+.install-input,
+.appearance__glass-input {
+  border: 1px solid var(--ink);
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+}
+
+.field__input:focus,
+.store__search-input:focus,
+.log-toolbar__search-input:focus,
+.install-input:focus,
+.appearance__glass-input:focus {
+  border-color: var(--success);
+}
+
 .skip-link {
   position: fixed;
   top: var(--space-3);

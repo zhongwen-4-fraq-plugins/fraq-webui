@@ -1,7 +1,8 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { NCard, NDescriptions, NDescriptionsItem, NIcon, NButton } from 'naive-ui'
-import { Activity, Apps, ArrowRight } from '@vicons/tabler'
+import IconActivity from '~icons/tabler/activity'
+import IconArrowRight from '~icons/tabler/arrow-right'
+import IconBlocks from '~icons/tabler/blocks'
 import { store } from '../services/store.js'
 import { formatDuration, formatTime } from '../data/format.js'
 import { logTimeLabel } from '../data/logs.js'
@@ -89,57 +90,59 @@ const onlineDuration = computed(() => {
       @retry="store.refreshCore"
     />
 
-    <NCard class="app-panel" :bordered="false" size="large">
-      <template #header>
-        <span class="panel__heading">
-          <NIcon size="18"><Activity /></NIcon>
-          核心状态
-        </span>
-      </template>
+    <section class="panel" aria-labelledby="core-heading">
+      <h3 id="core-heading" class="panel__heading">
+        <IconActivity class="panel__heading-icon" aria-hidden="true" />
+        核心状态
+      </h3>
 
       <SkeletonBlock v-if="store.state.loading.core" :lines="3" />
 
-      <NDescriptions
-        v-else
-        :column="{ xs: 1, s: 2, m: 3 }"
-        label-placement="left"
-        size="small"
-      >
-        <NDescriptionsItem label="状态">
-          <StatusBadge :tone="coreStatusMeta.tone">{{ coreStatusMeta.label }}</StatusBadge>
-        </NDescriptionsItem>
-        <NDescriptionsItem label="事件连接">
-          {{ store.state.core.connected ? '在线' : '断开' }}
-        </NDescriptionsItem>
-        <NDescriptionsItem label="服务地址">
-          <span class="facts__mono">{{ store.state.core.baseUrl || '—' }}</span>
-        </NDescriptionsItem>
-        <NDescriptionsItem label="版本">
-          <span class="facts__mono">{{ store.state.core.version || '—' }}</span>
-        </NDescriptionsItem>
-        <NDescriptionsItem label="启动时间">
-          {{ formatTime(store.state.core.startedAt) }}
-        </NDescriptionsItem>
-        <NDescriptionsItem label="在线时长">{{ onlineDuration }}</NDescriptionsItem>
-        <NDescriptionsItem label="收到消息">
-          <span class="facts__num">{{ store.state.stats.available ? store.state.stats.received : '—' }}</span>
-        </NDescriptionsItem>
-        <NDescriptionsItem label="发出消息">
-          <span class="facts__num">{{ store.state.stats.available ? store.state.stats.sent : '—' }}</span>
-        </NDescriptionsItem>
-        <NDescriptionsItem label="每分钟发送">
-          <span class="facts__num">{{ store.state.stats.available ? store.state.stats.sentPerMinute : '—' }}</span>
-        </NDescriptionsItem>
-      </NDescriptions>
-    </NCard>
+      <dl v-else class="facts">
+        <div class="facts__item">
+          <dt>状态</dt>
+          <dd><StatusBadge :tone="coreStatusMeta.tone">{{ coreStatusMeta.label }}</StatusBadge></dd>
+        </div>
+        <div class="facts__item">
+          <dt>事件连接</dt>
+          <dd>{{ store.state.core.connected ? '在线' : '断开' }}</dd>
+        </div>
+        <div class="facts__item">
+          <dt>服务地址</dt>
+          <dd class="facts__mono">{{ store.state.core.baseUrl || '—' }}</dd>
+        </div>
+        <div class="facts__item">
+          <dt>版本</dt>
+          <dd class="facts__mono">{{ store.state.core.version || '—' }}</dd>
+        </div>
+        <div class="facts__item">
+          <dt>启动时间</dt>
+          <dd>{{ formatTime(store.state.core.startedAt) }}</dd>
+        </div>
+        <div class="facts__item">
+          <dt>在线时长</dt>
+          <dd>{{ onlineDuration }}</dd>
+        </div>
+        <div class="facts__item">
+          <dt>收到消息</dt>
+          <dd class="facts__num">{{ store.state.stats.available ? store.state.stats.received : '—' }}</dd>
+        </div>
+        <div class="facts__item">
+          <dt>发出消息</dt>
+          <dd class="facts__num">{{ store.state.stats.available ? store.state.stats.sent : '—' }}</dd>
+        </div>
+        <div class="facts__item">
+          <dt>每分钟发送</dt>
+          <dd class="facts__num">{{ store.state.stats.available ? store.state.stats.sentPerMinute : '—' }}</dd>
+        </div>
+      </dl>
+    </section>
 
-    <NCard class="app-panel" :bordered="false" size="large">
-      <template #header>
-        <span class="panel__heading">
-          <NIcon size="18"><Apps /></NIcon>
-          插件健康
-        </span>
-      </template>
+    <section class="panel" aria-labelledby="plugins-heading">
+      <h3 id="plugins-heading" class="panel__heading">
+        <IconBlocks class="panel__heading-icon" aria-hidden="true" />
+        插件健康
+      </h3>
 
       <SkeletonBlock v-if="store.state.loading.plugins" :lines="2" />
 
@@ -166,22 +169,19 @@ const onlineDuration = computed(() => {
           </li>
         </ul>
       </template>
-    </NCard>
+    </section>
 
-    <NCard class="app-panel" :bordered="false" size="large">
-      <template #header>
-        <div class="panel__header">
-          <span class="panel__heading panel__heading--dot">最近日志</span>
-          <RouterLink :to="{ name: 'logs' }" class="panel__more">
-            <NButton text size="small">
-              查看全部日志
-              <template #icon>
-                <NIcon size="16"><ArrowRight /></NIcon>
-              </template>
-            </NButton>
-          </RouterLink>
-        </div>
-      </template>
+    <section class="panel" aria-labelledby="logs-heading">
+      <div class="panel__header">
+        <h3 id="logs-heading" class="panel__heading">
+          <span class="panel__heading-dot" aria-hidden="true" />
+          最近日志
+        </h3>
+        <RouterLink :to="{ name: 'logs' }" class="panel__more">
+          查看全部日志
+          <IconArrowRight aria-hidden="true" />
+        </RouterLink>
+      </div>
 
       <SkeletonBlock v-if="store.state.loading.logs" :lines="4" />
 
@@ -198,32 +198,39 @@ const onlineDuration = computed(() => {
           <span class="log-row__message">{{ entry.message }}</span>
         </li>
       </ul>
-    </NCard>
+    </section>
   </div>
 </template>
 
 <style scoped>
-.app-panel + .app-panel {
-  margin-top: var(--space-5);
-}
-
-.app-panel {
-  --n-color: var(--app-area-bg, var(--surface));
+.panel {
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--app-area-bg, var(--surface));
   -webkit-backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
   backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
 }
 
+.panel + .panel {
+  margin-top: var(--space-5);
+}
+
 .panel__heading {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: var(--space-2);
   font-size: var(--text-base);
   font-weight: 600;
-  color: var(--app-text-color, var(--ink));
+  margin-bottom: var(--space-4);
 }
 
-.panel__heading--dot::before {
-  content: '';
+.panel__heading-icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--primary);
+}
+
+.panel__heading-dot {
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
@@ -235,16 +242,53 @@ const onlineDuration = computed(() => {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  width: 100%;
+  margin-bottom: var(--space-4);
+}
+
+.panel__header .panel__heading {
+  margin-bottom: 0;
 }
 
 .panel__more {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
   text-decoration: none;
+  white-space: nowrap;
+}
+
+.panel__more:hover {
+  text-decoration: underline;
+}
+
+.panel__more svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--space-4) var(--space-5);
+  margin: 0;
+}
+
+.facts__item dt {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  margin-bottom: var(--space-1);
+}
+
+.facts__item dd {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 500;
 }
 
 .facts__mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: var(--text-xs);
+  font-size: var(--text-xs) !important;
   word-break: break-all;
 }
 

@@ -1,24 +1,13 @@
 <script setup>
-import { computed, h, onMounted, ref } from 'vue'
-import {
-  NButton,
-  NButtonGroup,
-  NDataTable,
-  NIcon,
-  NInput,
-  NTabPane,
-  NTabs,
-  NTag,
-} from 'naive-ui'
-import {
-  ExternalLink,
-  PlayerPlay,
-  Plus,
-  Search,
-  Settings,
-  Square,
-  Trash,
-} from '@vicons/tabler'
+import { computed, onMounted, ref } from 'vue'
+import IconBlocks from '~icons/tabler/blocks'
+import IconExternalLink from '~icons/tabler/external-link'
+import IconPlayerPlay from '~icons/tabler/player-play'
+import IconPlus from '~icons/tabler/plus'
+import IconSearch from '~icons/tabler/search'
+import IconSettings from '~icons/tabler/settings'
+import IconSquare from '~icons/tabler/square'
+import IconTrash from '~icons/tabler/trash'
 import { store } from '../services/store.js'
 import { sortPlugins } from '../data/plugins.js'
 import { categoryLabel, filterStorePlugins, isInstalled } from '../data/storePlugins.js'
@@ -112,139 +101,6 @@ function installFromStore(plugin) {
   installError.value = ''
   installOpen.value = true
 }
-
-function renderPluginCell(row) {
-  return h('div', { class: 'plugin-cell' }, [
-    h('p', { class: 'plugin-cell__name' }, [
-      row.name,
-      h('span', { class: 'plugin-cell__version' }, `v${row.version}`),
-    ]),
-    h('p', { class: 'plugin-cell__description' }, row.description),
-  ])
-}
-
-function renderIcon(icon) {
-  return () => h(NIcon, null, { default: () => h(icon) })
-}
-
-function actionButton({ icon, label, loading, danger, onClick }) {
-  return h(
-    NButton,
-    {
-      size: 'small',
-      quaternary: true,
-      type: danger ? 'error' : 'default',
-      loading,
-      'aria-label': label,
-      title: label,
-      onClick,
-    },
-    { icon: renderIcon(icon) },
-  )
-}
-
-const localColumns = [
-  {
-    title: '插件',
-    key: 'name',
-    minWidth: 220,
-    render: renderPluginCell,
-  },
-  {
-    title: '状态',
-    key: 'status',
-    width: 100,
-    render: (row) => {
-      const meta = statusMeta(row.status)
-      return h(StatusBadge, { tone: meta.tone }, { default: () => meta.label })
-    },
-  },
-  {
-    title: '操作',
-    key: 'actions',
-    width: 148,
-    render: (row) =>
-      h(NButtonGroup, null, {
-        default: () => [
-          actionButton({
-            icon: Settings,
-            label: `配置 ${row.name}`,
-            onClick: () => openConfig(row),
-          }),
-          row.status === PLUGIN_STATUS.running
-            ? actionButton({
-                icon: Square,
-                label: `停用 ${row.name}`,
-                loading: isBusy(row.id),
-                onClick: () => store.setPluginEnabled(row.id, false),
-              })
-            : actionButton({
-                icon: PlayerPlay,
-                label: `启用 ${row.name}`,
-                loading: isBusy(row.id),
-                onClick: () => store.setPluginEnabled(row.id, true),
-              }),
-          actionButton({
-            icon: Trash,
-            label: `卸载 ${row.name}`,
-            danger: true,
-            loading: isBusy(row.id),
-            onClick: () => openUninstall(row),
-          }),
-        ],
-      }),
-  },
-]
-
-const storeColumns = [
-  {
-    title: '插件',
-    key: 'name',
-    minWidth: 220,
-    render: renderPluginCell,
-  },
-  {
-    title: '分类',
-    key: 'category',
-    width: 110,
-    render: (row) => h(NTag, { size: 'small', bordered: false }, { default: () => categoryLabel(row.category) }),
-  },
-  {
-    title: '操作',
-    key: 'actions',
-    width: 132,
-    render: (row) => {
-      if (isInstalled(store.state.plugins, row)) {
-        return h(NTag, { type: 'success', size: 'small', bordered: false }, { default: () => '已安装' })
-      }
-      return h(NButtonGroup, null, {
-        default: () => [
-          actionButton({
-            icon: Plus,
-            label: `安装 ${row.name}`,
-            onClick: () => installFromStore(row),
-          }),
-          row.repository
-            ? h(
-                NButton,
-                {
-                  size: 'small',
-                  quaternary: true,
-                  tag: 'a',
-                  href: row.repository,
-                  target: '_blank',
-                  rel: 'noopener noreferrer',
-                  'aria-label': `查看 ${row.name} 源码`,
-                  title: '查看源码',
-                },
-                { icon: renderIcon(ExternalLink) },
-              )
-            : null,
-        ],
-      })
-    },
-  },
-]
 </script>
 
 <template>
@@ -255,102 +111,208 @@ const storeColumns = [
     >
       <template #action>
         <AppButton v-if="view === 'local'" @click="openInstall">
-          <NIcon><Plus /></NIcon>
+          <IconPlus aria-hidden="true" />
           安装插件
         </AppButton>
       </template>
     </PageHeader>
 
-    <NTabs v-model:value="view" type="segment" class="source-tabs" :pane-style="{ paddingTop: '16px' }">
-      <NTabPane name="local" tab="本地插件">
-        <template #default>
-          <ErrorBanner
-            v-if="store.state.errors.plugins"
-            :message="store.state.errors.plugins"
-            @retry="store.refreshPlugins"
-          />
+    <div class="source-tabs" role="group" aria-label="插件来源">
+      <button
+        type="button"
+        class="source-tab"
+        :class="{ 'source-tab--active': view === 'local' }"
+        :aria-pressed="view === 'local'"
+        @click="view = 'local'"
+      >
+        本地插件
+        <span class="source-tab__count">{{ store.state.plugins.length }}</span>
+      </button>
+      <button
+        type="button"
+        class="source-tab"
+        :class="{ 'source-tab--active': view === 'store' }"
+        :aria-pressed="view === 'store'"
+        @click="view = 'store'"
+      >
+        插件商店
+      </button>
+    </div>
 
-          <SkeletonBlock v-if="store.state.loading.plugins" :lines="5" />
+    <template v-if="view === 'local'">
+      <ErrorBanner
+        v-if="store.state.errors.plugins"
+        :message="store.state.errors.plugins"
+        @retry="store.refreshPlugins"
+      />
 
-          <EmptyState
-            v-else-if="sortedPlugins.length === 0"
-            title="还没有本地插件"
-            description="安装第一个插件后，它会显示在这里。"
-          >
-            <template #action>
-              <AppButton @click="openInstall">
-                <NIcon><Plus /></NIcon>
-                安装插件
-              </AppButton>
-            </template>
-          </EmptyState>
+      <SkeletonBlock v-if="store.state.loading.plugins" :lines="5" />
 
-          <NDataTable
-            v-else
-            :columns="localColumns"
-            :data="sortedPlugins"
-            :row-key="(row) => row.id"
-            :bordered="false"
-            :single-line="false"
-            class="plugin-table"
-          />
+      <EmptyState
+        v-else-if="sortedPlugins.length === 0"
+        title="还没有本地插件"
+        description="安装第一个插件后，它会显示在这里。"
+      >
+        <template #icon>
+          <IconBlocks class="empty-icon" aria-hidden="true" />
         </template>
-      </NTabPane>
+        <template #action>
+          <AppButton @click="openInstall">
+            <IconPlus aria-hidden="true" />
+            安装插件
+          </AppButton>
+        </template>
+      </EmptyState>
 
-      <NTabPane name="store" tab="插件商店">
-        <template #default>
-          <div class="store__toolbar">
-            <NInput
-              v-model:value="storeQuery"
-              class="store__search"
-              placeholder="搜索插件名称、描述或分类"
-              clearable
-              aria-label="搜索商店插件"
+      <div v-else class="plugin-list">
+        <div class="plugin-list__head" aria-hidden="true">
+          <span>插件</span>
+          <span>状态</span>
+          <span>操作</span>
+        </div>
+
+        <ul class="plugin-list__body">
+          <li v-for="plugin in sortedPlugins" :key="plugin.id" class="plugin-row">
+            <div class="plugin-row__info">
+              <p class="plugin-row__name">
+                {{ plugin.name }}
+                <span class="plugin-row__version">v{{ plugin.version }}</span>
+              </p>
+              <p class="plugin-row__description">{{ plugin.description }}</p>
+            </div>
+            <StatusBadge :tone="statusMeta(plugin.status).tone">
+              {{ statusMeta(plugin.status).label }}
+            </StatusBadge>
+            <div class="plugin-row__actions">
+              <AppButton
+                variant="secondary"
+                size="icon"
+                :aria-label="`配置 ${plugin.name}`"
+                title="配置"
+                @click="openConfig(plugin)"
+              >
+                <IconSettings aria-hidden="true" />
+              </AppButton>
+              <AppButton
+                v-if="plugin.status !== PLUGIN_STATUS.running"
+                variant="secondary"
+                size="icon"
+                :loading="isBusy(plugin.id)"
+                :aria-label="`启用 ${plugin.name}`"
+                title="启用"
+                @click="store.setPluginEnabled(plugin.id, true)"
+              >
+                <IconPlayerPlay aria-hidden="true" />
+              </AppButton>
+              <AppButton
+                v-else
+                variant="secondary"
+                size="icon"
+                :loading="isBusy(plugin.id)"
+                :aria-label="`停用 ${plugin.name}`"
+                title="停用"
+                @click="store.setPluginEnabled(plugin.id, false)"
+              >
+                <IconSquare aria-hidden="true" />
+              </AppButton>
+              <AppButton
+                variant="danger-ghost"
+                size="icon"
+                :loading="isBusy(plugin.id)"
+                :aria-label="`卸载 ${plugin.name}`"
+                title="卸载"
+                @click="openUninstall(plugin)"
+              >
+                <IconTrash aria-hidden="true" />
+              </AppButton>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </template>
+
+    <section v-else class="store" aria-labelledby="store-heading">
+      <div class="store__toolbar">
+        <div class="store__search">
+          <IconSearch class="store__search-icon" aria-hidden="true" />
+          <input
+            v-model="storeQuery"
+            type="search"
+            class="store__search-input"
+            placeholder="搜索插件名称、描述或分类"
+            aria-label="搜索商店插件"
+          />
+        </div>
+        <span class="store__count">共 {{ filteredStorePlugins.length }} 个插件</span>
+        <AppButton variant="ghost" size="sm" href="https://fraq.dev/plugins" target="_blank">
+          官方商店
+          <IconExternalLink aria-hidden="true" />
+        </AppButton>
+      </div>
+
+      <ErrorBanner
+        v-if="store.state.errors.storePlugins"
+        :message="store.state.errors.storePlugins"
+        @retry="store.refreshStorePlugins"
+      />
+
+      <SkeletonBlock v-if="store.state.loading.storePlugins" :lines="6" />
+
+      <EmptyState
+        v-else-if="filteredStorePlugins.length === 0"
+        title="没有找到插件"
+        description="换个关键词试试，或前往官方商店浏览全部插件。"
+      >
+        <template #icon>
+          <IconBlocks class="empty-icon" aria-hidden="true" />
+        </template>
+        <template #action>
+          <AppButton href="https://fraq.dev/plugins" target="_blank">
+            前往插件商店
+            <IconExternalLink aria-hidden="true" />
+          </AppButton>
+        </template>
+      </EmptyState>
+
+      <ul v-else class="store-list">
+        <li v-for="plugin in filteredStorePlugins" :key="plugin.id" class="store-row">
+          <div class="store-row__info">
+            <p class="store-row__name">
+              {{ plugin.name }}
+              <span class="store-row__version">v{{ plugin.version }}</span>
+            </p>
+            <p class="store-row__description">{{ plugin.description }}</p>
+          </div>
+          <div class="store-row__meta">
+            <StatusBadge tone="neutral">{{ categoryLabel(plugin.category) }}</StatusBadge>
+          </div>
+          <div class="store-row__actions">
+            <StatusBadge v-if="isInstalled(store.state.plugins, plugin)" tone="success">已安装</StatusBadge>
+            <AppButton
+              v-else
+              variant="secondary"
+              size="icon"
+              :aria-label="`安装 ${plugin.name}`"
+              title="安装"
+              @click="installFromStore(plugin)"
             >
-              <template #prefix>
-                <NIcon size="16"><Search /></NIcon>
-              </template>
-            </NInput>
-            <span class="store__count">共 {{ filteredStorePlugins.length }} 个插件</span>
-            <AppButton variant="ghost" size="sm" href="https://fraq.dev/plugins" target="_blank">
-              官方商店
-              <NIcon><ExternalLink /></NIcon>
+              <IconPlus aria-hidden="true" />
+            </AppButton>
+            <AppButton
+              v-if="plugin.repository"
+              variant="ghost"
+              size="icon"
+              :href="plugin.repository"
+              target="_blank"
+              :aria-label="`查看 ${plugin.name} 源码`"
+              title="查看源码"
+            >
+              <IconExternalLink aria-hidden="true" />
             </AppButton>
           </div>
-
-          <ErrorBanner
-            v-if="store.state.errors.storePlugins"
-            :message="store.state.errors.storePlugins"
-            @retry="store.refreshStorePlugins"
-          />
-
-          <SkeletonBlock v-if="store.state.loading.storePlugins" :lines="6" />
-
-          <EmptyState
-            v-else-if="filteredStorePlugins.length === 0"
-            title="没有找到插件"
-            description="换个关键词试试，或前往官方商店浏览全部插件。"
-          >
-            <template #action>
-              <AppButton href="https://fraq.dev/plugins" target="_blank">
-                前往插件商店
-                <NIcon><ExternalLink /></NIcon>
-              </AppButton>
-            </template>
-          </EmptyState>
-
-          <NDataTable
-            v-else
-            :columns="storeColumns"
-            :data="filteredStorePlugins"
-            :row-key="(row) => row.id"
-            :bordered="false"
-            :single-line="false"
-            class="plugin-table"
-          />
-        </template>
-      </NTabPane>
-    </NTabs>
+        </li>
+      </ul>
+    </section>
 
     <ConfirmDialog
       v-model:open="installOpen"
@@ -359,9 +321,11 @@ const storeColumns = [
       @confirm="confirmInstall"
     >
       <label class="install-field" for="plugin-name">插件名称</label>
-      <NInput
+      <input
         id="plugin-name"
-        v-model:value="installName"
+        v-model="installName"
+        class="install-input"
+        type="text"
         placeholder="例如 fraq-plugin-ai"
         autocomplete="off"
         @keydown.enter="confirmInstall"
@@ -387,37 +351,50 @@ const storeColumns = [
 
 <style scoped>
 .source-tabs {
-  margin-bottom: var(--space-1);
+  display: inline-flex;
+  padding: 2px;
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--app-component-bg, var(--surface));
 }
 
-.plugin-table {
-  --n-color: var(--app-area-bg, var(--surface));
-  -webkit-backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
-  backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-.plugin-cell__name {
-  font-size: var(--text-sm);
-  font-weight: 600;
-  word-break: break-all;
-}
-
-.plugin-cell__description {
-  margin-top: 2px;
+.source-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
   color: var(--muted);
   font-size: var(--text-xs);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-weight: 500;
+  cursor: pointer;
 }
 
-.plugin-cell__version {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+.source-tab:hover {
+  color: var(--app-text-color, var(--ink));
+}
+
+.source-tab--active {
+  background: transparent;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.source-tab__count {
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--app-text-color, var(--ink));
   font-size: var(--text-xs);
-  color: var(--faint);
-  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+.store {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
 }
 
 .store__toolbar {
@@ -425,12 +402,41 @@ const storeColumns = [
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
-  margin-bottom: var(--space-4);
 }
 
 .store__search {
+  position: relative;
+  display: flex;
+  align-items: center;
   flex: 1;
   min-width: 12rem;
+}
+
+.store__search-icon {
+  position: absolute;
+  left: var(--space-3);
+  width: 1rem;
+  height: 1rem;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.store__search-input {
+  width: 100%;
+  height: 2.5rem;
+  padding: 0 var(--space-3) 0 2.25rem;
+  border-radius: var(--radius-md);
+  background: var(--app-component-bg, var(--surface-2));
+  color: var(--app-text-color, var(--ink));
+  font-size: var(--text-sm);
+}
+
+.store__search-input::placeholder {
+  color: var(--placeholder);
+}
+
+.install-input::placeholder {
+  color: var(--placeholder);
 }
 
 .store__count {
@@ -439,11 +445,167 @@ const storeColumns = [
   white-space: nowrap;
 }
 
+.store-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: var(--radius-lg);
+  background: var(--app-area-bg, var(--surface));
+  -webkit-backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
+  backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
+  overflow: hidden;
+}
+
+.store-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-4);
+  background: var(--app-area-bg, var(--bg));
+}
+
+.store-row__name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.store-row__description {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.store-row__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-1);
+}
+
+.store-row__version {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--text-xs);
+  color: var(--faint);
+  font-weight: 400;
+}
+
+.store-row__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+@media (max-width: 720px) {
+  .store-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .store-row__actions {
+    grid-column: 1 / -1;
+  }
+}
+
+.empty-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--primary);
+}
+
+.plugin-list {
+  border-radius: var(--radius-lg);
+  background: var(--app-area-bg, var(--surface));
+  -webkit-backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
+  backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
+  overflow: hidden;
+}
+
+.plugin-list__head,
+.plugin-row {
+  display: grid;
+  /* 表头与行共用同一套列宽，保证标注与内容对齐 */
+  grid-template-columns: minmax(0, 1fr) 4.5rem 8rem;
+  gap: var(--space-4);
+  align-items: center;
+}
+
+.plugin-list__head {
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+/* 状态标注与徽标文字对齐（跳过圆点） */
+.plugin-list__head span:nth-child(2) {
+  padding-left: calc(0.5rem + var(--space-1));
+}
+
+/* 操作标注居中于两个按钮之间 */
+.plugin-list__head span:nth-child(3) {
+  text-align: center;
+}
+
+.plugin-list__body {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plugin-row {
+  padding: var(--space-4);
+  background: var(--app-area-bg, var(--bg));
+}
+
+.plugin-row__name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.plugin-row__description {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plugin-row__version {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--text-xs);
+  color: var(--faint);
+  font-weight: 400;
+}
+
+.plugin-row__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
 .install-field {
   display: block;
   margin-bottom: var(--space-2);
   font-size: var(--text-sm);
   font-weight: 500;
+}
+
+.install-input {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--app-component-bg, var(--surface-2));
+  color: var(--app-text-color, var(--ink));
+  font-size: var(--text-sm);
+}
+
+.install-input::placeholder {
+  color: var(--muted);
 }
 
 .install-error {
@@ -456,5 +618,20 @@ const storeColumns = [
   margin-top: var(--space-2);
   color: var(--muted);
   font-size: var(--text-xs);
+}
+
+@media (max-width: 720px) {
+  .plugin-list__head {
+    display: none;
+  }
+
+  .plugin-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-3);
+  }
+
+  .plugin-row__actions {
+    grid-column: 1 / -1;
+  }
 }
 </style>

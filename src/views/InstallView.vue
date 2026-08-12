@@ -1,25 +1,12 @@
 <script setup>
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
-import {
-  NCard,
-  NIcon,
-  NInput,
-  NProgress,
-  NRadio,
-  NRadioButton,
-  NRadioGroup,
-  NSelect,
-  NSpace,
-} from 'naive-ui'
-import {
-  ArrowUp,
-  BrandGithub,
-  Download,
-  Folder,
-  PlayerPlay,
-  PlayerStop,
-  Refresh,
-} from '@vicons/tabler'
+import IconArrowUp from '~icons/tabler/arrow-up'
+import IconBrandGithub from '~icons/tabler/brand-github'
+import IconDownload from '~icons/tabler/download'
+import IconFolder from '~icons/tabler/folder'
+import IconPlayerPlay from '~icons/tabler/player-play'
+import IconPlayerStop from '~icons/tabler/player-stop'
+import IconRefresh from '~icons/tabler/refresh'
 import { httpApi } from '../services/httpApi.js'
 import { formatBytes, formatDate } from '../data/format.js'
 import AppButton from '../components/AppButton.vue'
@@ -341,32 +328,36 @@ onUnmounted(stopPolling)
       description="检查并安装 fraq 运行环境：Node.js、fraq CLI 与 Milky 协议端。"
     />
 
-    <ErrorBanner v-if="checkError" :message="checkError" @retry="refreshCheck" />
+    <ErrorBanner
+      v-if="checkError"
+      :message="checkError"
+      @retry="refreshCheck"
+    />
 
     <SkeletonBlock v-if="checking" :lines="5" />
 
     <div v-else class="install">
-      <NCard class="app-panel" :bordered="false" size="large">
-        <template #header>
-          <span class="install__heading">安装目录</span>
-        </template>
+      <section class="install__group" aria-labelledby="dir-heading">
+        <h3 id="dir-heading" class="install__heading">安装目录</h3>
         <div class="install__dir-row">
-          <NInput
+          <input
             id="install-dir"
-            v-model:value="protocolDir"
+            v-model.trim="protocolDir"
+            class="install-input"
+            type="text"
             placeholder="D:\bot\fraq-webui\protocols"
             autocomplete="off"
             aria-label="安装目录"
           />
           <AppButton variant="secondary" :loading="picking" @click="pickDir">
-            <NIcon><Folder /></NIcon>
+            <IconFolder aria-hidden="true" />
             {{ picking ? '选择中' : '选择' }}
           </AppButton>
         </div>
         <p class="install__hint">
           Node.js 与协议端的下载解压位置，需为完整路径；留空使用默认目录，修改后自动保存。
         </p>
-      </NCard>
+      </section>
 
       <ConfirmDialog
         v-model:open="dirOpen"
@@ -383,7 +374,7 @@ onUnmounted(stopPolling)
               size="sm"
               @click="loadDirs(dirParent)"
             >
-              <NIcon><ArrowUp /></NIcon>
+              <IconArrowUp aria-hidden="true" />
               上一级
             </AppButton>
           </div>
@@ -394,25 +385,23 @@ onUnmounted(stopPolling)
               此目录没有子文件夹，可直接使用
             </li>
             <li v-for="item in dirs" :key="item">
-              <AppButton variant="ghost" size="sm" class="dir-picker__item" @click="loadDirs(item)">
-                <NIcon><Folder /></NIcon>
+              <button type="button" class="dir-picker__item" @click="loadDirs(item)">
+                <IconFolder class="dir-picker__icon" aria-hidden="true" />
                 <span>{{ item }}</span>
-              </AppButton>
+              </button>
             </li>
           </ul>
         </div>
       </ConfirmDialog>
 
-      <NCard class="app-panel" :bordered="false" size="large">
-        <template #header>
-          <span class="install__heading">Node.js</span>
-        </template>
+      <section class="install__group" aria-labelledby="node-heading">
+        <h3 id="node-heading" class="install__heading">Node.js</h3>
         <div class="install__row">
           <StatusBadge :tone="node.installed ? 'success' : 'danger'">
             {{ node.installed ? `已安装 ${node.nodeVersion}` : '未检测到' }}
           </StatusBadge>
           <AppButton v-if="node.installed" variant="ghost" size="sm" @click="refreshCheck">
-            <NIcon><Refresh /></NIcon>
+            <IconRefresh aria-hidden="true" />
             重新检查
           </AppButton>
         </div>
@@ -426,33 +415,36 @@ onUnmounted(stopPolling)
         <template v-if="!node.installed">
           <div class="install__field">
             <label class="install__label" for="node-version">版本</label>
-            <NSelect
+            <select
               id="node-version"
-              v-model:value="nodeTag"
-              :options="nodeReleases.map((item) => ({
-                label: item.lts ? `${item.version}（LTS ${item.lts}）` : item.version,
-                value: item.version,
-              }))"
+              v-model="nodeTag"
+              class="install-input"
               :disabled="nodeReleasesLoading || nodeReleases.length === 0"
-              :placeholder="nodeReleasesLoading ? '正在加载版本...' : '选择版本'"
-            />
+            >
+              <option v-if="nodeReleasesLoading" value="">正在加载版本...</option>
+              <option v-for="item in nodeReleases" :key="item.version" :value="item.version">
+                {{ item.version }}{{ item.lts ? `（LTS ${item.lts}）` : '' }}
+              </option>
+            </select>
             <p v-if="nodeReleaseError" class="install__error">{{ nodeReleaseError }}</p>
           </div>
 
           <div class="install__actions">
             <AppButton :loading="nodeInstalling" :disabled="!nodeTag" @click="installNode">
-              <NIcon><Download /></NIcon>
+              <IconDownload aria-hidden="true" />
               下载并安装
             </AppButton>
           </div>
 
-          <div v-if="nodeBusy" class="install__progress">
-            <NProgress
-              type="line"
-              :percentage="status.progress"
-              :show-indicator="false"
-              :height="6"
-            />
+          <div
+            v-if="nodeBusy"
+            class="install__progress"
+            role="progressbar"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            :aria-valuenow="status.progress"
+          >
+            <div class="install__bar" :style="{ width: `${status.progress}%` }" />
             <span class="install__progress-text" aria-live="polite">
               {{ status.message }}（{{ status.progress }}%）
             </span>
@@ -467,12 +459,10 @@ onUnmounted(stopPolling)
             Node.js 安装完成，正在使用新版本。
           </p>
         </template>
-      </NCard>
+      </section>
 
-      <NCard class="app-panel" :bordered="false" size="large">
-        <template #header>
-          <span class="install__heading">fraq CLI</span>
-        </template>
+      <section class="install__group" aria-labelledby="cli-heading">
+        <h3 id="cli-heading" class="install__heading">fraq CLI</h3>
         <div class="install__row">
           <StatusBadge :tone="cli.installed ? 'success' : 'danger'">
             {{ cli.installed ? `已安装 ${cli.version}` : '未检测到' }}
@@ -483,24 +473,19 @@ onUnmounted(stopPolling)
             :loading="installingCli"
             @click="installCli"
           >
-            <NIcon><Download /></NIcon>
+            <IconDownload aria-hidden="true" />
             安装 CLI
           </AppButton>
           <AppButton v-else variant="ghost" size="sm" @click="refreshCheck">
-            <NIcon><Refresh /></NIcon>
+            <IconRefresh aria-hidden="true" />
             重新检查
           </AppButton>
         </div>
         <p class="install__hint">
           fraq CLI 用于启动和管理 fraq 核心，未安装时通过 npm 全局安装（npm install -g @fraqjs/cli）。
         </p>
-        <div v-if="cliBusy" class="install__progress">
-          <NProgress
-            type="line"
-            :percentage="status.progress"
-            :show-indicator="false"
-            :height="6"
-          />
+        <div v-if="cliBusy" class="install__progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" :aria-valuenow="status.progress">
+          <div class="install__bar" :style="{ width: `${status.progress}%` }" />
           <span class="install__progress-text" aria-live="polite">
             {{ status.message }}（{{ status.progress }}%）
           </span>
@@ -508,18 +493,16 @@ onUnmounted(stopPolling)
         <p v-if="status.task === 'cli' && status.phase === 'error'" class="install__error">
           {{ status.error }}
         </p>
-      </NCard>
+      </section>
 
-      <NCard class="app-panel" :bordered="false" size="large">
-        <template #header>
-          <span class="install__heading">Milky 协议端</span>
-        </template>
+      <section class="install__group" aria-labelledby="protocol-heading">
+        <h3 id="protocol-heading" class="install__heading">Milky 协议端</h3>
 
         <template v-if="protocol.reachable">
           <div class="install__row">
             <StatusBadge tone="success">已连接</StatusBadge>
             <AppButton variant="ghost" size="sm" @click="refreshCheck">
-              <NIcon><Refresh /></NIcon>
+              <IconRefresh aria-hidden="true" />
               重新检查
             </AppButton>
           </div>
@@ -532,7 +515,7 @@ onUnmounted(stopPolling)
               :loading="stopping"
               @click="stopProtocol"
             >
-              <NIcon><PlayerStop /></NIcon>
+              <IconPlayerStop aria-hidden="true" />
               停止协议端
             </AppButton>
           </div>
@@ -542,7 +525,7 @@ onUnmounted(stopPolling)
           <div class="install__row">
             <StatusBadge tone="warning">协议端在运行</StatusBadge>
             <AppButton variant="ghost" size="sm" @click="refreshCheck">
-              <NIcon><Refresh /></NIcon>
+              <IconRefresh aria-hidden="true" />
               重新检查
             </AppButton>
           </div>
@@ -559,7 +542,7 @@ onUnmounted(stopPolling)
               :loading="stopping"
               @click="stopProtocol"
             >
-              <NIcon><PlayerStop /></NIcon>
+              <IconPlayerStop aria-hidden="true" />
               停止协议端
             </AppButton>
           </div>
@@ -569,7 +552,7 @@ onUnmounted(stopPolling)
           <div class="install__row">
             <StatusBadge tone="danger">无法连接</StatusBadge>
             <AppButton variant="ghost" size="sm" @click="refreshCheck">
-              <NIcon><Refresh /></NIcon>
+              <IconRefresh aria-hidden="true" />
               重新检查
             </AppButton>
           </div>
@@ -577,67 +560,68 @@ onUnmounted(stopPolling)
             {{ protocol.detail || '协议端未运行或地址不可达，请选择下方实现下载安装。' }}
           </p>
 
-          <div class="install__field">
-            <span class="install__label">协议端实现</span>
-            <NRadioGroup v-model:value="source" name="protocol-source">
-              <NSpace vertical :size="8">
-                <NRadio
-                  v-for="item in sources"
-                  :key="item.id"
-                  :value="item.id"
-                  class="install__source"
-                >
-                  <span class="install__source-name">{{ item.label }}</span>
-                  <span class="install__source-repo">
-                    <NIcon size="16"><BrandGithub /></NIcon>
-                    {{ item.repo }}
-                  </span>
-                </NRadio>
-              </NSpace>
-            </NRadioGroup>
+          <div class="install__sources" role="radiogroup" aria-label="选择协议端">
+            <label
+              v-for="item in sources"
+              :key="item.id"
+              class="install__source"
+              :class="{ 'install__source--active': source === item.id }"
+            >
+              <input v-model="source" type="radio" :value="item.id" class="install__radio" />
+              <span class="install__source-name">{{ item.label }}</span>
+              <span class="install__source-repo">
+                <IconBrandGithub aria-hidden="true" />
+                {{ item.repo }}
+              </span>
+            </label>
           </div>
 
           <div class="install__field">
             <label class="install__label" for="release-version">版本</label>
-            <NSelect
+            <select
               id="release-version"
-              v-model:value="tag"
-              :options="releases.map((item) => ({
-                label: `${item.tag}${item.prerelease ? '（预览版）' : ''} · ${formatDate(item.publishedAt)}`,
-                value: item.tag,
-              }))"
+              v-model="tag"
+              class="install-input"
               :disabled="releasesLoading || releases.length === 0"
-              :placeholder="releasesLoading ? '正在加载版本...' : '选择版本'"
-            />
+            >
+              <option v-if="releasesLoading" value="">正在加载版本...</option>
+              <option v-for="item in releases" :key="item.tag" :value="item.tag">
+                {{ item.tag }}{{ item.prerelease ? '（预览版）' : '' }} · {{ formatDate(item.publishedAt) }}
+              </option>
+            </select>
             <p v-if="releaseError" class="install__error">{{ releaseError }}</p>
           </div>
 
           <div v-if="currentRelease" class="install__field">
             <span class="install__label">下载文件</span>
-            <NRadioGroup v-model:value="assetName" name="asset">
-              <NSpace vertical :size="8">
-                <NRadio
-                  v-for="asset in currentRelease.assets"
-                  :key="asset.name"
+            <div class="install__assets" role="radiogroup" aria-label="下载文件">
+              <label
+                v-for="asset in currentRelease.assets"
+                :key="asset.name"
+                class="install__asset"
+                :class="{ 'install__asset--active': assetName === asset.name }"
+              >
+                <input
+                  v-model="assetName"
+                  type="radio"
                   :value="asset.name"
-                  class="install__asset"
-                >
-                  <span class="install__asset-name">{{ asset.name }}</span>
-                  <span class="install__asset-size">{{ formatBytes(asset.size) }}</span>
-                  <StatusBadge v-if="isRecommended(asset)" tone="info" :dot="false">
-                    推荐
-                  </StatusBadge>
-                </NRadio>
-              </NSpace>
-            </NRadioGroup>
-            <p v-if="currentRelease.assets.length === 0" class="install__hint">
-              该版本没有可下载的文件
-            </p>
+                  class="install__radio"
+                />
+                <span class="install__asset-name">{{ asset.name }}</span>
+                <span class="install__asset-size">{{ formatBytes(asset.size) }}</span>
+                <StatusBadge v-if="isRecommended(asset)" tone="info" :dot="false">
+                  推荐
+                </StatusBadge>
+              </label>
+              <p v-if="currentRelease.assets.length === 0" class="install__hint">
+                该版本没有可下载的文件
+              </p>
+            </div>
           </div>
 
           <div class="install__actions">
             <AppButton :loading="downloading" :disabled="!assetName" @click="download">
-              <NIcon><Download /></NIcon>
+              <IconDownload aria-hidden="true" />
               下载并安装
             </AppButton>
             <AppButton
@@ -645,7 +629,7 @@ onUnmounted(stopPolling)
               :loading="starting"
               @click="startProtocol"
             >
-              <NIcon><PlayerPlay /></NIcon>
+              <IconPlayerPlay aria-hidden="true" />
               启动协议端
             </AppButton>
             <AppButton
@@ -654,18 +638,20 @@ onUnmounted(stopPolling)
               :loading="stopping"
               @click="stopProtocol"
             >
-              <NIcon><PlayerStop /></NIcon>
+              <IconPlayerStop aria-hidden="true" />
               停止协议端
             </AppButton>
           </div>
 
-          <div v-if="protocolBusy" class="install__progress">
-            <NProgress
-              type="line"
-              :percentage="status.progress"
-              :show-indicator="false"
-              :height="6"
-            />
+          <div
+            v-if="protocolBusy"
+            class="install__progress"
+            role="progressbar"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            :aria-valuenow="status.progress"
+          >
+            <div class="install__bar" :style="{ width: `${status.progress}%` }" />
             <span class="install__progress-text" aria-live="polite">
               {{ status.message }}（{{ status.progress }}%）
             </span>
@@ -685,7 +671,7 @@ onUnmounted(stopPolling)
             首次启动协议端需要在它自己的窗口扫码登录 QQ，之后即可正常使用。
           </p>
         </template>
-      </NCard>
+      </section>
     </div>
   </div>
 </template>
@@ -698,8 +684,10 @@ onUnmounted(stopPolling)
   max-width: 44rem;
 }
 
-.app-panel {
-  --n-color: var(--app-area-bg, var(--surface));
+.install__group {
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--app-area-bg, var(--surface));
   -webkit-backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
   backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
 }
@@ -707,6 +695,7 @@ onUnmounted(stopPolling)
 .install__heading {
   font-size: var(--text-base);
   font-weight: 600;
+  margin-bottom: var(--space-4);
 }
 
 .install__row {
@@ -730,7 +719,7 @@ onUnmounted(stopPolling)
   gap: var(--space-2);
 }
 
-.install__dir-row .n-input {
+.install__dir-row .install-input {
   flex: 1;
 }
 
@@ -762,8 +751,29 @@ onUnmounted(stopPolling)
 }
 
 .dir-picker__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   width: 100%;
-  justify-content: flex-start;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--app-text-color, var(--ink));
+  font-size: var(--text-sm);
+  text-align: left;
+  cursor: pointer;
+}
+
+.dir-picker__item:hover {
+  background: var(--surface-2);
+}
+
+.dir-picker__icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+  color: var(--muted);
 }
 
 .dir-picker__empty {
@@ -778,32 +788,33 @@ onUnmounted(stopPolling)
   font-size: var(--text-xs);
 }
 
-.install__field {
+.install__sources {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
   margin-top: var(--space-4);
 }
 
-.install__label {
-  display: block;
-  margin-bottom: var(--space-2);
-  font-size: var(--text-sm);
-  font-weight: 500;
-}
-
 .install__source {
-  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
   padding: var(--space-3);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--app-component-bg, var(--surface-2));
+  cursor: pointer;
 }
 
-.install__source :deep(.n-radio__label),
-.install__asset :deep(.n-radio__label) {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  gap: var(--space-2);
-  min-width: 0;
+.install__source--active {
+  border-color: var(--primary);
+}
+
+.install__radio {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--primary);
+  flex-shrink: 0;
 }
 
 .install__source-name {
@@ -820,12 +831,55 @@ onUnmounted(stopPolling)
   font-size: var(--text-xs);
 }
 
-.install__asset {
+.install__source-repo svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.install__field {
+  margin-top: var(--space-4);
+}
+
+.install__label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.install-input {
   width: 100%;
+  height: 2.5rem;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--app-component-bg, var(--surface-2));
+  color: var(--app-text-color, var(--ink));
+  font-size: var(--text-sm);
+}
+
+.install-input::placeholder {
+  color: var(--placeholder);
+}
+
+.install__assets {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.install__asset {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--app-component-bg, var(--surface-2));
+  cursor: pointer;
+}
+
+.install__asset--active {
+  border-color: var(--primary);
 }
 
 .install__asset-name {
@@ -849,6 +903,13 @@ onUnmounted(stopPolling)
 
 .install__progress {
   margin-top: var(--space-4);
+}
+
+.install__bar {
+  height: 0.375rem;
+  border-radius: 999px;
+  background: var(--primary);
+  transition: width 300ms ease-out;
 }
 
 .install__progress-text {

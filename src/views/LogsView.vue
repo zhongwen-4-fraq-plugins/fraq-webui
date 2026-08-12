@@ -1,12 +1,15 @@
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { NButton, NIcon, NInput, NRadioButton, NRadioGroup } from 'naive-ui'
-import { PlayerPause, PlayerPlay, Search, Settings, Terminal2 } from '@vicons/tabler'
+import IconPlayerPause from '~icons/tabler/player-pause'
+import IconPlayerPlay from '~icons/tabler/player-play'
+import IconSearch from '~icons/tabler/search'
+import IconSettings from '~icons/tabler/settings'
+import IconTerminal from '~icons/tabler/terminal-2'
 import { store } from '../services/store.js'
 import { filterLogs, levelLabel, logTimeLabel } from '../data/logs.js'
 import { LOG_LEVEL } from '../models/logEntry.js'
-import { LOG_POLL_INTERVAL_MS, MAX_VISIBLE_LOGS } from '../core/config.js'
+import { LOG_PAGE_SIZE, LOG_POLL_INTERVAL_MS, MAX_VISIBLE_LOGS } from '../core/config.js'
 import AppButton from '../components/AppButton.vue'
 import EmptyState from '../components/EmptyState.vue'
 import ErrorBanner from '../components/ErrorBanner.vue'
@@ -155,19 +158,16 @@ const toneOf = (entry) => {
     <div class="logs-header">
       <h2 class="logs-header__title">
         日志
-        <NButton
-          quaternary
-          circle
-          size="small"
+        <AppButton
+          variant="ghost"
+          size="icon"
           class="logs-header__gear"
           aria-label="日志颜色设置"
           title="日志颜色设置"
           @click="store.state.logColorsOpen = true"
         >
-          <template #icon>
-            <NIcon><Settings /></NIcon>
-          </template>
-        </NButton>
+          <IconSettings aria-hidden="true" />
+        </AppButton>
       </h2>
       <p class="logs-header__description">实时查看 fraq 运行日志，支持按级别过滤与搜索。</p>
     </div>
@@ -175,35 +175,34 @@ const toneOf = (entry) => {
     <ErrorBanner v-if="store.state.errors.logs" :message="store.state.errors.logs" @retry="store.refreshLogs" />
 
     <div class="log-toolbar">
-      <NRadioGroup
-        v-model:value="level"
-        size="small"
-        class="log-toolbar__levels"
-        aria-label="按级别过滤"
-      >
-        <NRadioButton
+      <div class="log-toolbar__levels" role="group" aria-label="按级别过滤">
+        <button
           v-for="item in LEVELS"
           :key="item.value"
-          :value="item.value"
+          type="button"
+          class="level-button"
+          :class="{ 'level-button--active': level === item.value }"
+          :aria-pressed="level === item.value"
+          @click="level = item.value"
         >
           {{ item.label }}
-        </NRadioButton>
-      </NRadioGroup>
+        </button>
+      </div>
 
-      <NInput
-        v-model:value="query"
-        class="log-toolbar__search"
-        placeholder="搜索模块或内容"
-        clearable
-        aria-label="搜索日志"
-      >
-        <template #prefix>
-          <NIcon size="16"><Search /></NIcon>
-        </template>
-      </NInput>
+      <div class="log-toolbar__search">
+        <IconSearch class="log-toolbar__search-icon" aria-hidden="true" />
+        <input
+          v-model="query"
+          type="search"
+          class="log-toolbar__search-input"
+          placeholder="搜索模块或内容"
+          aria-label="搜索日志"
+        />
+      </div>
 
       <AppButton variant="secondary" size="sm" @click="toggleFollow">
-        <NIcon><PlayerPause v-if="follow" /><PlayerPlay v-else /></NIcon>
+        <IconPlayerPause v-if="follow" aria-hidden="true" />
+        <IconPlayerPlay v-else aria-hidden="true" />
         {{ follow ? '跟随中' : '已暂停' }}
       </AppButton>
     </div>
@@ -217,7 +216,7 @@ const toneOf = (entry) => {
         description="日志会实时出现在这里。换个过滤条件试试？"
       >
         <template #icon>
-          <NIcon size="22" color="var(--primary)"><Terminal2 /></NIcon>
+          <IconTerminal class="empty-icon" aria-hidden="true" />
         </template>
       </EmptyState>
 
@@ -265,6 +264,7 @@ const toneOf = (entry) => {
         </ul>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -284,11 +284,22 @@ const toneOf = (entry) => {
   margin-left: 10px;
 }
 
+.logs-header__gear.logs-header__gear,
+.logs-header__gear.logs-header__gear:hover {
+  background: transparent;
+}
+
 .logs-header__description {
   margin-top: var(--space-1);
   color: var(--muted);
   font-size: var(--text-sm);
   max-width: 60ch;
+}
+
+.empty-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--primary);
 }
 
 .log-toolbar {
@@ -299,9 +310,63 @@ const toneOf = (entry) => {
   margin-bottom: var(--space-4);
 }
 
+.log-toolbar__levels {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: var(--radius-md);
+  background: var(--app-component-bg, var(--surface));
+}
+
+.level-button {
+  padding: var(--space-1) var(--space-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.level-button:hover {
+  color: var(--app-text-color, var(--ink));
+}
+
+.level-button--active {
+  background: var(--bg);
+  color: var(--app-text-color, var(--ink));
+  box-shadow: var(--shadow-sm);
+}
+
 .log-toolbar__search {
+  position: relative;
+  display: flex;
+  align-items: center;
   flex: 1;
   min-width: 12rem;
+}
+
+.log-toolbar__search-icon {
+  position: absolute;
+  left: var(--space-3);
+  width: 1rem;
+  height: 1rem;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.log-toolbar__search-input {
+  width: 100%;
+  height: 2.5rem;
+  padding: 0 var(--space-3) 0 2.25rem;
+  border-radius: var(--radius-md);
+  background: var(--app-component-bg, var(--surface-2));
+  color: var(--app-text-color, var(--ink));
+  font-size: var(--text-sm);
+}
+
+.log-toolbar__search-input::placeholder {
+  color: var(--placeholder);
 }
 
 .log-panel {
@@ -434,6 +499,7 @@ const toneOf = (entry) => {
   white-space: nowrap;
   cursor: pointer;
 }
+
 
 @media (max-width: 640px) {
   .log-line {

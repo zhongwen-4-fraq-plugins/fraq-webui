@@ -1,7 +1,5 @@
 <script setup>
 import { ref, watch } from 'vue'
-import { NButton, NIcon, NInput, NInputNumber, NSelect, NSwitch } from 'naive-ui'
-import { X } from '@vicons/tabler'
 import { httpApi } from '../services/httpApi.js'
 import {
   AI_SDK_OPTIONS,
@@ -11,6 +9,7 @@ import {
   deleteByPath,
 } from '../data/pluginSchemas.js'
 import { store } from '../services/store.js'
+import AppButton from './AppButton.vue'
 import ConfirmDialog from './ConfirmDialog.vue'
 import SkeletonBlock from './SkeletonBlock.vue'
 
@@ -79,17 +78,6 @@ function addProvider(key) {
   })
 }
 
-function sdkOptions() {
-  return AI_SDK_OPTIONS.map((option) => ({
-    label: `${option.label}（${option.value}）`,
-    value: option.value,
-  }))
-}
-
-function selectOptions(field) {
-  return [{ label: '默认', value: '' }, ...(field.options ?? [])]
-}
-
 watch(
   () => [props.open, props.plugin?.id],
   async ([open, id]) => {
@@ -110,8 +98,6 @@ watch(
             form.value[field.key] = JSON.stringify(value ?? {}, null, 2)
           } else if (field.type === 'boolean') {
             form.value[field.key] = value ?? false
-          } else if (field.type === 'number') {
-            form.value[field.key] = value ?? null
           } else {
             form.value[field.key] = value ?? ''
           }
@@ -209,9 +195,14 @@ async function save() {
       <div v-if="schema" class="cfg-form">
         <div v-for="field in schema.fields" :key="field.key" class="cfg-field">
           <template v-if="field.type === 'boolean'">
-            <label class="cfg-check">
-              <NSwitch v-model:value="form[field.key]" size="small" />
-              <span>{{ field.label }}</span>
+            <label class="cfg-check" :for="`cfg-${field.key}`">
+              <input
+                :id="`cfg-${field.key}`"
+                v-model="form[field.key]"
+                type="checkbox"
+                class="cfg-checkbox"
+              />
+              {{ field.label }}
             </label>
           </template>
           <template v-else-if="field.type === 'providers'">
@@ -223,99 +214,116 @@ async function save() {
                 class="cfg-provider"
               >
                 <div class="cfg-provider__head">
-                  <NInput
-                    v-model:value="provider.name"
+                  <input
+                    v-model="provider.name"
+                    class="install-input cfg-input"
+                    type="text"
                     placeholder="提供商名称，如 akile"
                     aria-label="提供商名称"
                   />
-                  <NButton
-                    quaternary
-                    circle
-                    size="small"
+                  <button
+                    type="button"
+                    class="cfg-provider__remove"
                     :aria-label="`删除提供商 ${provider.name || index + 1}`"
                     title="删除"
                     @click="form[field.key].splice(index, 1)"
                   >
-                    <template #icon>
-                      <NIcon><X /></NIcon>
-                    </template>
-                  </NButton>
+                    ×
+                  </button>
                 </div>
                 <label class="cfg-label" :for="`cfg-${field.key}-${index}-sdk`">SDK</label>
-                <NSelect
+                <select
                   :id="`cfg-${field.key}-${index}-sdk`"
-                  v-model:value="provider.sdk"
-                  :options="sdkOptions()"
-                />
+                  v-model="provider.sdk"
+                  class="install-input cfg-input"
+                >
+                  <option
+                    v-for="option in AI_SDK_OPTIONS"
+                    :key="option.value"
+                    :value="option.value"
+                  >
+                    {{ option.label }}（{{ option.value }}）
+                  </option>
+                </select>
                 <label class="cfg-label" :for="`cfg-${field.key}-${index}-key`">API Key</label>
-                <NInput
+                <input
                   :id="`cfg-${field.key}-${index}-key`"
-                  v-model:value="provider.apiKey"
+                  v-model="provider.apiKey"
+                  class="install-input cfg-input"
                   type="password"
-                  show-password-on="click"
                   autocomplete="off"
                   placeholder="sk-..."
                 />
                 <label class="cfg-label" :for="`cfg-${field.key}-${index}-url`">Base URL</label>
-                <NInput
+                <input
                   :id="`cfg-${field.key}-${index}-url`"
-                  v-model:value="provider.baseURL"
+                  v-model="provider.baseURL"
+                  class="install-input cfg-input"
+                  type="text"
                   placeholder="https://api.example.com/v1"
                 />
                 <label class="cfg-label" :for="`cfg-${field.key}-${index}-models`">
                   模型列表
                 </label>
-                <NInput
+                <textarea
                   :id="`cfg-${field.key}-${index}-models`"
-                  v-model:value="provider.models"
-                  type="textarea"
-                  :autosize="{ minRows: 2, maxRows: 4 }"
+                  v-model="provider.models"
+                  class="install-input cfg-input cfg-input--json"
+                  rows="2"
                   placeholder="每行一个模型，如 gpt-5.6-sol"
                 />
                 <label class="cfg-label" :for="`cfg-${field.key}-${index}-images`">
                   生图模型（可选）
                 </label>
-                <NInput
+                <textarea
                   :id="`cfg-${field.key}-${index}-images`"
-                  v-model:value="provider.images"
-                  type="textarea"
-                  :autosize="{ minRows: 2, maxRows: 4 }"
+                  v-model="provider.images"
+                  class="install-input cfg-input cfg-input--json"
+                  rows="2"
                   placeholder="每行一个生图模型"
                 />
               </div>
-              <NButton size="small" @click="addProvider(field.key)">添加提供商</NButton>
+              <AppButton variant="secondary" size="sm" @click="addProvider(field.key)">
+                添加提供商
+              </AppButton>
             </div>
           </template>
           <template v-else>
             <label class="cfg-label" :for="`cfg-${field.key}`">{{ field.label }}</label>
-            <NInput
+            <input
               v-if="field.type === 'text' || field.type === 'password'"
               :id="`cfg-${field.key}`"
-              v-model:value="form[field.key]"
+              v-model="form[field.key]"
+              class="install-input cfg-input"
               :type="field.type"
-              show-password-on="click"
               :placeholder="field.placeholder"
               autocomplete="off"
             />
-            <NInputNumber
+            <input
               v-else-if="field.type === 'number'"
               :id="`cfg-${field.key}`"
-              v-model:value="form[field.key]"
+              v-model="form[field.key]"
+              type="number"
+              class="install-input cfg-input"
               :placeholder="field.placeholder"
-              style="width: 100%"
             />
-            <NSelect
+            <select
               v-else-if="field.type === 'select'"
               :id="`cfg-${field.key}`"
-              v-model:value="form[field.key]"
-              :options="selectOptions(field)"
-            />
-            <NInput
+              v-model="form[field.key]"
+              class="install-input cfg-input"
+            >
+              <option value="">默认</option>
+              <option v-for="option in field.options" :key="option.value" :value="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+            <textarea
               v-else-if="field.type === 'json'"
               :id="`cfg-${field.key}`"
-              v-model:value="form[field.key]"
-              type="textarea"
-              :autosize="{ minRows: 7, maxRows: 16 }"
+              v-model="form[field.key]"
+              class="install-input cfg-input cfg-input--json"
+              rows="7"
               spellcheck="false"
             />
           </template>
@@ -326,11 +334,11 @@ async function save() {
 
       <div v-else class="cfg-field">
         <label class="cfg-label" for="cfg-json">配置（JSON）</label>
-        <NInput
+        <textarea
           id="cfg-json"
-          v-model:value="jsonText"
-          type="textarea"
-          :autosize="{ minRows: 12, maxRows: 24 }"
+          v-model="jsonText"
+          class="install-input cfg-input cfg-input--json"
+          rows="12"
           spellcheck="false"
         />
         <p class="cfg-hint">
@@ -360,14 +368,39 @@ async function save() {
   font-weight: 500;
 }
 
+.cfg-input {
+  width: 100%;
+  height: 2.5rem;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--app-component-bg, var(--surface-2));
+  color: var(--app-text-color, var(--ink));
+  font-size: var(--text-sm);
+}
+
+.cfg-input--json {
+  height: auto;
+  min-height: 7rem;
+  padding: var(--space-2) var(--space-3);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  resize: vertical;
+}
+
 .cfg-check {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: var(--space-2);
   color: var(--app-text-color, var(--ink));
   font-size: var(--text-sm);
   font-weight: 500;
-  cursor: pointer;
+}
+
+.cfg-checkbox {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--primary);
 }
 
 .cfg-providers {
@@ -391,8 +424,28 @@ async function save() {
   gap: var(--space-2);
 }
 
-.cfg-provider__head .n-input {
+.cfg-provider__head .cfg-input {
   flex: 1;
+}
+
+.cfg-provider__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  font-size: var(--text-lg);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cfg-provider__remove:hover {
+  background: var(--danger-soft);
+  color: var(--danger);
 }
 
 .cfg-hint {
