@@ -50,6 +50,7 @@ Current:
 - 日志页"日志"旁设置图标（右 15px、文字间距 10px、背景透明），可改各日志级别文字颜色与底色；错误/警告整行变色（底色去掉）；长错误报告折叠为一行可点击展开。
 - 警告文字色 #d9b500。
 - 插件配置弹窗：模型供应商卡片背景改为跟随组件外观（--app-component-bg），修复组件透明时供应商区仍纯白的问题。
+- 自定义 CSS 功能：设置页界面外观下新增 CSS 输入框，内容存浏览器 localStorage（fraq-webui.customCss），通过注入 `<style id="fraq-webui-custom-css">` 实时生效。
 
 ## Open questions
 
