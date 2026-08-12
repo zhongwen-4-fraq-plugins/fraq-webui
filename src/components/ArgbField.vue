@@ -39,23 +39,29 @@ const argb = computed(() => {
   <div class="argb">
     <span class="argb__label">{{ label }}</span>
     <input v-model="hex" type="color" class="argb__color" :aria-label="`${label}颜色`" />
-    <input
-      v-model="alphaPercent"
-      type="range"
-      min="0"
-      max="100"
-      class="argb__alpha"
-      :aria-label="`${label}透明度`"
-    />
-    <input
-      v-model="blurValue"
-      type="range"
-      min="0"
-      max="40"
-      step="1"
-      class="argb__blur"
-      :aria-label="`${label}模糊程度`"
-    />
+    <div class="argb__slider">
+      <span class="argb__slider-label">透明度</span>
+      <input
+        v-model="alphaPercent"
+        type="range"
+        min="0"
+        max="100"
+        class="argb__alpha"
+        :aria-label="`${label}透明度`"
+      />
+    </div>
+    <div class="argb__slider">
+      <span class="argb__slider-label">模糊</span>
+      <input
+        v-model="blurValue"
+        type="range"
+        min="0"
+        max="40"
+        step="1"
+        class="argb__blur"
+        :aria-label="`${label}模糊程度`"
+      />
+    </div>
     <span class="argb__blur-value">{{ blurValue }}px</span>
     <code class="argb__value">{{ argb }}</code>
   </div>
@@ -74,6 +80,18 @@ const argb = computed(() => {
   flex-shrink: 0;
   font-size: var(--text-sm);
   font-weight: 500;
+}
+
+.argb__slider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.argb__slider-label {
+  font-size: var(--text-xs);
+  color: var(--muted);
 }
 
 .argb__color {
