@@ -27,8 +27,7 @@ export const DEFAULT_APPEARANCE = {
 
 function normalizeColor(raw, fallback) {
   const color = typeof raw?.color === 'string' && /^#[0-9a-f]{3,6}$/i.test(raw.color) ? raw.color : fallback.color
-  // 透明度最低 20%，避免区域完全透明（与滑杆下限一致）
-  const alpha = Number.isFinite(raw?.alpha) ? Math.min(1, Math.max(0.2, raw.alpha)) : fallback.alpha
+  const alpha = Number.isFinite(raw?.alpha) ? Math.min(1, Math.max(0, raw.alpha)) : fallback.alpha
   const blur = Number.isFinite(raw?.blur) ? Math.min(40, Math.max(0, raw.blur)) : fallback.blur
   return { color, alpha, blur }
 }
