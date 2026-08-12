@@ -2,6 +2,8 @@
 //   node server/index.js
 // 默认监听 http://127.0.0.1:8787，同时托管前端构建产物（dist/）。
 
+// 最先加载根目录 .env（若存在），让后续模块能读到环境变量
+import 'dotenv/config'
 import { serve } from '@hono/node-server'
 import { WebSocketServer } from 'ws'
 import { app } from './core/app.js'

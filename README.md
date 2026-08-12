@@ -41,6 +41,8 @@ npm run dev          # Vite 开发服务器（/api 自动代理到 8787）
 | `FRAQ_WEBUI_MILKY_URL` | `http://localhost:30001` | 真实 Milky 协议端地址 |
 | `FRAQ_WEBUI_MILKY_TOKEN` | 空 | 转发到 Milky 协议端时使用的访问令牌 |
 
+支持根目录 `.env` 文件：服务启动时自动加载（已存在的系统环境变量优先），示例见 `.env.example`；`.env` 已加入 `.gitignore`，不会提交。
+
 ## 说明
 
 - 插件列表、版本、核心状态、日志均来自真实 fraq 实例；插件启停与 Milky 设置直接写 `fraq.yml`，fraq CLI 会自动重启生效。
