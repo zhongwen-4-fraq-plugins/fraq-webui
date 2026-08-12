@@ -415,7 +415,7 @@ async function save() {
   gap: var(--space-2);
   padding: var(--space-3);
   border-radius: var(--radius-md);
-  background: var(--surface-2);
+  background: var(--app-component-bg, var(--surface-2));
 }
 
 .cfg-provider__head {
