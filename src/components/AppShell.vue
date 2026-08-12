@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import { NLayout, NLayoutContent } from 'naive-ui'
 import SidebarNav from './SidebarNav.vue'
 import TopBar from './TopBar.vue'
 
@@ -7,31 +8,33 @@ const navOpen = ref(false)
 </script>
 
 <template>
-  <div class="shell">
+  <NLayout class="shell" has-sider>
     <a class="skip-link" href="#main">跳到主要内容</a>
 
     <div v-if="navOpen" class="shell__overlay" @click="navOpen = false" />
 
     <SidebarNav :open="navOpen" @close="navOpen = false" />
 
-    <div class="shell__main">
+    <NLayout class="shell__main">
       <TopBar @toggle-nav="navOpen = !navOpen" />
-      <main id="main" class="shell__content" tabindex="-1">
+      <NLayoutContent id="main" class="shell__content" tabindex="-1" :native-scrollbar="false">
         <router-view />
-      </main>
-    </div>
-  </div>
+      </NLayoutContent>
+    </NLayout>
+  </NLayout>
 </template>
 
 <style scoped>
 .shell {
   min-height: 100dvh;
+  background: transparent;
 }
 
 .shell__main {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  background: transparent;
 }
 
 .shell__content {
@@ -40,6 +43,7 @@ const navOpen = ref(false)
   max-width: 68rem;
   margin: 0 auto;
   padding: var(--space-5) var(--space-4) var(--space-8);
+  background: transparent;
   outline: none;
 }
 
@@ -51,11 +55,6 @@ const navOpen = ref(false)
 }
 
 @media (min-width: 900px) {
-  .shell {
-    display: grid;
-    grid-template-columns: 15rem 1fr;
-  }
-
   .shell__content {
     padding: var(--space-6) var(--space-7) var(--space-8);
   }

@@ -6,10 +6,12 @@
 
 外观与设置页持续迭代至 2026-08-12：液态玻璃、ARGB 分区外观、日志配色、透明度滑杆、安装页等均已落地并提交。
 
+2026-08-12 已用 Naive UI 全量重构界面（外壳/侧栏/顶栏/四屏+安装页/通用组件），图标切换为 xicons（@vicons/tabler），旧 unplugin-icons/iconify 依赖已移除；生产构建与 dev 冒烟测试通过。
+
 ## Next
 
-- 刷新 http://127.0.0.1:8787 验证：组件透明度默认 0、透明度数值输入框已删（注意 localStorage 旧值，需点"恢复默认外观"）。
-- 浏览器打开 /install 验证安装页（环境检查、版本选择下载、自定义目录、Node 便携安装）。
+- 浏览器验证 Naive UI 重构后的界面：外观设置（注意 localStorage 旧值，需点"恢复默认外观"）、插件页表格与操作、安装页选择器/radio/进度条、日志页过滤与跟随、登录页。
+- 刷新 http://127.0.0.1:8787 验证：组件透明度默认 0、透明度数值输入框已删、自定义 CSS 功能仍生效。
 - 需要时 git push 推送远程。
 
 ## Read now
@@ -33,6 +35,7 @@ Done:
 - 消息收发统计：milky 透明代理（fraq.yml milky.url 指向本服务），收=事件流 message_receive、发=发送 API 计数，概览展示
 
 Current:
+- 2026-08-12 Naive UI 重构：17 个组件 + 5 视图全部改为 Naive UI 组件（NLayout/NMenu/NButton/NTag/NModal/NDataTable/NForm 控件等），外观 ARGB 通过 buildThemeOverrides 映射主题，玻璃效果用 --n-color CSS 变量覆盖；图标全部换 @vicons/tabler（blocks→Apps、layout-dashboard→LayoutGrid、loader-2→Loader），移除 @iconify/* 与 unplugin-icons；npm 装包失败时用 npmmirror 镜像。
 - 新增"安装"页：环境检查（fraq CLI `fraq version`、协议端 `get_login_info`）、CLI 一键 npm 全局安装、协议端（Yogurt / LuckyLilliaBot）GitHub 版本列表选择 + 下载解压 + 启动/停止（进度轮询）。已用临时服务实测下载 Yogurt Windows 包并自动定位 yogurt.exe。
 - 修复协议端检查与代理 401：检查改直连 MILKY_URL（带 JSON body），放行 milky 代理单段端点，代理令牌回退到 fraq.yml milky.accessToken；前端区分已连接/在运行/未运行。
 - 协议端安装目录可自定义：安装页输入完整路径（存 .fraq-webui-state.json，默认 protocols/），下载时生效。

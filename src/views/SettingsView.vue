@@ -1,9 +1,15 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import IconDeviceFloppy from '~icons/tabler/device-floppy'
-import IconEye from '~icons/tabler/eye'
-import IconEyeOff from '~icons/tabler/eye-off'
-import IconUpload from '~icons/tabler/upload'
+import {
+  NCard,
+  NIcon,
+  NInput,
+  NSelect,
+  NSlider,
+  NUpload,
+  NUploadDragger,
+} from 'naive-ui'
+import { DeviceFloppy, Upload } from '@vicons/tabler'
 import { store } from '../services/store.js'
 import { createDefaultAppearance } from '../models/appearance.js'
 import AppButton from '../components/AppButton.vue'
@@ -20,17 +26,6 @@ const form = reactive({
 
 const saving = ref(false)
 const baseUrlError = ref('')
-const showToken = ref(false)
-const bgFileInput = ref(null)
-const dragActive = ref(false)
-
-// 表单有未保存的修改时，输入框边框显示主题色
-const dirty = computed(
-  () =>
-    form.baseUrl !== store.state.settings.baseUrl ||
-    form.accessToken !== store.state.settings.accessToken ||
-    form.appDir !== store.state.settings.appDir,
-)
 
 const appearance = reactive(JSON.parse(JSON.stringify(store.state.appearance)))
 const customCss = ref(store.state.customCss)
@@ -65,18 +60,8 @@ const backgroundBlur = computed({
   },
 })
 
-function onBackgroundFile(event) {
-  applyBackgroundFile(event.target.files?.[0])
-  event.target.value = ''
-}
-
-function onBackgroundDrop(event) {
-  dragActive.value = false
-  applyBackgroundFile(event.dataTransfer?.files?.[0])
-}
-
-function pickBackground() {
-  bgFileInput.value?.click()
+function onUploadChange({ file }) {
+  applyBackgroundFile(file?.file)
 }
 
 function applyBackgroundFile(file) {
@@ -159,18 +144,19 @@ async function save() {
     <SkeletonBlock v-if="store.state.loading.settings" :lines="5" />
 
     <form v-else class="settings" @submit.prevent="save">
-      <section class="settings__group" aria-labelledby="connection-heading">
-        <h3 id="connection-heading" class="settings__heading">Milky 连接</h3>
+      <NCard class="app-panel" :bordered="false" size="large">
+        <template #header>
+          <span class="settings__heading">Milky 连接</span>
+        </template>
 
         <div class="field">
           <label class="field__label" for="base-url">服务地址</label>
-          <input
+          <NInput
             id="base-url"
-            v-model="form.baseUrl"
-            class="field__input"
-            type="url"
+            v-model:value="form.baseUrl"
+            type="text"
             placeholder="http://127.0.0.1:4649"
-            :class="{ 'field__input--dirty': dirty }"
+            :status="baseUrlError ? 'error' : undefined"
             :aria-invalid="Boolean(baseUrlError)"
             :aria-describedby="baseUrlError ? 'base-url-error' : 'base-url-hint'"
           />
@@ -184,26 +170,14 @@ async function save() {
 
         <div class="field">
           <label class="field__label" for="access-token">访问令牌</label>
-          <div class="field__token">
-            <input
-              id="access-token"
-              v-model="form.accessToken"
-              class="field__input"
-              :type="showToken ? 'text' : 'password'"
-              autocomplete="off"
-              placeholder="留空表示不校验"
-              :class="{ 'field__input--dirty': dirty }"
-            />
-            <button
-              type="button"
-              class="field__toggle"
-              :aria-label="showToken ? '隐藏访问令牌' : '显示访问令牌'"
-              @click="showToken = !showToken"
-            >
-              <IconEyeOff v-if="showToken" aria-hidden="true" />
-              <IconEye v-else aria-hidden="true" />
-            </button>
-          </div>
+          <NInput
+            id="access-token"
+            v-model:value="form.accessToken"
+            type="password"
+            show-password-on="click"
+            autocomplete="off"
+            placeholder="留空表示不校验"
+          />
           <p class="field__hint">
             {{
               store.state.settings.hasAccessToken
@@ -212,80 +186,75 @@ async function save() {
             }}
           </p>
         </div>
-      </section>
+      </NCard>
 
-      <section class="settings__group" aria-labelledby="project-heading">
-        <h3 id="project-heading" class="settings__heading">fraq 项目</h3>
+      <NCard class="app-panel" :bordered="false" size="large">
+        <template #header>
+          <span class="settings__heading">fraq 项目</span>
+        </template>
 
         <div class="field">
           <label class="field__label" for="app-dir">项目目录</label>
-          <input
+          <NInput
             id="app-dir"
-            v-model="form.appDir"
-            class="field__input"
-            type="text"
+            v-model:value="form.appDir"
             placeholder="D:\bot\fraq-plugins\my-fraq-app"
-            :class="{ 'field__input--dirty': dirty }"
             autocomplete="off"
           />
           <p class="field__hint">
             包含 fraq.yml 的项目目录；修改保存后需重启核心生效。
           </p>
         </div>
-      </section>
+      </NCard>
 
-      <section class="settings__group" aria-labelledby="appearance-heading">
-        <h3 id="appearance-heading" class="settings__heading">界面外观</h3>
+      <NCard class="app-panel" :bordered="false" size="large">
+        <template #header>
+          <span class="settings__heading">界面外观</span>
+        </template>
 
         <div class="field">
           <label class="field__label" for="bg-mode">背景图</label>
-          <select id="bg-mode" v-model="appearance.background.mode" class="field__input">
-            <option value="default">默认背景</option>
-            <option value="url">图片链接</option>
-            <option value="file">本地上传</option>
-          </select>
-          <input
+          <NSelect
+            id="bg-mode"
+            v-model:value="appearance.background.mode"
+            :options="[
+              { label: '默认背景', value: 'default' },
+              { label: '图片链接', value: 'url' },
+              { label: '本地上传', value: 'file' },
+            ]"
+          />
+          <NInput
             v-if="appearance.background.mode === 'url'"
-            v-model="appearance.background.value"
-            type="url"
-            class="field__input field__input--gap appearance__url-input"
+            v-model:value="appearance.background.value"
+            type="text"
+            class="appearance__gap"
             placeholder="https://example.com/background.jpg"
           />
-          <div
+          <NUpload
             v-else-if="appearance.background.mode === 'file'"
-            class="appearance__dropzone"
-            :class="{ 'appearance__dropzone--drag': dragActive }"
-            role="button"
-            tabindex="0"
-            :aria-label="bgFileName ? `更换背景图（${bgFileName}）` : '选择背景图'"
-            @click="pickBackground"
-            @keydown.enter.prevent="pickBackground"
-            @keydown.space.prevent="pickBackground"
-            @dragover.prevent="dragActive = true"
-            @dragleave.prevent="dragActive = false"
-            @drop.prevent="onBackgroundDrop"
+            :default-upload="false"
+            accept="image/*"
+            :show-file-list="false"
+            class="appearance__gap"
+            @change="onUploadChange"
           >
-            <IconUpload class="appearance__dropzone-icon" aria-hidden="true" />
-            <span class="appearance__dropzone-text">
-              {{ bgFileName || '点击选择图片，或将图片拖到这里' }}
-            </span>
-            <input
-              ref="bgFileInput"
-              type="file"
-              accept="image/*"
-              class="appearance__file-input"
-              @change="onBackgroundFile"
-            />
-          </div>
+            <NUploadDragger>
+              <div class="appearance__dropzone">
+                <NIcon size="20"><Upload /></NIcon>
+                <span class="appearance__dropzone-text">
+                  {{ bgFileName || '点击选择图片，或将图片拖到这里' }}
+                </span>
+              </div>
+            </NUploadDragger>
+          </NUpload>
           <div class="appearance__blur">
             <label for="bg-blur">背景模糊</label>
-            <input
+            <NSlider
               id="bg-blur"
-              v-model="backgroundBlur"
-              type="range"
-              min="0"
-              max="40"
-              step="1"
+              v-model:value="backgroundBlur"
+              :min="0"
+              :max="40"
+              :tooltip="false"
               class="appearance__blur-input"
             />
             <span class="appearance__blur-value">{{ backgroundBlur }}px</span>
@@ -318,24 +287,25 @@ async function save() {
         <AppButton variant="secondary" size="sm" class="appearance__reset" @click="resetAppearance">
           恢复默认外观
         </AppButton>
+
         <div class="field appearance__css">
           <label class="field__label" for="custom-css">自定义 CSS</label>
-          <textarea
+          <NInput
             id="custom-css"
-            v-model="customCss"
-            class="field__input field__input--code"
-            rows="8"
+            v-model:value="customCss"
+            type="textarea"
+            :autosize="{ minRows: 8, maxRows: 16 }"
             spellcheck="false"
             placeholder="例如 .sidebar { background: red; }"
           />
           <p class="field__hint">覆盖整个界面的样式，改动即时生效并保存到本浏览器。</p>
         </div>
         <p class="field__hint">颜色格式 ARGB（#AARRGGBB）+ 模糊程度，修改即时生效并自动保存。</p>
-      </section>
+      </NCard>
 
       <div class="settings__save">
         <AppButton type="submit" :loading="saving">
-          <IconDeviceFloppy aria-hidden="true" />
+          <NIcon><DeviceFloppy /></NIcon>
           保存更改
         </AppButton>
       </div>
@@ -351,10 +321,8 @@ async function save() {
   max-width: 40rem;
 }
 
-.settings__group {
-  padding: var(--space-5);
-  border-radius: var(--radius-lg);
-  background: var(--app-area-bg, var(--surface));
+.app-panel {
+  --n-color: var(--app-area-bg, var(--surface));
   -webkit-backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
   backdrop-filter: blur(var(--app-area-blur, 16px)) saturate(1.4);
 }
@@ -362,7 +330,6 @@ async function save() {
 .settings__heading {
   font-size: var(--text-base);
   font-weight: 600;
-  margin-bottom: var(--space-4);
 }
 
 .field + .field {
@@ -374,32 +341,6 @@ async function save() {
   margin-bottom: var(--space-2);
   font-size: var(--text-sm);
   font-weight: 500;
-}
-
-.field__input {
-  width: 100%;
-  height: 2.5rem;
-  padding: 0 var(--space-3);
-  border-radius: var(--radius-md);
-  background: var(--app-component-bg, var(--surface-2));
-  color: var(--app-text-color, var(--ink));
-  font-size: var(--text-sm);
-}
-
-.field__input::placeholder {
-  color: var(--placeholder);
-}
-
-.field__input[aria-invalid='true'] {
-  background: var(--danger-soft);
-}
-
-.field__input.field__input--dirty {
-  border-color: var(--primary);
-}
-
-.field__input:focus {
-  border-color: var(--success);
 }
 
 .field__hint,
@@ -416,7 +357,7 @@ async function save() {
   color: var(--danger);
 }
 
-.field__input--gap {
+.appearance__gap {
   margin-top: var(--space-2);
 }
 
@@ -426,6 +367,7 @@ async function save() {
   border-radius: var(--radius-md);
   background-size: cover;
   background-position: center;
+  border: 1px solid var(--border);
 }
 
 .appearance__blur {
@@ -443,35 +385,8 @@ async function save() {
 }
 
 .appearance__blur-input {
-  -webkit-appearance: none;
-  appearance: none;
   flex: 1;
   max-width: 12rem;
-  height: 0.375rem;
-  border: none;
-  border-radius: 999px;
-  background: var(--app-slider-track-bg, var(--surface-2));
-  outline: none;
-}
-
-.appearance__blur-input::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 1rem;
-  height: 1rem;
-  border: none;
-  border-radius: 50%;
-  background: var(--primary);
-  cursor: pointer;
-}
-
-.appearance__blur-input::-moz-range-thumb {
-  width: 1rem;
-  height: 1rem;
-  border: none;
-  border-radius: 50%;
-  background: var(--primary);
-  cursor: pointer;
 }
 
 .appearance__blur-value {
@@ -487,45 +402,12 @@ async function save() {
   justify-content: center;
   gap: var(--space-2);
   min-height: 5rem;
-  margin-top: var(--space-2);
-  padding: var(--space-3);
-  border-radius: var(--radius-md);
-  background: var(--app-component-bg, var(--surface-2));
   color: var(--muted);
   font-size: var(--text-sm);
-  cursor: pointer;
-  transition:
-    background-color 150ms ease-out,
-    color 150ms ease-out;
-}
-
-.appearance__dropzone:hover {
-  background: var(--border);
-  color: var(--app-text-color, var(--ink));
-}
-
-.appearance__dropzone--drag {
-  background: var(--primary-soft);
-  color: var(--app-text-color, var(--ink));
-}
-
-.appearance__dropzone:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
-}
-
-.appearance__dropzone-icon {
-  width: 1.25rem;
-  height: 1.25rem;
-  flex-shrink: 0;
 }
 
 .appearance__dropzone-text {
   overflow-wrap: anywhere;
-}
-
-.appearance__file-input {
-  display: none;
 }
 
 .appearance__reset {
@@ -536,84 +418,11 @@ async function save() {
   margin-top: var(--space-4);
 }
 
-.field__input--code {
-  height: auto;
-  min-height: 10rem;
-  padding: var(--space-2) var(--space-3);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: var(--text-xs);
-  line-height: 1.5;
-  resize: vertical;
-}
-
-.appearance__url-input::placeholder {
-  color: var(--placeholder);
-}
-
 .appearance__colors {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
   margin-top: var(--space-4);
-}
-
-.field__token {
-  position: relative;
-}
-
-.field__token .field__input {
-  padding-right: 2.75rem;
-}
-
-.field__toggle {
-  position: absolute;
-  top: 50%;
-  right: var(--space-2);
-  transform: translateY(-50%);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border: none;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--muted);
-  cursor: pointer;
-}
-
-.field__toggle:hover {
-  background: var(--surface-2);
-  color: var(--app-text-color, var(--ink));
-}
-
-.field__toggle svg {
-  width: 1.125rem;
-  height: 1.125rem;
-}
-
-.field--check {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.field__check-label {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--text-sm);
-  font-weight: 500;
-}
-
-.field__checkbox {
-  width: 1rem;
-  height: 1rem;
-  accent-color: var(--primary);
-}
-
-.field--check .field__hint {
-  margin-top: 0;
 }
 
 .settings__save {

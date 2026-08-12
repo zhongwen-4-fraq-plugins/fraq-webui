@@ -1,4 +1,6 @@
 <script setup>
+import { NEmpty } from 'naive-ui'
+
 defineProps({
   title: { type: String, required: true },
   description: { type: String, default: '' },
@@ -6,50 +8,33 @@ defineProps({
 </script>
 
 <template>
-  <div class="empty">
-    <slot name="icon">
-      <div class="empty__icon" aria-hidden="true" />
-    </slot>
-    <h3 class="empty__title">{{ title }}</h3>
-    <p v-if="description" class="empty__description">{{ description }}</p>
-    <div v-if="$slots.action" class="empty__action">
+  <NEmpty size="large" class="empty-state">
+    <template #icon>
+      <slot name="icon" />
+    </template>
+    <template #default>
+      <p class="empty-state__title">{{ title }}</p>
+      <p v-if="description" class="empty-state__description">{{ description }}</p>
+    </template>
+    <template #extra>
       <slot name="action" />
-    </div>
-  </div>
+    </template>
+  </NEmpty>
 </template>
 
 <style scoped>
-.empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+.empty-state {
   padding: var(--space-8) var(--space-5);
-  text-align: center;
-  border-radius: var(--radius-lg);
 }
 
-.empty__icon {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: var(--radius-md);
-  background: var(--primary-soft);
-}
-
-.empty__title {
-  margin-top: var(--space-4);
+.empty-state__title {
   font-size: var(--text-base);
   font-weight: 600;
 }
 
-.empty__description {
-  margin-top: var(--space-2);
+.empty-state__description {
+  margin-top: var(--space-1);
   color: var(--muted);
   font-size: var(--text-sm);
-  max-width: 34ch;
-}
-
-.empty__action {
-  margin-top: var(--space-5);
 }
 </style>
