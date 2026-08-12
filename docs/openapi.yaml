@@ -5,7 +5,8 @@ info:
     fraq 轻量 Web 管理界面后端 API（Hono）。
     鉴权：登录后通过 httpOnly cookie（fraq_webui_session）维持会话，也可用
     Authorization: Bearer <FRAQ_WEBUI_TOKEN>（配置了令牌时）。
-    免登录例外：/api/health、/api/auth/*、POST /api/<单段端点>（milky 协议代理）。
+    免登录例外：/api/health、/api/auth/*。
+    milky 协议代理（POST /api/<单段端点>）是 fraq 核心按协议固定调用的内部接口，不列入本规范。
     失败统一返回 401/400/409/502 与 { error: string }。
   version: 0.1.0
 servers:
@@ -172,7 +173,7 @@ paths:
                       type: string
         "400":
           $ref: "#/components/responses/Error"
-  /api/plugins/{id}/enable:
+  /api/plugins/enable:
     post:
       tags: [插件]
       summary: 启用插件
@@ -181,7 +182,7 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/Ok"
-  /api/plugins/{id}/disable:
+  /api/plugins/disable:
     post:
       tags: [插件]
       summary: 停用插件
@@ -190,7 +191,7 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/Ok"
-  /api/plugins/{id}/uninstall:
+  /api/plugins/uninstall:
     post:
       tags: [插件]
       summary: 卸载插件
@@ -199,7 +200,7 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/Ok"
-  /api/plugins/{id}/config:
+  /api/plugins/config:
     get:
       tags: [插件]
       summary: 读取插件配置
@@ -494,29 +495,6 @@ paths:
                 $ref: "#/components/schemas/UpdateCheck"
         "502":
           $ref: "#/components/responses/Error"
-  /api/{endpoint}:
-    post:
-      tags: [其它]
-      summary: Milky 协议代理
-      description: fraq 核心把 milky.url 指向本服务后调用；免登录。发送类端点会累计"发出"计数。
-      security: []
-      parameters:
-        - name: endpoint
-          in: path
-          required: true
-          description: Milky 协议端点名，如 send_private_message
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-      responses:
-        "200":
-          description: Milky 协议端原样返回
-        "502":
-          $ref: "#/components/responses/Error"
 components:
   securitySchemes:
     sessionCookie:
@@ -531,7 +509,7 @@ components:
   parameters:
     PluginId:
       name: id
-      in: path
+      in: query
       required: true
       description: 插件 id（fraq.yml 中的键）
       schema:

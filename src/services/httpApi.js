@@ -95,21 +95,21 @@ export const httpApi = {
   },
 
   async setPluginEnabled(id, enabled) {
-    return request(`/api/plugins/${encodeURIComponent(id)}/${enabled ? 'enable' : 'disable'}`, {
+    return request(`/api/plugins/${enabled ? 'enable' : 'disable'}?id=${encodeURIComponent(id)}`, {
       method: 'POST',
     })
   },
 
   async uninstallPlugin(id) {
-    return request(`/api/plugins/${encodeURIComponent(id)}/uninstall`, { method: 'POST' })
+    return request(`/api/plugins/uninstall?id=${encodeURIComponent(id)}`, { method: 'POST' })
   },
 
   async getPluginConfig(id) {
-    return request(`/api/plugins/${encodeURIComponent(id)}/config`)
+    return request(`/api/plugins/config?id=${encodeURIComponent(id)}`)
   },
 
   async savePluginConfig(id, config) {
-    return request(`/api/plugins/${encodeURIComponent(id)}/config`, {
+    return request(`/api/plugins/config?id=${encodeURIComponent(id)}`, {
       method: 'PUT',
       body: JSON.stringify({ config }),
     })

@@ -52,7 +52,7 @@ npm run dev          # Vite 开发服务器（/api 自动代理到 8787）
 3. 上传 `docs/openapi.yaml`（或把文件内容粘贴进去）。
 4. 环境变量里的服务器地址保持 `http://127.0.0.1:8787`。
 
-鉴权说明：登录接口成功后 Apifox 会自动保存会话 cookie，后续请求即可通过；配置了 `FRAQ_WEBUI_TOKEN` 时，也可在请求头加 `Authorization: Bearer <令牌>`。`POST /api/<单段端点>` 与 `GET /event`（WebSocket）属于 milky 协议代理/事件流，WebSocket 可在 Apifox 里单独新建。
+鉴权说明：登录接口成功后 Apifox 会自动保存会话 cookie，后续请求即可通过；配置了 `FRAQ_WEBUI_TOKEN` 时，也可在请求头加 `Authorization: Bearer <令牌>`。milky 协议代理（`POST /api/<单段端点>`）是 fraq 核心按协议固定调用的内部接口，不列入 OpenAPI；`GET /event`（WebSocket）可在 Apifox 里单独新建。
 
 ## 说明
 

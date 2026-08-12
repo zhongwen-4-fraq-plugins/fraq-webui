@@ -151,31 +151,32 @@ app.post('/api/plugins/install', async (c) => {
   return c.json({ ok: true, plugins: plan.map((item) => item.key) })
 })
 
-app.post('/api/plugins/:id/enable', (c) => {
-  fraqConfig.setPluginEnabled(c.req.param('id'), true)
+// 插件操作统一用 query 参数 id，不使用路径参数
+app.post('/api/plugins/enable', (c) => {
+  fraqConfig.setPluginEnabled(c.req.query('id') ?? '', true)
   return c.json({ ok: true })
 })
 
-app.post('/api/plugins/:id/disable', (c) => {
-  fraqConfig.setPluginEnabled(c.req.param('id'), false)
+app.post('/api/plugins/disable', (c) => {
+  fraqConfig.setPluginEnabled(c.req.query('id') ?? '', false)
   return c.json({ ok: true })
 })
 
-app.post('/api/plugins/:id/uninstall', (c) => {
-  fraqConfig.uninstallPlugin(c.req.param('id'))
+app.post('/api/plugins/uninstall', (c) => {
+  fraqConfig.uninstallPlugin(c.req.query('id') ?? '')
   return c.json({ ok: true })
 })
 
-app.get('/api/plugins/:id/config', (c) => {
-  return c.json({ config: fraqConfig.getPluginConfig(c.req.param('id')) })
+app.get('/api/plugins/config', (c) => {
+  return c.json({ config: fraqConfig.getPluginConfig(c.req.query('id') ?? '') })
 })
 
-app.put('/api/plugins/:id/config', async (c) => {
+app.put('/api/plugins/config', async (c) => {
   const body = await c.req.json().catch(() => ({}))
   if (!body.config || typeof body.config !== 'object' || Array.isArray(body.config)) {
     return c.json({ error: '配置格式不正确' }, 400)
   }
-  fraqConfig.savePluginConfig(c.req.param('id'), body.config)
+  fraqConfig.savePluginConfig(c.req.query('id') ?? '', body.config)
   return c.json({ ok: true })
 })
 
