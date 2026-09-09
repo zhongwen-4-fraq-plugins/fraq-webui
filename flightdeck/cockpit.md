@@ -4,7 +4,7 @@ Focus: fraq-webui：用 Vue 3 + Vite 为 fraq 构建轻量 Web 管理界面（�
 
 ## In flight
 
-* dashboard — 已接真实后端（server/）；外观、日志、插件、安装页持续迭代中（work/dashboard/）
+* dashboard — 已接真实后端（server/）；插件列表已支持显示已停用插件，外观、日志、安装页持续迭代中（work/dashboard/）
 
 ## Next
 

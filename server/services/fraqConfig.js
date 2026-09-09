@@ -54,12 +54,13 @@ export function getPlugins(coreRunning) {
   const doc = readConfig()
   const versions = readVersions()
   const entries = doc.plugins ?? {}
-  return Object.entries(entries).map(([id, config]) =>
+  const ids = new Set([...Object.keys(versions), ...Object.keys(entries)])
+  return [...ids].map((id) =>
     plugin({
       id,
       name: id,
       version: versions[id] ?? '',
-      enabled: true,
+      enabled: Object.hasOwn(entries, id),
       coreRunning,
     }),
   )
@@ -113,6 +114,10 @@ export function uninstallPlugin(id) {
   const doc = readConfig()
   delete doc.plugins?.[id]
   writeConfig(doc)
+
+  const versions = readVersions()
+  delete versions[id]
+  writeVersions(versions)
 }
 
 const MASK = '******'

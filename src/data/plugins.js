@@ -13,6 +13,9 @@ export function pluginSummary(plugins) {
 }
 
 export function sortPlugins(plugins) {
-  const rank = { error: 0, running: 1, stopped: 2 }
-  return [...plugins].sort((a, b) => rank[a.status] - rank[b.status])
+  const rank = (plugin) => {
+    if (!plugin.enabled) return 3
+    return { error: 0, running: 1, stopped: 2 }[plugin.status] ?? 2
+  }
+  return [...plugins].sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name))
 }

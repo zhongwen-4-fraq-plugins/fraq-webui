@@ -27,11 +27,24 @@ onMounted(() => {
 })
 
 const sortedPlugins = computed(() => sortPlugins(store.state.plugins))
+const localFilter = ref('all')
+const enabledPluginCount = computed(() => sortedPlugins.value.filter((plugin) => plugin.enabled).length)
+const disabledPluginCount = computed(() => sortedPlugins.value.length - enabledPluginCount.value)
+const visiblePlugins = computed(() => {
+  if (localFilter.value === 'enabled') {
+    return sortedPlugins.value.filter((plugin) => plugin.enabled)
+  }
+  if (localFilter.value === 'disabled') {
+    return sortedPlugins.value.filter((plugin) => !plugin.enabled)
+  }
+  return sortedPlugins.value
+})
 
-const statusMeta = (status) => {
-  if (status === PLUGIN_STATUS.running) return { tone: 'success', label: '运行中' }
-  if (status === PLUGIN_STATUS.error) return { tone: 'danger', label: '异常' }
-  return { tone: 'neutral', label: '已停用' }
+const statusMeta = (plugin) => {
+  if (!plugin.enabled) return { tone: 'neutral', label: '已停用' }
+  if (plugin.status === PLUGIN_STATUS.error) return { tone: 'danger', label: '异常' }
+  if (plugin.status === PLUGIN_STATUS.running) return { tone: 'success', label: '运行中' }
+  return { tone: 'neutral', label: '等待核心启动' }
 }
 
 const installOpen = ref(false)
@@ -107,7 +120,7 @@ function installFromStore(plugin) {
   <div>
     <PageHeader
       title="插件"
-      description="管理本地已安装的插件，或前往官方商店发现新插件。"
+      description="管理本地已安装的插件，包括暂时停用的插件。"
     >
       <template #action>
         <AppButton v-if="view === 'local'" @click="openInstall">
@@ -164,7 +177,51 @@ function installFromStore(plugin) {
         </template>
       </EmptyState>
 
-      <div v-else class="plugin-list">
+      <template v-else>
+        <div class="plugin-toolbar" aria-label="插件状态筛选">
+          <button
+            type="button"
+            class="plugin-filter"
+            :class="{ 'plugin-filter--active': localFilter === 'all' }"
+            :aria-pressed="localFilter === 'all'"
+            @click="localFilter = 'all'"
+          >
+            全部
+            <span class="plugin-filter__count">{{ sortedPlugins.length }}</span>
+          </button>
+          <button
+            type="button"
+            class="plugin-filter"
+            :class="{ 'plugin-filter--active': localFilter === 'enabled' }"
+            :aria-pressed="localFilter === 'enabled'"
+            @click="localFilter = 'enabled'"
+          >
+            已启用
+            <span class="plugin-filter__count">{{ enabledPluginCount }}</span>
+          </button>
+          <button
+            type="button"
+            class="plugin-filter"
+            :class="{ 'plugin-filter--active': localFilter === 'disabled' }"
+            :aria-pressed="localFilter === 'disabled'"
+            @click="localFilter = 'disabled'"
+          >
+            已停用
+            <span class="plugin-filter__count">{{ disabledPluginCount }}</span>
+          </button>
+        </div>
+
+        <EmptyState
+          v-if="visiblePlugins.length === 0"
+          title="没有符合条件的插件"
+          description="切换筛选条件，或启用列表中的停用插件。"
+        >
+          <template #icon>
+            <IconBlocks class="empty-icon" aria-hidden="true" />
+          </template>
+        </EmptyState>
+
+        <div v-else class="plugin-list">
         <div class="plugin-list__head" aria-hidden="true">
           <span>插件</span>
           <span>状态</span>
@@ -172,7 +229,7 @@ function installFromStore(plugin) {
         </div>
 
         <ul class="plugin-list__body">
-          <li v-for="plugin in sortedPlugins" :key="plugin.id" class="plugin-row">
+          <li v-for="plugin in visiblePlugins" :key="plugin.id" class="plugin-row">
             <div class="plugin-row__info">
               <p class="plugin-row__name">
                 {{ plugin.name }}
@@ -180,11 +237,12 @@ function installFromStore(plugin) {
               </p>
               <p class="plugin-row__description">{{ plugin.description }}</p>
             </div>
-            <StatusBadge :tone="statusMeta(plugin.status).tone">
-              {{ statusMeta(plugin.status).label }}
+            <StatusBadge :tone="statusMeta(plugin).tone">
+              {{ statusMeta(plugin).label }}
             </StatusBadge>
             <div class="plugin-row__actions">
               <AppButton
+                v-if="plugin.enabled"
                 variant="secondary"
                 size="icon"
                 :aria-label="`配置 ${plugin.name}`"
@@ -194,7 +252,7 @@ function installFromStore(plugin) {
                 <IconSettings aria-hidden="true" />
               </AppButton>
               <AppButton
-                v-if="plugin.status !== PLUGIN_STATUS.running"
+                v-if="!plugin.enabled"
                 variant="secondary"
                 size="icon"
                 :loading="isBusy(plugin.id)"
@@ -229,6 +287,7 @@ function installFromStore(plugin) {
           </li>
         </ul>
       </div>
+      </template>
     </template>
 
     <section v-else class="store" aria-labelledby="store-heading">
@@ -394,6 +453,45 @@ function installFromStore(plugin) {
   color: var(--app-text-color, var(--ink));
   font-size: var(--text-xs);
   font-variant-numeric: tabular-nums; /* 数字对齐 */
+}
+
+/* 本地插件状态筛选：与来源切换保持同一组控件语言。 */
+.plugin-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+}
+
+.plugin-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 2rem;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.plugin-filter:hover {
+  background: var(--app-component-bg, var(--surface-2));
+  color: var(--app-text-color, var(--ink));
+}
+
+.plugin-filter--active {
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.plugin-filter__count {
+  font-variant-numeric: tabular-nums;
 }
 
 /* 商店区：纵向排列 */

@@ -33,6 +33,7 @@ Done:
 - 消息收发统计：milky 透明代理（fraq.yml milky.url 指向本服务），收=事件流 message_receive、发=发送 API 计数，概览展示
 
 Current:
+- 2026-09-10 插件列表以 `fraq.yml.plugins` 与 `versions.yml` 的并集作为数据源，已停用插件保留在列表中；前端提供“全部 / 已启用 / 已停用”筛选和一键启用，卸载会同时清除版本记录。
 - 2026-08-13 新增 `docs/openapi.json`（由 openapi.yaml 生成，31 个路径、无路径参数、无重复），供 Apifox 覆盖导入。
 - 2026-08-13 插件操作接口去掉路径参数，统一改为 query 参数 `id`（enable/disable/uninstall/config）；milky 代理由 `/api/:endpoint` 改为通配路由 `/api/*`（无命名路径参数，端点名从请求路径提取）；全项目已无命名路径参数，OpenAPI 规范同步且不含任何路径参数。
 - 2026-08-13 新增 `docs/openapi.yaml`（OpenAPI 3.0，覆盖 31 个路径），供导入 Apifox；README 增加导入说明。
