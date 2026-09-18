@@ -77,6 +77,15 @@ textarea {
   border: 1px solid transparent;
 }
 
+/* 输入框聚焦：套一圈激活色（沿用原来的聚焦绿），替代浏览器默认的深色焦点框；
+   滑杆 / 取色器自带滑块反馈，不套外圈 */
+input:not([type='radio']):not([type='checkbox']):not([type='range']):not([type='color']):focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--success);
+  outline-offset: 1px;
+}
+
 a {
   color: var(--primary); /* 链接统一用主色 */
   text-underline-offset: 3px; /* 下划线离文字稍远，更易读 */

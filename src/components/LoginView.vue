@@ -155,12 +155,6 @@ async function submit() {
   font-size: var(--text-sm);
 }
 
-/* 聚焦：边框变绿色 */
-.login__input:focus {
-  border-color: var(--success);
-  outline: none; /* 用边框色代替系统焦点框 */
-}
-
 /* 登录失败：输入框浅红底 */
 .login__input[aria-invalid='true'] {
   background: var(--danger-soft);

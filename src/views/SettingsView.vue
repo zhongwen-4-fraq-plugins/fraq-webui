@@ -408,11 +408,6 @@ async function save() {
   border-color: var(--primary); /* 主色描边提示 */
 }
 
-/* 聚焦：边框变绿色 */
-.field__input:focus {
-  border-color: var(--success);
-}
-
 /* 提示与错误共用布局 */
 .field__hint,
 .field__error {
