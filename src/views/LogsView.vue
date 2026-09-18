@@ -320,6 +320,7 @@ const toneOf = (entry) => {
 /* 级别过滤：胶囊形分段控件 */
 .log-toolbar__levels {
   display: inline-flex;
+  height: 2.5rem; /* 与搜索框、跟随按钮同高 */
   padding: 2px;
   border-radius: var(--radius-md);
   background: var(--app-component-bg, var(--surface));
@@ -347,6 +348,11 @@ const toneOf = (entry) => {
   background: var(--bg);
   color: var(--app-text-color, var(--ink));
   box-shadow: var(--shadow-sm);
+}
+
+/* 顶部控件高度统一：跟随按钮补到 2.5rem（字号仍用 sm） */
+.log-toolbar .btn {
+  min-height: 2.5rem;
 }
 
 /* 搜索框包裹：相对定位放图标 */
