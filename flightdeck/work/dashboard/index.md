@@ -9,6 +9,7 @@
 ## Next
 
 - 刷新 http://127.0.0.1:8787 验证：组件透明度默认 0、透明度数值输入框已删（注意 localStorage 旧值，需点"恢复默认外观"）。
+- 刷新设置页 / 日志页 / 安装页 / 登录页的表单，确认聚焦是绿色 2px 外圈（滑杆不套外圈），且未保存时主色边框仍在。
 - 浏览器打开 /install 验证安装页（环境检查、版本选择下载、自定义目录、Node 便携安装）。
 - 需要时 git push 推送远程。
 
@@ -58,7 +59,11 @@ Current:
 - 插件配置弹窗：模型供应商卡片背景改为跟随组件外观（--app-component-bg），修复组件透明时供应商区仍纯白的问题。
 - 自定义 CSS 功能：设置页界面外观下新增 CSS 输入框，内容存浏览器 localStorage（fraq-webui.customCss），通过注入 `<style id="fraq-webui-custom-css">` 实时生效。
 
-- 2026-09-19 输入框统一去掉默认边框：`src/styles/base.css` 对文本类 input / select / textarea 设 `border: 1px solid transparent`，登录框写死的墨色边框同步改透明；聚焦变绿、未保存主色、校验失败浅红底等状态保留。生产构建通过（见 knowledge/vue/input-border-convention.md）。
+- 2026-09-19 输入框统一去掉默认边框：`src/styles/base.css` 对文本类 input / select / textarea 设 `border: 1px solid transparent`，登录框写死的墨色边框同步改透明；未保存主色、校验失败浅红底等状态保留（见 knowledge/vue/input-border-convention.md）。
+
+- 2026-09-19 恢复输入框聚焦激活色：聚焦改为 base.css 统一给 `outline: 2px solid var(--success)` + `outline-offset: 1px`，删掉设置页 `.field__input:focus` 与登录页 `.login__input:focus` 的 border-color 写法，滑杆/取色器不套外圈。原因：去边框后聚焦只剩 Chrome 自带的深色 UA 焦点框，绿边几乎看不见。改动前用无头 Chrome 计算样式实测确认，生产构建通过。
+
+- 2026-09-19 my-fraq-app 启动崩溃（PluginRegistry.sortPlugins 读 undefined.key）定位修复：0.x 官方插件与 1.x kernel 的服务令牌不匹配，改项目根 versions.yml / fraq.yml 后 `fraq start` 实测通过；app/ 是 CLI 生成物不能改（见 knowledge/fraq/kernel-service-token-mismatch-trap.md、knowledge/fraq/cli-generated-app-dir-trap.md）。
 
 - 2026-09-19 日志页顶部控件高度统一为 2.5rem：级别胶囊组设 `height: 2.5rem`、跟随按钮补 `min-height: 2.5rem`（字号仍用 sm），与搜索框齐平。
 
