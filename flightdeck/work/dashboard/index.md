@@ -60,6 +60,8 @@ Current:
 
 - 2026-09-19 输入框统一去掉默认边框：`src/styles/base.css` 对文本类 input / select / textarea 设 `border: 1px solid transparent`，登录框写死的墨色边框同步改透明；聚焦变绿、未保存主色、校验失败浅红底等状态保留。生产构建通过（见 knowledge/vue/input-border-convention.md）。
 
+- 2026-09-19 日志页顶部控件高度统一为 2.5rem：级别胶囊组设 `height: 2.5rem`、跟随按钮补 `min-height: 2.5rem`（字号仍用 sm），与搜索框齐平。
+
 ## Open questions
 
 - 已解决：采用配套管理服务（server/）。剩余：单个插件的真实运行状态无法从外部获取（近似为进程运行即全部运行）。
