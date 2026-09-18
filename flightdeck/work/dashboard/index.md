@@ -58,6 +58,8 @@ Current:
 - 插件配置弹窗：模型供应商卡片背景改为跟随组件外观（--app-component-bg），修复组件透明时供应商区仍纯白的问题。
 - 自定义 CSS 功能：设置页界面外观下新增 CSS 输入框，内容存浏览器 localStorage（fraq-webui.customCss），通过注入 `<style id="fraq-webui-custom-css">` 实时生效。
 
+- 2026-09-19 输入框统一去掉默认边框：`src/styles/base.css` 对文本类 input / select / textarea 设 `border: 1px solid transparent`，登录框写死的墨色边框同步改透明；聚焦变绿、未保存主色、校验失败浅红底等状态保留。生产构建通过（见 knowledge/vue/input-border-convention.md）。
+
 ## Open questions
 
 - 已解决：采用配套管理服务（server/）。剩余：单个插件的真实运行状态无法从外部获取（近似为进程运行即全部运行）。
