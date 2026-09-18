@@ -69,6 +69,14 @@ select {
   color: inherit; /* 表单控件继承文字色 */
 }
 
+/* 输入框默认不描边：浏览器自带的边框在这里统一去掉，
+   聚焦（绿）、未保存（主色）等状态仍由各组件改 border-color */
+input:not([type='radio']):not([type='checkbox']),
+select,
+textarea {
+  border: 1px solid transparent;
+}
+
 a {
   color: var(--primary); /* 链接统一用主色 */
   text-underline-offset: 3px; /* 下划线离文字稍远，更易读 */

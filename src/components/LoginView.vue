@@ -148,7 +148,7 @@ async function submit() {
   width: 100%;
   height: 2.5rem;
   padding: 0 2.75rem 0 2.25rem; /* 右 44px 放显示按钮，左 36px 放锁图标 */
-  border: 1px solid var(--ink); /* 墨色边框 */
+  border: 1px solid transparent; /* 默认不描边，聚焦时变绿（状态色见下） */
   border-radius: var(--radius-md);
   background: var(--app-component-bg, var(--surface-2));
   color: var(--app-text-color, var(--ink));
