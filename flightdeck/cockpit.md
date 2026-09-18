@@ -13,3 +13,4 @@ Focus: fraq-webui：用 Vue 3 + Vite 为 fraq 构建轻量 Web 管理界面（�
 ## Open questions
 
 * 已解决：核心启停/插件管理由配套管理服务（server/）承担。剩余：协议端安装依赖 GitHub 网络，国内环境偶发超时。
+* my-fraq-app（另一个独立项目，不在本仓库）：`node index.js` 启动即抛 kernel TypeError，已定位为 0.x 时代插件与 1.x kernel 的服务令牌不匹配（见 knowledge/fraq/kernel-service-token-mismatch-trap.md）；待用户决定是否升级依赖。
