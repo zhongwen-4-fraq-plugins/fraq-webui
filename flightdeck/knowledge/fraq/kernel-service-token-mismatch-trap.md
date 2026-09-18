@@ -55,3 +55,19 @@ npm i @fraqjs/fraq@1.1.1 @fraqjs/color-log@1.1.1 @fraqjs/plugin-hono@1.1.0 @fraq
 - `@fraqjs/plugin-webui-gateway@1.1.1` 需要 `hono ^4.13.5` 与 `@fraqjs/plugin-hono ^1.1.0`；`ctx.install(webuiGateway, { accessToken })` 选项未变。
 - `@fraqjs/plugin-ai` 的 `providers` / `defaultModel` 选项在 1.0.x 仍是同一形状（每项仍可写 `sdk` / `options` / `models`）。
 - 自己写的、`provides` 为空的插件（如 `fraq-plugin-doudizhu`）不受影响，只要 peer 写的是 `@fraqjs/fraq ^1.x`。
+
+## 实测（2026-09-19，my-fraq-app）
+
+在 `D:\bot\fraq-plugins\my-fraq-app\app` 按上面的命令升级后：
+
+- `npm ls` 里 `@fraqjs/kernel` 只剩单份 1.1.1（全部 deduped），无嵌套重复副本，也无未满足的 peer 警告。
+- 4 个插件的 `provides[0].token` 都从 `undefined` 变成 `{ key: 'fraqjs/.../XService' }`。
+- `node index.js` 完整走通 apply 与 start：hono 监听 127.0.0.1:4649、webui-gateway 注册到 /webui、kysely 迁移并 vacuum 数据库、milky websocket connected。
+
+结论：0.x 到 1.x 是可直接替换的版本升级，`index.js` 与各插件选项都不用改。
+
+## 坑：同目录的第二个锁文件会把升级退回
+
+该 app 目录同时躺着 `package-lock.json`（npm，与 node_modules 一致，权威）和 `pnpm-lock.yaml`（2026-08-27 的残留，里面仍是 0.x 插件版本）。用 npm 升完若有人跑一次 pnpm install，会按旧锁文件把插件退回 0.x，本坑当场复现。二选一：删掉 pnpm-lock.yaml（连同 node_modules/.pnpm 残留），或用 pnpm 重新安装以刷新它。
+
+另注：该 app 目录不在任何 git 仓库里（`git rev-parse` 报 not a git repository），依赖改动没有版本记录可留。
