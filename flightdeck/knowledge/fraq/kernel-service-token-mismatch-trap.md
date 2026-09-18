@@ -45,6 +45,11 @@ node --input-type=module -e 'const m = await import(process.argv[1]); console.lo
 
 ## 修法
 
+先分两种情况：
+
+- 项目根有 `fraq.yml`（fraq CLI 或 fraq-webui 管理）：版本源是根目录 `fraq.yml` 的 `fraqVersion` 与 `versions.yml`，不要直接改 `app/package.json`（每次 `fraq start` 都会重写并重新安装，改动被覆盖）。做法见 knowledge/fraq/cli-generated-app-dir-trap.md。
+- 独立 app（自己维护 package.json、没有 fraq.yml）：直接用下面的命令。
+
 同一个大版本线内对齐（示例为 2026-09 的 1.x 组合，选项形状与 0.x 兼容，可直接替换依赖版本）：
 
 ```
@@ -58,7 +63,7 @@ npm i @fraqjs/fraq@1.1.1 @fraqjs/color-log@1.1.1 @fraqjs/plugin-hono@1.1.0 @fraq
 
 ## 实测（2026-09-19，my-fraq-app）
 
-在 `D:\bot\fraq-plugins\my-fraq-app\app` 按上面的命令升级后：
+第一次只在 `app/` 里 `npm i`，被下一次 `fraq start` 覆盖回 0.x（该目录是生成物）；改成在项目根更新 `versions.yml` 与 `fraq.yml` 后重启才真正生效。生效后：
 
 - `npm ls` 里 `@fraqjs/kernel` 只剩单份 1.1.1（全部 deduped），无嵌套重复副本，也无未满足的 peer 警告。
 - 4 个插件的 `provides[0].token` 都从 `undefined` 变成 `{ key: 'fraqjs/.../XService' }`。
